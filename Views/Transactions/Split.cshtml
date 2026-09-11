@@ -2,7 +2,7 @@
 @using Splitbill.Models
 @{ ViewData["Title"] = L["SetSplit"]; }
 <div class="page-heading compact"><div><span class="eyebrow">@L["StepThreeOfThree"]</span><h1>@L["SetSplit"]</h1><p>@Model.MerchantName · @L["Total"] Rp @Model.GrandTotal.ToString("N0")</p></div></div>
-<form method="post" id="split-form" data-pickup-preview-url="@Url.Action("PickupPreview", "Transactions")" data-pickup-transaction-id="@Model.TransactionId">
+<form method="post" id="split-form">
     @Html.AntiForgeryToken()
     <input asp-for="TransactionId" type="hidden" /><input asp-for="AssignmentsJson" type="hidden" /><input asp-for="ParticipantsJson" type="hidden" /><input asp-for="ParticipantNames" type="hidden" />
     <div asp-validation-summary="All" class="validation-summary"></div>
@@ -18,10 +18,17 @@
             <div class="form-group"><label for="guest-name-input">@L["GuestName"]</label><div class="d-flex gap-2"><input id="guest-name-input" class="form-control" placeholder='@L["GuestPlaceholder"]' /><button class="btn btn-light" id="add-guest" type="button">@L["Add"]</button></div></div>
             <div id="participant-chips" class="participant-chips"></div>
             <span asp-validation-for="ParticipantNames" class="text-danger"></span>
-            <div id="pickup-preview" class="pickup-preview-card" hidden>
-                <div class="pickup-preview-head"><div><strong>★ @L["FoodPickupPreview"]</strong><small>@L["FoodPickupPreviewHint"]</small></div><span class="pickup-preview-state"></span></div>
-                <div class="pickup-preview-candidates"></div>
-            </div>
+            @if (Model.PickupRotationEnabled || Model.RequiresFoodPickup)
+            {
+                <fieldset class="pickup-choice-card">
+                    <legend>🛵 @L["FoodPickupToggle"]</legend>
+                    <label class="pickup-toggle-row" for="RequiresFoodPickup">
+                        <span><strong>@L["FoodPickupToggleLabel"]</strong><small>@L["FoodPickupToggleHint"]</small></span>
+                        <input asp-for="RequiresFoodPickup" type="checkbox" role="switch" />
+                    </label>
+                    <p class="pickup-surprise-copy">@L["FoodPickupSurprise"]</p>
+                </fieldset>
+            }
         </section>
         <section class="content-card">
             <div class="section-head"><div><h2>@L["SplitMethod"]</h2><p>@L["ChooseMethod"]</p></div></div>
@@ -46,4 +53,4 @@
     </div>
     <div class="form-actions"><a class="btn btn-light" asp-action="Review" asp-route-id="@Model.TransactionId">@L["Back"]</a><button class="btn btn-primary" type="submit">@L["CalculateAndSaveSplit"]</button></div>
 </form>
-@section Scripts { <script>window.splitBillAssignmentLocale = { owned: @Json.Serialize(L["OwnedQuantity"].Value), shared: @Json.Serialize(L["SharedEqually"].Value), group: @Json.Serialize(L["AllocationGroup"].Value), remove: @Json.Serialize(L["RemoveGroup"].Value), add: @Json.Serialize(L["AddGroup"].Value), assigned: @Json.Serialize(L["AssignedQuantity"].Value), remaining: @Json.Serialize(L["RemainingQuantity"].Value), sharedBy: @Json.Serialize(L["SharedByPeople"].Value), choose: @Json.Serialize(L["ChooseGroupParticipant"].Value), incomplete: @Json.Serialize(L["AssignmentIncomplete"].Value) }; window.splitBillPickupLocale = { candidateCount: @Json.Serialize(L["FoodPickupCandidateCount"].Value), priorPickups: @Json.Serialize(L["FoodPickupPriorPickups"].Value), roundRobinPreview: @Json.Serialize(L["FoodPickupRoundRobinPreview"].Value), nextInRotation: @Json.Serialize(L["FoodPickupNextInRotation"].Value) };</script> }
+@section Scripts { <script>window.splitBillAssignmentLocale = { owned: @Json.Serialize(L["OwnedQuantity"].Value), shared: @Json.Serialize(L["SharedEqually"].Value), group: @Json.Serialize(L["AllocationGroup"].Value), remove: @Json.Serialize(L["RemoveGroup"].Value), add: @Json.Serialize(L["AddGroup"].Value), assigned: @Json.Serialize(L["AssignedQuantity"].Value), remaining: @Json.Serialize(L["RemainingQuantity"].Value), sharedBy: @Json.Serialize(L["SharedByPeople"].Value), choose: @Json.Serialize(L["ChooseGroupParticipant"].Value), incomplete: @Json.Serialize(L["AssignmentIncomplete"].Value) };</script> }

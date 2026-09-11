@@ -18,7 +18,7 @@ Admin or Moderator login
   -> choose equal split or assign each item to one or more participants
   -> ASP.NET calculates final amounts and proportional tax/service adjustments
   -> participant list starts as Unpaid
-  -> if enabled, server selects one pickup person from eligible registered participants using Weighted Random or Round Robin
+  -> uploader optionally turns on per-transaction pickup; server selects one pickup person from eligible registered participants using Weighted Random or Round Robin after save
   -> user marks individual participants Paid
   -> transaction status automatically becomes Unpaid, Partial, or Paid
   -> Admin/Moderator view the report permitted by their role
@@ -94,6 +94,7 @@ Splitbill/
 |   |-- SharePointNotificationService.cs Localized outbox event creation
 |   |-- SharePointNotificationProcessor.cs Durable Graph list delivery/retry
 |   |-- FoodPickupRotationService.cs  Secure weighted pickup selection and audit
+|   |-- TransactionShareExportService.cs  Safe localized long-JPEG projection
 |   |-- AdminUserService.cs           Identity administration and audit rules
 |   |-- UploadedImageProcessor.cs     Safe raster decode and canonical JPEG output
 |   |-- InstallationSetupService.cs   One-time bootstrap verifier
@@ -165,13 +166,15 @@ BillTransaction (header)
 
 `SharePointNotificationOutbox` is the durable boundary between payment actions and Power Automate. When SharePoint integration is enabled, saving a split creates one `BillAssigned` event for each registered participant with an email; submitting **I've paid** creates `PaymentApprovalRequested` for the transaction uploader; rejecting that request creates `PaymentRejected` for the linked member and includes the rejection reason; each actual pickup winner change creates one stable `FoodPickupSelected` event for the selected account. Guests and accounts without email are skipped. The business change and outbox row are committed together, while `SharePointNotificationDispatcher` publishes the row independently every 15 seconds and retries transient failures with exponential backoff up to eight attempts. This prevents Microsoft 365 availability from breaking receipt, split, payment, or pickup operations.
 
+`TransactionShareExportService` is the privacy boundary for sharing. It consumes calculator-owned values and returns localized display strings only; no account IDs, emails, usernames, file paths, receipt photos, payment proofs, secrets, rejection notes, or raw money values reach the browser. The exact uploader can request the full transaction projection, while a linked Member can request only their own projection. The local Canvas renderer creates one measured 1000px-wide JPEG whose height grows for every participant and falls back to download when native file sharing is unavailable.
+
 `FoodPickupRotationService` owns the optional pickup feature. Admin enables the rotation, chooses **Weighted Random** or **Round Robin**, and checks eligible registered accounts at `/AdminFoodPickup`. On a successful Step 3 save, candidates are the intersection of that set and the transaction's active registered participants; guests and absent eligible accounts never enter the selection. Weighted Random uses `1 / (1 + current pickup count)` weights with a cryptographically secure random source. Round Robin deterministically chooses a candidate who has never picked up, then the candidate whose current completed pickup assignment is oldest; stable display-name/user-ID ordering resolves an exact tie. An absent account is skipped without receiving an assignment, and a selected account moves to the back because its `SelectedAt` becomes newest. Existing transaction winners remain stable when Admin changes the configured strategy. Assignments and immutable history store the strategy used; Weighted Random stores its normalized probability while Round Robin stores a deterministic `1.0` result. Editing keeps a winner when possible, automatically selects again once when the winner is removed, and records every change in `FoodPickupDrawHistories`. Only Admin can reroll a saved transaction and must provide a bounded reason. Reports and Excel show filter-scoped participation/pickup ratios; these descriptive metrics are separate from the global selection history used by future choices.
 
 The Graph writer deliberately targets the existing Power Automate list contract: `Title`, `Email`, `Description`, and `IsProcessed`. New rows always start with `IsProcessed = false`. Power Automate sends `Description` to `Email`, then updates the same row to processed only after Teams succeeds. Notification title, body, field labels, and currency formatting use the ID/EN culture active in the web request that created the event. Bodies HTML-encode every dynamic value and convert line breaks to explicit `<br>` tags because the Teams connector collapses plain single newlines. Each new message also appends one encoded clickable anchor in `Description`: bill assignments and rejections target `/MyBills/Details/{participantId}`, while payment requests target `/Payments/Approvals`. `BillTransaction.NotificationBaseUrl` captures the uploader's safe scheme/host/port/path base when Step 3 is saved, so later member events keep using an address the uploader selected. This keeps merchant, transaction, amount, actor, rejection reason, and the action link distinct without allowing receipt/user text to inject markup. The app stores richer event, transaction, participant, amount, recipient, actor, retry, and diagnostic metadata locally, so the SharePoint list can remain minimal.
 
 ### BillTransaction
 
-The header stores the transaction number, merchant, receipt date, upload timestamp, uploader, subtotal, discount, tax, service, grand total, protected receipt filename, AI confidence/warnings, split method, aggregate status, and the safe notification base URL captured at split save time.
+The header stores the transaction number, merchant, receipt date, upload timestamp, uploader, subtotal, discount, tax, service, grand total, protected receipt filename, AI confidence/warnings, split method, aggregate status, the additive `RequiresFoodPickup` choice (false by default), and the safe notification base URL captured at split save time.
 
 `TransactionReceiptImages` stores each protected filename, MIME type, and order. `BillTransaction.ReceiptImagePath` remains the first-image compatibility field so transactions created before multi-image support continue to render. Existing SQLite installations receive the detail table through idempotent startup DDL.
 
@@ -289,6 +292,8 @@ Manage Users uses ASP.NET Core Identity through `IAdminUserService`. Admin can c
 | `/Reports/Export` | Admin, Moderator, Member | Date/filter-scoped Excel workbook with summary, payment details, typed-value Pivot per Person, and a populated Pickup Rotation sheet |
 | `/MyBills` | Member | Bills assigned to the signed-in participant |
 | `/MyBills/Details/{id}` | Member | Transparent item/charge breakdown, private receipt gallery, and **I've paid** claim action |
+| `GET /Transactions/ShareData/{id}` | Exact uploader | Localized privacy-safe full-transaction sharing projection |
+| `GET /MyBills/ShareData/{id}` | Linked Member | Localized privacy-safe own-bill sharing projection |
 | `/MyBills/ReceiptImage/{participantId}?index=0` | Linked Member | Authorized ordered receipt image for that member's bill |
 | `/Payments/Approvals` | Admin, Moderator | Pending Member payment claims; Moderator is limited to owned transactions |
 | `/Notifications` | Authenticated | Bill/payment notifications with read and read-all actions |

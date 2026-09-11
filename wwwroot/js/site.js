@@ -173,38 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
       el.appendChild(remove); return el;
     }));
   };
-  const pickupPreview = document.getElementById("pickup-preview");
-  const pickupPreviewCandidates = pickupPreview?.querySelector(".pickup-preview-candidates");
-  const pickupPreviewState = pickupPreview?.querySelector(".pickup-preview-state");
-  const pickupLocale = window.splitBillPickupLocale || {};
-  let pickupPreviewSequence = 0;
-  const refreshPickupPreview = async () => {
-    if (!pickupPreview || !splitForm?.dataset.pickupPreviewUrl) return;
-    const ids = participants.map(x => x.userId).filter(Boolean);
-    if (!ids.length) { pickupPreview.hidden = true; return; }
-    const sequence = ++pickupPreviewSequence;
-    const token = splitForm.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
-    const body = new URLSearchParams({ participantUserIds: JSON.stringify(ids), transactionId: splitForm.dataset.pickupTransactionId || "" });
-    body.append("__RequestVerificationToken", token);
-    try {
-      const response = await fetch(splitForm.dataset.pickupPreviewUrl, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" }, body });
-      if (!response.ok) throw new Error("preview failed");
-      const data = await response.json();
-      if (sequence !== pickupPreviewSequence) return;
-      if (!Array.isArray(data.candidates) || data.candidates.length === 0) { pickupPreview.hidden = true; return; }
-      pickupPreview.hidden = false;
-      const roundRobin = data.strategy === "RoundRobin";
-      if (pickupPreviewState) pickupPreviewState.textContent = roundRobin ? (pickupLocale.roundRobinPreview || "Round robin") : text(pickupLocale.candidateCount || "{0} candidates", data.candidates.length);
-      const percent = new Intl.NumberFormat(document.documentElement.lang === "en" ? "en-US" : "id-ID", { style: "percent", maximumFractionDigits: 2 });
-      pickupPreviewCandidates?.replaceChildren(...data.candidates.map(candidate => {
-        const chip = document.createElement("span"); chip.className = "pickup-preview-candidate";
-        const name = document.createElement("strong"); name.textContent = candidate.name;
-        const odds = document.createElement("b"); odds.textContent = roundRobin ? (Number(candidate.probability) === 1 ? (pickupLocale.nextInRotation || "Next") : "—") : percent.format(Number(candidate.probability) || 0);
-        const prior = document.createElement("small"); prior.textContent = text(pickupLocale.priorPickups || "{0} prior pickups", candidate.priorPickups || 0);
-        chip.append(name, odds, prior); return chip;
-      }));
-    } catch { if (sequence === pickupPreviewSequence) pickupPreview.hidden = true; }
-  };
   const money = value => `Rp ${Math.round(value).toLocaleString(document.documentElement.lang === "en" ? "en-US" : "id-ID")}`;
   const text = (template, ...values) => String(template || "").replace(/\{(\d+)\}/g, (_, index) => values[Number(index)] ?? "");
   const renderGroup = (item, group, groupIndex) => {
@@ -261,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
       Object.values(groupsByItem).forEach(groups => groups.forEach(group => group.participants.forEach(key => { const person = participants.find(p => p.clientKey === key); if (person) counts.set(person.name, (counts.get(person.name) || 0) + Number(group.quantity || 0) / group.participants.length); })));
       summary.hidden = counts.size === 0; summary.textContent = [...counts].map(([name, count]) => `${name} · ${Number.isInteger(count) ? count : count.toFixed(1)} qty`).join(" · ");
     }
-    refreshPickupPreview();
   };
   chips?.addEventListener("click", event => { const button = event.target.closest(".remove-participant"); if (button) removeParticipant(button.dataset.clientKey); });
   userPicker?.addEventListener("click", event => {

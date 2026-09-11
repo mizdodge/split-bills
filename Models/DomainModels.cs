@@ -192,6 +192,8 @@ public sealed class BillTransaction
     [MaxLength(500)] public string ReceiptImagePath { get; set; } = string.Empty;
     public TransactionStatus Status { get; set; } = TransactionStatus.Draft;
     public SplitMethod SplitMethod { get; set; } = SplitMethod.Equal;
+    /// <summary>Whether this transaction asks the configured pickup rotation to choose a collector.</summary>
+    public bool RequiresFoodPickup { get; set; }
     public decimal AiConfidence { get; set; }
     public bool AiNeedsReview { get; set; }
     public string? AiWarningsJson { get; set; }

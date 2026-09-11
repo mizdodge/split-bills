@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SplitBill production share renderer preview</title>
+<style>
+html,body{margin:0;background:#fff}canvas{display:block;width:1000px;height:auto}
+</style>
+</head>
+<body>
+<canvas id="share-export" aria-label="Sanitized SplitBill transaction share image"></canvas>
+<script src="../../../wwwroot/js/transaction-share.js"></script>
+<script>
+const people = [
+  ["Mizan", "Lunas", [["Promo ayam bakar + ayam goreng", "× 2", "Rp 48.000", ""], ["Nasi putih", "× 4", "Rp 20.000", ""]], "Rp 68.000", "Rp 78.000"],
+  ["Ragil", "Belum dibayar", [["Promo ayam bakar + ayam goreng", "½ porsi bersama", "Rp 12.000", "Berbagi dengan Agi"], ["Nasi putih", "× 1", "Rp 5.000", ""]], "Rp 17.000", "Rp 19.500"],
+  ["Agi", "Menunggu konfirmasi", [["Promo ayam bakar + ayam goreng", "½ porsi bersama", "Rp 12.000", "Berbagi dengan Ragil"], ["Nasi putih", "× 1", "Rp 5.000", ""]], "Rp 17.000", "Rp 19.500"],
+  ["Fawwaz", "Lunas", [["Es kopi susu", "× 1", "Rp 22.000", ""], ["Kentang goreng", "⅓ porsi bersama", "Rp 8.000", "Berbagi dengan Yovan dan Afwan"]], "Rp 30.000", "Rp 34.300"],
+  ["Yovan", "Belum dibayar", [["Ayam geprek sambal matah", "× 1", "Rp 28.000", ""], ["Kentang goreng", "⅓ porsi bersama", "Rp 8.000", "Berbagi dengan Fawwaz dan Afwan"]], "Rp 36.000", "Rp 41.200"],
+  ["Afwan", "Belum dibayar", [["Nasi goreng spesial", "× 1", "Rp 32.000", ""], ["Kentang goreng", "⅓ porsi bersama", "Rp 8.000", "Berbagi dengan Fawwaz dan Yovan"]], "Rp 40.000", "Rp 45.800"],
+  ["Rendi", "Lunas", [["Soto ayam", "× 1", "Rp 25.000", ""], ["Teh tawar dingin", "× 1", "Rp 5.000", ""]], "Rp 30.000", "Rp 34.300"],
+  ["Iyan", "Belum dibayar", [["Mie goreng", "× 1", "Rp 24.000", ""], ["Air mineral", "× 1", "Rp 4.000", ""]], "Rp 28.000", "Rp 32.100"],
+  ["Lucky", "Menunggu konfirmasi", [["Rice bowl teriyaki", "× 1", "Rp 29.000", ""], ["Lemon tea", "× 1", "Rp 8.000", ""]], "Rp 37.000", "Rp 42.400"],
+  ["Wisnu", "Belum dibayar", [["Chicken katsu curry", "× 1", "Rp 35.000", ""], ["Ocha", "× 1", "Rp 6.000", ""]], "Rp 41.000", "Rp 46.900"]
+];
+const adjustments = subtotal => [
+  { label: "Voucher diskon", percentageText: "≈ 9,80% dari subtotal", amountText: subtotal, isSubtract: true },
+  { label: "Biaya layanan", percentageText: "≈ 5,88% dari subtotal", amountText: "Rp 1.300", isSubtract: false }
+];
+const data = {
+  fileName: "SplitBill_Kedai_Bersama_2026-09-11.jpg",
+  language: "id-ID",
+  merchantName: "Kedai Bersama",
+  transactionNumber: "TRX-20260911-DEMO10",
+  transactionDateText: "11 September 2026",
+  pickupPersonName: "Mizan",
+  participantCountText: "10 peserta",
+  paymentSummary: {
+    paidCountText: "3 lunas",
+    awaitingCountText: "2 menunggu konfirmasi",
+    unpaidCountText: "5 belum dibayar",
+    collectedAmountText: "Rp 146.600",
+    outstandingAmountText: "Rp 247.400"
+  },
+  participants: people.map((person, index) => ({
+    participantKey: `p${index + 1}`,
+    displayName: person[0],
+    paymentStatusText: person[1],
+    items: person[2].map(item => ({ name: item[0], shareDescription: item[1], amountText: item[2], sharedWith: item[3] })),
+    menuSubtotalText: person[3],
+    adjustments: adjustments(index % 2 ? "Rp 2.000" : "Rp 3.000"),
+    finalAmountText: person[4]
+  })),
+  receiptSummary: {
+    subtotalText: "Rp 344.000",
+    adjustments: [
+      { label: "Voucher diskon", percentageText: "≈ 9,88% dari subtotal", amountText: "Rp 34.000", isSubtract: true },
+      { label: "Biaya pengiriman", percentageText: "≈ 4,36% dari subtotal", amountText: "Rp 15.000", isSubtract: false },
+      { label: "Biaya layanan", percentageText: "≈ 20,06% dari subtotal", amountText: "Rp 69.000", isSubtract: false }
+    ],
+    grandTotalText: "Rp 394.000"
+  },
+  labels: {
+    collected: "terkumpul",
+    outstanding: "belum dibayar",
+    menuSubtotal: "Subtotal menu",
+    total: "Total peserta",
+    receiptSummary: "Ringkasan struk",
+    subtotal: "Subtotal",
+    grandTotal: "Total keseluruhan",
+    generatedBy: "Dibuat oleh SplitBill"
+  }
+};
+const result = window.SplitBillShare.paint(document.getElementById("share-export"), data);
+document.documentElement.dataset.rendered = "true";
+document.documentElement.dataset.width = result.width;
+document.documentElement.dataset.height = result.height;
+document.documentElement.dataset.participants = result.paintedParticipantCount;
+</script>
+</body>
+</html>

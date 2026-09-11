@@ -55,6 +55,8 @@ public sealed class SplitTransactionViewModel
     [BindNever, ValidateNever] public string MerchantName { get; set; } = string.Empty;
     [BindNever, ValidateNever] public decimal GrandTotal { get; set; }
     public SplitMethod SplitMethod { get; set; }
+    public bool RequiresFoodPickup { get; set; }
+    [BindNever, ValidateNever] public bool PickupRotationEnabled { get; set; }
     [Required] public string ParticipantNames { get; set; } = string.Empty;
     public string ParticipantsJson { get; set; } = "[]";
     public string AssignmentsJson { get; set; } = "{}";

@@ -171,6 +171,7 @@ public sealed class DraftDeletionTests : IDisposable
         {
             TransactionId = id,
             SplitMethod = SplitMethod.Equal,
+            RequiresFoodPickup = true,
             ParticipantNames = "Owner",
             ParticipantsJson = "[{\"clientKey\":\"user:owner\",\"userId\":\"owner\",\"name\":\"Owner\"}]"
         };

@@ -15,7 +15,7 @@ namespace Splitbill.Controllers;
 public sealed class MyBillsController(ApplicationDbContext db, UserManager<ApplicationUser> userManager,
     IPaymentWorkflowService paymentWorkflowService, IPaymentProofStorageService proofStorage,
     IStringLocalizer<SharedResource> localizer, ISplitBillCalculator calculator,
-    IWebHostEnvironment environment) : Controller
+    IWebHostEnvironment environment, ITransactionShareExportService? shareExportService = null) : Controller
 {
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
@@ -54,6 +54,28 @@ public sealed class MyBillsController(ApplicationDbContext db, UserManager<Appli
         var breakdown = calculator.BuildParticipantBreakdowns(participant.Transaction)
             .SingleOrDefault(x => x.ParticipantId == participant.Id);
         return breakdown is null ? NotFound() : View(ToDetails(participant, breakdown));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ShareData(long id, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User)!;
+        var participant = await db.TransactionParticipants.AsSplitQuery()
+            .Where(x => x.Id == id && x.AccountLink != null && x.AccountLink.UserId == userId)
+            .Include(x => x.Transaction).ThenInclude(x => x!.Items)
+            .Include(x => x.Transaction).ThenInclude(x => x!.Charges)
+            .Include(x => x.Transaction).ThenInclude(x => x!.PickupAssignment)
+            .Include(x => x.Transaction).ThenInclude(x => x!.Participants).ThenInclude(x => x.ItemAllocations).ThenInclude(x => x.Item)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (participant?.Transaction is null || participant.Transaction.Status == TransactionStatus.Draft)
+            return NotFound();
+        var breakdowns = calculator.BuildParticipantBreakdowns(participant.Transaction);
+        if (!breakdowns.Any(x => x.ParticipantId == participant.Id)) return NotFound();
+        var exporter = shareExportService ?? throw new InvalidOperationException("Share exporter is not configured.");
+        var projection = exporter.Build(participant.Transaction, breakdowns, [participant.Id]);
+        Response.Headers["Cache-Control"] = "no-store";
+        Response.Headers["Pragma"] = "no-cache";
+        return Json(projection);
     }
 
     [HttpGet]

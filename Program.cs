@@ -111,6 +111,7 @@ builder.Services.AddScoped<IBackupService, BackupService>();
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 builder.Services.AddScoped<IExcelReportService, ExcelReportService>();
 builder.Services.AddSingleton<ISplitBillCalculator, SplitBillCalculator>();
+builder.Services.AddScoped<ITransactionShareExportService, TransactionShareExportService>();
 builder.Services.AddSingleton<IDashboardAnalyticsService, DashboardAnalyticsService>();
 
 var app = builder.Build();

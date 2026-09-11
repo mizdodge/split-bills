@@ -45,6 +45,34 @@
   <data name="Uploader" xml:space="preserve"><value>Uploader</value></data>
   <data name="Participant" xml:space="preserve"><value>Peserta</value></data>
   <data name="Amount" xml:space="preserve"><value>Nominal</value></data>
+  <data name="CurrencyAmount" xml:space="preserve"><value>Rp {0:N0}</value></data>
+  <data name="ParticipantCount" xml:space="preserve"><value>{0} peserta</value></data>
+  <data name="PaidCount" xml:space="preserve"><value>{0} sudah dibayar</value></data>
+  <data name="AwaitingCount" xml:space="preserve"><value>{0} menunggu konfirmasi</value></data>
+  <data name="UnpaidCount" xml:space="preserve"><value>{0} belum dibayar</value></data>
+  <data name="SharedWith" xml:space="preserve"><value>Patungan dengan {0}</value></data>
+  <data name="NoDate" xml:space="preserve"><value>Tanggal belum diisi</value></data>
+  <data name="ShareUnavailable" xml:space="preserve"><value>Simpan split dengan minimal satu peserta terlebih dahulu.</value></data>
+  <data name="ShareTransaction" xml:space="preserve"><value>Bagikan transaksi</value></data>
+  <data name="ShareTransactionHint" xml:space="preserve"><value>Buat satu gambar panjang yang mudah dibagikan ke semua orang.</value></data>
+  <data name="DownloadJpg" xml:space="preserve"><value>Unduh JPG</value></data>
+  <data name="ShareMyBill" xml:space="preserve"><value>Bagikan tagihan saya</value></data>
+  <data name="ShareDialogTitle" xml:space="preserve"><value>Bagikan rincian split</value></data>
+  <data name="ShareAllParticipants" xml:space="preserve"><value>Semua peserta</value></data>
+  <data name="ShareSelectedParticipants" xml:space="preserve"><value>Peserta terpilih</value></data>
+  <data name="ShareIndividualParticipant" xml:space="preserve"><value>Satu peserta</value></data>
+  <data name="ShareMode" xml:space="preserve"><value>Isi gambar</value></data>
+  <data name="ShareSelectParticipant" xml:space="preserve"><value>Pilih peserta</value></data>
+  <data name="ShareGenerate" xml:space="preserve"><value>Buat gambar</value></data>
+  <data name="ShareClose" xml:space="preserve"><value>Tutup</value></data>
+  <data name="ShareRendering" xml:space="preserve"><value>Menyiapkan gambar…</value></data>
+  <data name="ShareReady" xml:space="preserve"><value>Gambar siap dibagikan.</value></data>
+  <data name="ShareFallback" xml:space="preserve"><value>Berbagi file tidak tersedia di browser ini, jadi JPG otomatis diunduh.</value></data>
+  <data name="ShareError" xml:space="preserve"><value>Gambar belum dapat dibuat. Coba lagi.</value></data>
+  <data name="ShareTooTall" xml:space="preserve"><value>Rincian terlalu panjang. Pilih lebih sedikit peserta.</value></data>
+  <data name="GeneratedBySplitBill" xml:space="preserve"><value>Dibuat oleh SplitBill</value></data>
+  <data name="Collected" xml:space="preserve"><value>terkumpul</value></data>
+  <data name="ReceiptSummary" xml:space="preserve"><value>Ringkasan struk</value></data>
   <data name="Total" xml:space="preserve"><value>Total</value></data>
   <data name="PaidAmount" xml:space="preserve"><value>Sudah dibayar</value></data>
   <data name="UnpaidAmount" xml:space="preserve"><value>Belum dibayar</value></data>
@@ -626,6 +654,10 @@ Semangat, pahlawan perut lapar! 🛵😆</value></data>
   <data name="FoodPickupDrawAdminReroll" xml:space="preserve"><value>Undian ulang Admin</value></data>
   <data name="FoodPickupPreview" xml:space="preserve"><value>Pratinjau peluang pengambil</value></data>
   <data name="FoodPickupPreviewHint" xml:space="preserve"><value>Ini hanya pratinjau. Pemenang final dipilih aman oleh server saat disimpan.</value></data>
+  <data name="FoodPickupToggle" xml:space="preserve"><value>Pengambilan pesanan</value></data>
+  <data name="FoodPickupToggleLabel" xml:space="preserve"><value>Pesanan ini perlu diambil</value></data>
+  <data name="FoodPickupToggleHint" xml:space="preserve"><value>Aktifkan untuk pesanan delivery atau pesanan grup yang perlu diambil.</value></data>
+  <data name="FoodPickupSurprise" xml:space="preserve"><value>Pengambil akan diumumkan setelah pembagian disimpan. Siapkan mental dan kendaraan terbaikmu! 🎉</value></data>
   <data name="FoodPickupCandidateCount" xml:space="preserve"><value>{0} kandidat</value></data>
   <data name="FoodPickupPriorPickups" xml:space="preserve"><value>{0} kali sebelumnya</value></data>
   <data name="FoodPickupWinnerHint" xml:space="preserve"><value>Orang ini terpilih untuk mengambil pesanan pada transaksi ini.</value></data>

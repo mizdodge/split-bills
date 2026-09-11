@@ -209,6 +209,19 @@ public static class DatabaseSchemaUpdater
                 await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"AllocationPlanJson\" TEXT NULL;", cancellationToken);
             if (!await HasColumnAsync(db, "Transactions", "NotificationBaseUrl", cancellationToken))
                 await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"NotificationBaseUrl\" TEXT NULL;", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "RequiresFoodPickup", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"RequiresFoodPickup\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
+            // Existing transactions that already have a winner are historical
+            // pickup transactions. Preserve that behavior when adding the flag.
+            await ExecuteAsync(db, """
+                UPDATE "Transactions"
+                SET "RequiresFoodPickup" = 1
+                WHERE "RequiresFoodPickup" = 0
+                  AND EXISTS (
+                      SELECT 1 FROM "FoodPickupAssignments" a
+                      WHERE a."TransactionId" = "Transactions"."Id"
+                  );
+                """, cancellationToken);
             if (!await HasColumnAsync(db, "PaymentApprovals", "ProofFileName", cancellationToken))
                 await ExecuteAsync(db, "ALTER TABLE \"PaymentApprovals\" ADD COLUMN \"ProofFileName\" TEXT NULL;", cancellationToken);
             if (!await HasColumnAsync(db, "PaymentApprovals", "ProofOriginalFileName", cancellationToken))

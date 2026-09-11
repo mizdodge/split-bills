@@ -1,6 +1,7 @@
 @model TransactionDetailsViewModel
+@using System.Security.Claims
 @{ ViewData["Title"] = L["Details"]; var tx = Model.Transaction; }
-@{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); }
+@{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); var isUploader = string.Equals(tx.UploadedByUserId, User.FindFirstValue(ClaimTypes.NameIdentifier), StringComparison.Ordinal); }
 @{ var pickupName = !string.IsNullOrWhiteSpace(Model.PickupAssignment?.SelectedUser?.DisplayName) ? Model.PickupAssignment.SelectedUser!.DisplayName : tx.Participants.FirstOrDefault(p => p.Id == Model.PickupAssignment?.SelectedParticipantId)?.Name; }
 <div class="page-heading compact"><div><a class="back-link" asp-action="Index">@L["AllTransactions"]</a><h1>@tx.MerchantName</h1><p>@tx.TransactionNumber · @(tx.TransactionDate?.ToString("dd MMMM yyyy") ?? tx.UploadDate.ToLocalTime().ToString("dd MMMM yyyy"))</p></div><span class="status large @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span></div>
 <div class="detail-grid">
@@ -20,7 +21,7 @@
                         <strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong><small>@L["FoodPickupSelectedByRoundRobin"]</small>
                     }
                     else
-                    {
+    {
                         <strong>@Model.PickupAssignment.RecordedProbability.ToString("0.##%")</strong><small>@L["FoodPickupDrawProbability"]</small>
                     }
                 </div>
@@ -38,7 +39,7 @@
                 }
             </aside>
         }
-        else
+        else if (tx.RequiresFoodPickup)
         {
             <aside class="bill-summary-pickup is-empty">
                 <span class="bill-summary-pickup-icon" aria-hidden="true">○</span>
@@ -140,4 +141,19 @@
         <div class="compact-items">@foreach(var item in tx.Items.OrderBy(x => x.LineNumber)){<div><span>@item.Name <small>@item.Quantity × Rp @item.UnitPrice.ToString("N0")</small></span><strong>Rp @item.TotalPrice.ToString("N0")</strong></div>}</div>
         <div class="compact-totals"><div><span>@L["Subtotal"]</span><strong>Rp @tx.Subtotal.ToString("N0")</strong></div>@foreach(var charge in Model.Charges){var rate=ReceiptReviewNormalizer.CalculateEffectivePercentage(charge.Amount ?? 0,tx.Subtotal);<div><span>@charge.Label @if(rate.HasValue){<small>@L["EffectiveRate", rate.Value.ToString("0.##")].Value</small>}</span><strong>@(charge.Operation == ChargeOperation.Subtract ? "-" : "+") Rp @charge.Amount.GetValueOrDefault().ToString("N0")</strong></div>}<div><span>@L["Total"]</span><strong>Rp @tx.GrandTotal.ToString("N0")</strong></div></div>
     </section>
+    @if (isUploader && tx.Status != TransactionStatus.Draft && tx.Participants.Count > 0)
+    {
+        <section class="content-card share-export-card" data-share-export data-share-endpoint="@Url.Action("ShareData", "Transactions", new { id = tx.Id })">
+            <div class="section-head"><div><h2>@L["ShareTransaction"]</h2><p>@L["ShareTransactionHint"]</p></div><span class="share-count" data-share-count>—</span></div>
+            <div class="share-action-row"><button type="button" class="btn btn-primary" data-share-open>@L["ShareTransaction"]</button><button type="button" class="btn btn-soft" data-share-download>@L["DownloadJpg"]</button><span class="share-status" data-share-status role="status" aria-live="polite"></span></div>
+            <dialog class="share-dialog" data-share-dialog aria-labelledby="share-dialog-title" hidden>
+                <div class="share-dialog-panel"><div class="share-dialog-head"><h2 id="share-dialog-title">@L["ShareDialogTitle"]</h2><button type="button" class="share-dialog-close" data-share-close aria-label='@L["ShareClose"]'>×</button></div>
+                    <fieldset class="share-mode-options"><legend>@L["ShareMode"]</legend><label><input type="radio" name="share-mode" value="all" checked /> @L["ShareAllParticipants"]</label><label><input type="radio" name="share-mode" value="selected" /> @L["ShareSelectedParticipants"]</label><label><input type="radio" name="share-mode" value="individual" /> @L["ShareIndividualParticipant"]</label></fieldset>
+                    <div class="share-participant-select" data-share-participants hidden><p class="field-hint">@L["ShareSelectParticipant"]</p></div>
+                    <div class="share-dialog-actions"><button type="button" class="btn btn-primary" data-share-generate>@L["ShareGenerate"]</button><button type="button" class="btn btn-soft" data-share-native>@L["ShareTransaction"]</button></div><p class="share-status" data-share-status role="status" aria-live="polite"></p>
+                </div>
+            </dialog>
+            <canvas class="share-render-canvas" aria-hidden="true"></canvas>
+        </section>
+    }
 </div>

@@ -70,7 +70,14 @@ Copy-Item -LiteralPath (Join-Path $repoRoot 'update-iis.ps1') -Destination $pack
 Copy-Item -LiteralPath (Join-Path $repoRoot 'restore-splitbill.ps1') -Destination $packageRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'project_guide.md') -Destination $packageRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'README.md') -Destination $packageRoot -Force
-Copy-Item -LiteralPath (Join-Path $repoRoot 'documentation') -Destination (Join-Path $packageRoot 'documentation') -Recurse -Force
+$publicDocumentation = Join-Path $packageRoot 'documentation'
+New-Item -ItemType Directory -Path $publicDocumentation -Force | Out-Null
+foreach ($fileName in @('README.md', 'SECURITY.md')) {
+    Copy-Item -LiteralPath (Join-Path $repoRoot (Join-Path 'documentation' $fileName)) -Destination $publicDocumentation -Force
+}
+foreach ($directoryName in @('guides', 'screenshots')) {
+    Copy-Item -LiteralPath (Join-Path $repoRoot (Join-Path 'documentation' $directoryName)) -Destination $publicDocumentation -Recurse -Force
+}
 
 $settingsPath = Join-Path $publishRoot 'appsettings.json'
 $settings = Get-Content -LiteralPath $settingsPath -Raw | ConvertFrom-Json
@@ -88,9 +95,10 @@ $forbidden = @(
     $stagedFiles | Where-Object { $_.Name -match '\.(db|db-wal|db-shm|log)$' }
     $stagedFiles | Where-Object { $_.Name -in @('.env', 'appsettings.Local.json') }
     $stagedFiles | Where-Object { $_.FullName -match '[\\/]App_Data[\\/](backups|receipts|data-protection-keys)[\\/]' }
+    $stagedFiles | Where-Object { $_.Name -eq 'status.md' -or $_.FullName -match '[\\/]documentation[\\/]plans[\\/]' }
 )
 if ($forbidden.Count -gt 0) {
-    throw "Release contains forbidden runtime data: $($forbidden.FullName -join ', ')"
+    throw "Release contains forbidden runtime or internal files: $($forbidden.FullName -join ', ')"
 }
 $settingsText = Get-Content -LiteralPath $settingsPath -Raw
 if ($settingsText -match '(?i)OpenAI|ApiKey|ProtectedApiKey|AzureOpenAI') {

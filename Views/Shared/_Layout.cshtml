@@ -136,9 +136,17 @@ else
         receiptPhotoCounter = L["ReceiptPhotoCounter"].Value,
         receiptPhotos = L["ReceiptPhotos"].Value,
         paymentProof = L["PaymentProof"].Value
+        ,shareRendering = L["ShareRendering"].Value
+        ,shareReady = L["ShareReady"].Value
+        ,shareFallback = L["ShareFallback"].Value
+        ,shareError = L["ShareError"].Value
+        ,shareTooTall = L["ShareTooTall"].Value
+        ,shareSelectParticipant = L["ShareSelectParticipant"].Value
     }));
 </script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/transaction-share.js" asp-append-version="true"></script>
+<script src="~/js/share-actions.js" asp-append-version="true"></script>
 <script src="~/js/pwa.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

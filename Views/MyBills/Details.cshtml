@@ -15,9 +15,10 @@
     <span class="status large @Model.PaymentStatus.ToString().ToLowerInvariant()">@L[Model.PaymentStatus.ToString()]</span>
 </div>
 
-<section class="member-total-strip">
+<section class="member-total-strip" data-share-export data-share-endpoint="@Url.Action("ShareData", "MyBills", new { id = Model.ParticipantId })">
     <div><span>@L["YourBillTotal"]</span><strong>Rp @Model.Amount.ToString("N0")</strong></div>
     <div class="member-total-equation"><span>@L["YourMenuSubtotal"]</span><strong>Rp @Model.ItemSubtotal.ToString("N0")</strong><span aria-hidden="true">·</span><span>@L["YourAdjustmentTotal"]</span><strong>Rp @Model.AdjustmentTotal.ToString("N0")</strong></div>
+    <div class="member-share-actions"><button type="button" class="btn btn-primary" data-share-native>@L["ShareMyBill"]</button><button type="button" class="btn btn-soft" data-share-download>@L["DownloadJpg"]</button><span class="share-status" data-share-status role="status" aria-live="polite"></span></div><canvas class="share-render-canvas" aria-hidden="true"></canvas>
 </section>
 
 @if (Model.PickupPersonName is not null)

@@ -10,10 +10,12 @@ The authoritative product and architecture reference is [`project_guide.md`](../
 - [`SHAREPOINT_SETUP.md`](guides/SHAREPOINT_SETUP.md) — Microsoft Entra permissions, SharePoint List schema, site grant, Power Automate, Teams, and troubleshooting
 - [`SECURITY.md`](SECURITY.md) — supported versions, private vulnerability reporting, secret handling, and deployment boundaries
 
+Share exports are generated locally from server-projected strings: uploader full-transaction sharing and Member own-bill sharing are available from the final detail views. The JPEG is a single dynamically sized 1000px Canvas image; raw HTTP automatically downloads it when native file sharing is unavailable.
+
 ## Visual previews
 
-The [`screenshots`](screenshots/) directory contains sanitized, illustrative UI previews used by the root README. They do not contain live database content, credentials, addresses, or protected receipt/payment files.
+The [`screenshots`](screenshots/) directory contains sanitized, illustrative UI previews used by the root README. They do not contain live database content, credentials, addresses, or protected receipt/payment files. [`share-transaction-long.jpg`](screenshots/share-transaction-long.jpg) is a 1000 × 4394 output painted directly by the production `transaction-share.js` Canvas renderer; it demonstrates that all ten participant blocks and the final receipt total remain inside one JPEG.
 
-The reproducible source is [`readme-gallery.html`](screenshots/source/readme-gallery.html). Open it with `?view=dashboard`, `?view=upload`, `?view=split`, `?view=transaction`, `?view=mybill`, or `?view=report` to render a specific 1600×900 preview. The Dashboard, Upload Receipt, and Set Split previews mirror the current Razor hierarchy, labels, dynamic states, navigation, and responsive application styles; all sample values are sanitized.
+The application-screen source is [`readme-gallery.html`](screenshots/source/readme-gallery.html). Open it with `?view=dashboard`, `?view=upload`, `?view=split`, `?view=transaction`, `?view=mybill`, or `?view=report` to render a specific 1600×900 preview. The long-share source is [`share-export-preview.html`](screenshots/source/share-export-preview.html); it loads the real renderer from `wwwroot/js/transaction-share.js` and paints sanitized precomputed display values. The Dashboard, Upload Receipt, and Set Split previews mirror the current Razor hierarchy, labels, dynamic states, navigation, and responsive application styles; all sample values are sanitized.
 
 Release-level changes are summarized in the public [`CHANGELOG.md`](../CHANGELOG.md). Internal implementation plans and environment-specific operational logs are intentionally kept outside the public repository.

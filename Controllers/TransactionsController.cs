@@ -19,7 +19,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     IPaymentWorkflowService? paymentWorkflowService = null, IStringLocalizer<SharedResource>? localizer = null,
     IPaymentProofStorageService? proofStorage = null,
     ISharePointNotificationOutboxService? sharePointNotifications = null,
-    IFoodPickupRotationService? pickupRotationService = null) : Controller
+    IFoodPickupRotationService? pickupRotationService = null,
+    ITransactionShareExportService? shareExportService = null) : Controller
 {
     private static readonly JsonSerializerOptions ParticipantJsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -289,6 +290,13 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
 
         await using var splitTransaction = await db.Database.BeginTransactionAsync(HttpContext.RequestAborted);
         FoodPickupDrawOperation? pickupOperation = null;
+        var rotationEnabled = await FoodPickupRotationEnabledAsync();
+        var requestedPickup = model.RequiresFoodPickup;
+        // A crafted first-time ON request cannot bypass the global Admin switch.
+        // An already assigned transaction may keep its winner while the global
+        // switch is later disabled; turning it OFF still removes that winner.
+        var keepExistingWhileDisabled = requestedPickup && previousPickup is not null && !rotationEnabled;
+        transaction.RequiresFoodPickup = requestedPickup && (rotationEnabled || previousPickup is not null);
         db.TransactionParticipants.RemoveRange(transaction.Participants);
         transaction.Participants = calculation.ParticipantShares.Select((x, index) => new TransactionParticipant
         {
@@ -299,7 +307,24 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             }
         }).ToList();
         await db.SaveChangesAsync();
-        if (pickupRotationService is not null)
+        if (keepExistingWhileDisabled && previousPickup is not null)
+        {
+            var preservedParticipant = transaction.Participants.FirstOrDefault(x =>
+                string.Equals(x.AccountLink?.UserId, previousPickup.SelectedUserId, StringComparison.Ordinal));
+            if (preservedParticipant is not null)
+                db.FoodPickupAssignments.Add(new FoodPickupAssignment
+                {
+                    TransactionId = transaction.Id,
+                    SelectedUserId = previousPickup.SelectedUserId,
+                    SelectedParticipantId = preservedParticipant.Id,
+                    RecordedProbability = previousPickup.RecordedProbability,
+                    Strategy = previousPickup.Strategy,
+                    DrawKind = previousPickup.DrawKind,
+                    SelectedAt = previousPickup.SelectedAt,
+                    SelectedByUserId = previousPickup.SelectedByUserId
+                });
+        }
+        else if (transaction.RequiresFoodPickup && pickupRotationService is not null)
             pickupOperation = await pickupRotationService.AssignOrReconcileAsync(transaction, userManager.GetUserId(User),
                 previousPickup?.SelectedUserId, previousPickup, HttpContext.RequestAborted);
         if (model.SplitMethod == SplitMethod.ByItem)
@@ -355,18 +380,10 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         var preview = pickupRotationService is null
             ? new FoodPickupPreview([])
             : await pickupRotationService.PreviewAsync(ids, transactionId, cancellationToken);
-        return Json(new
-        {
-            enabled = preview.HasCandidates,
-            strategy = preview.Strategy.ToString(),
-            candidates = preview.Candidates.Select(candidate => new
-            {
-                userId = candidate.UserId,
-                name = candidate.DisplayName,
-                priorPickups = candidate.PriorPickupCount,
-                probability = candidate.Probability
-            })
-        });
+        // Kept for backwards-compatible clients, but deliberately returns only
+        // a coarse availability signal. Candidate names, counts and odds are
+        // never exposed from Step 3 anymore.
+        return Json(new { enabled = preview.HasCandidates });
     }
 
     private async Task<SplitTransactionViewModel> ToSplitViewModelAsync(BillTransaction transaction)
@@ -377,6 +394,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             MerchantName = transaction.MerchantName,
             GrandTotal = transaction.GrandTotal,
             SplitMethod = transaction.SplitMethod,
+            RequiresFoodPickup = transaction.RequiresFoodPickup,
             ParticipantNames = string.Join(Environment.NewLine, transaction.Participants.Select(x => x.Name)),
             ParticipantsJson = JsonSerializer.Serialize(transaction.Participants.Select((participant, index) => new ParticipantSelectionViewModel
             {
@@ -387,6 +405,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             Items = transaction.Items.OrderBy(x => x.LineNumber).ToList(),
             AssignmentsJson = BuildAssignmentsJson(transaction)
         };
+        model.PickupRotationEnabled = await FoodPickupRotationEnabledAsync();
         model.AvailableUsers = await AvailableParticipantUsersAsync();
         return model;
     }
@@ -395,6 +414,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     {
         model.MerchantName = transaction.MerchantName;
         model.GrandTotal = transaction.GrandTotal;
+        model.RequiresFoodPickup = transaction.RequiresFoodPickup;
+        model.PickupRotationEnabled = await FoodPickupRotationEnabledAsync();
         model.Items = transaction.Items.OrderBy(x => x.LineNumber).ToList();
         model.AvailableUsers = await AvailableParticipantUsersAsync();
     }
@@ -410,6 +431,12 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         var now = DateTimeOffset.UtcNow;
         return users.Where(x => x.LockoutEnd is null || x.LockoutEnd < now).ToList();
     }
+
+    private Task<bool> FoodPickupRotationEnabledAsync()
+        => db.FoodPickupConfigurations.AsNoTracking()
+            .Where(x => x.Id == 1)
+            .Select(x => x.Enabled)
+            .SingleOrDefaultAsync();
 
     private async Task<List<ParticipantSelectionViewModel>> ParseParticipantSelectionsAsync(SplitTransactionViewModel model)
     {
@@ -557,6 +584,36 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             PickupHistory = transaction.PickupDrawHistories.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).ToList(),
             Charges = ToChargeViewModels(transaction), ParticipantBreakdowns = participantBreakdowns
         });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ShareData(long id, CancellationToken cancellationToken)
+    {
+        var currentUserId = userManager.GetUserId(User);
+        var owner = await db.Transactions.AsNoTracking()
+            .Where(x => x.Id == id)
+            .Select(x => new { x.UploadedByUserId, x.Status, ParticipantCount = x.Participants.Count })
+            .SingleOrDefaultAsync(cancellationToken);
+        if (owner is null) return NotFound();
+        if (!string.Equals(owner.UploadedByUserId, currentUserId, StringComparison.Ordinal))
+            return User.IsInRole(DatabaseSeeder.AdminRole) ? Forbid() : NotFound();
+        if (owner.Status == TransactionStatus.Draft || owner.ParticipantCount == 0)
+            return BadRequest(new { message = Text("ShareUnavailable", "Simpan split dengan minimal satu peserta terlebih dahulu.") });
+
+        var transaction = await db.Transactions.AsSplitQuery()
+            .Where(x => x.Id == id && x.UploadedByUserId == currentUserId)
+            .Include(x => x.Items)
+            .Include(x => x.Charges)
+            .Include(x => x.Participants).ThenInclude(x => x.ItemAllocations).ThenInclude(x => x.Item)
+            .Include(x => x.PickupAssignment)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (transaction is null) return NotFound();
+        var breakdowns = calculator.BuildParticipantBreakdowns(transaction);
+        var exporter = shareExportService ?? throw new InvalidOperationException("Share exporter is not configured.");
+        var projection = exporter.Build(transaction, breakdowns);
+        Response.Headers["Cache-Control"] = "no-store";
+        Response.Headers["Pragma"] = "no-cache";
+        return Json(projection);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
