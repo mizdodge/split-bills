@@ -143,7 +143,7 @@ For IIS prerequisites, first installation, upgrades, permissions, backup, restor
 ## Documentation
 
 - [Project guide](project_guide.md) — authoritative behavior, architecture, data model, security boundaries, and extension rules
-- [Documentation index](documentation/README.md) — setup guides, security policy, screenshots, and historical implementation plans
+- [Documentation index](documentation/README.md) — setup guides, security policy, and current interface screenshots
 - [Windows Server and IIS setup](documentation/guides/SERVER_SETUP.md)
 - [SharePoint and Power Automate setup](documentation/guides/SHAREPOINT_SETUP.md)
 - [Security policy](documentation/SECURITY.md)
