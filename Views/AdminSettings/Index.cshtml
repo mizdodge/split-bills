@@ -1,0 +1,30 @@
+@model AiSettingsViewModel
+@{ ViewData["Title"] = L["AISettings"]; }
+<div class="page-heading compact"><div><span class="eyebrow">@L["Admin"]</span><h1>@L["AiConfiguration"]</h1><p>@L["ChooseAiConnection"]</p></div></div>
+<form method="post" class="settings-layout" id="ai-settings-form" data-models-url="@Url.Action("Models", "AdminSettings")" data-has-stored-key="@Model.HasStoredApiKey.ToString().ToLowerInvariant()">
+    <section class="content-card">
+        <div class="section-head"><div><h2>@L["Provider"]</h2><p>@L["ConfigUsedNextUpload"]</p></div></div>
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="provider-options">
+            <label><input asp-for="Provider" type="radio" value="OpenAi" /><span class="provider-logo openai">✦</span><span><strong>OpenAI</strong><small>@L["EncryptedKeyHint"]</small></span></label>
+            <label><input asp-for="Provider" type="radio" value="AzureOpenAi" /><span class="provider-logo azure">A</span><span><strong>Azure OpenAI</strong><small>@L["EncryptedKeyHint"]</small></span></label>
+        </div>
+        <div class="settings-form">
+            <div class="form-group"><label asp-for="ApiKey">API key provider</label><input asp-for="ApiKey" class="form-control" placeholder="@(Model.HasStoredApiKey ? L["StoredKeyPlaceholder"].Value : L["EnterProviderKey"].Value)" autocomplete="new-password" spellcheck="false" /><small>@L["ApiKeySecurityHint"]</small><span asp-validation-for="ApiKey" class="text-danger"></span></div>
+            <div class="form-grid two"><div class="form-group"><label asp-for="Model">Model</label><div class="model-picker"><select asp-for="Model" class="form-select" data-current-model="@Model.Model" required><option value="@Model.Model">@Model.Model</option></select><button class="btn btn-light" type="button" id="load-ai-models">@L["LoadModels"]</button></div><small id="model-load-status" class="model-load-status" aria-live="polite">@L["ModelsFromProvider"]</small><span asp-validation-for="Model" class="text-danger"></span></div><div class="form-group"><label asp-for="ApiMode">@L["ApiMode"]</label><select asp-for="ApiMode" class="form-select"><option value="Responses">/responses</option><option value="ChatCompletions">/chat/completions</option></select></div></div>
+            <div class="openai-fields provider-fields"><div class="info-box">@L["OpenAiEncryptedKey"]</div></div>
+            <div class="azure-fields provider-fields">
+                <div class="form-group"><label asp-for="Endpoint">@L["AzureEndpoint"]</label><input asp-for="Endpoint" class="form-control" placeholder="https://resource.openai.azure.com" /><span asp-validation-for="Endpoint" class="text-danger"></span></div>
+                <div class="form-grid two"><div class="form-group"><label asp-for="DeploymentName">@L["Deployment"]</label><input asp-for="DeploymentName" class="form-control" placeholder="receipt-model" /></div><div class="form-group"><label asp-for="ApiVersion">@L["ApiVersion"]</label><input asp-for="ApiVersion" class="form-control" placeholder="2025-04-01-preview" /></div></div>
+            </div>
+        </div>
+    </section>
+    <aside class="content-card connection-card"><h2>@L["ConnectionStatus"]</h2>
+        @if(Model.LastTestSucceeded == true){<span class="connection-state success"><i></i> @L["Connected"]</span><p>@L["LastTested", Model.LastTestAt?.ToLocalTime().ToString("dd MMM yyyy, HH:mm") ?? string.Empty]</p>}
+        else if(Model.LastTestSucceeded == false){<span class="connection-state failed"><i></i> Failed</span><p>@Model.LastError</p>}
+        else{<span class="connection-state idle"><i></i> @L["NotTested"]</span><p>@L["SaveAndTestBeforeUse"]</p>}
+        <hr /><h3>@L["WhatWillBeSaved"]</h3><ul><li>@L["ActiveProvider"]</li><li>@L["EncryptedApiKey"]</li><li>@L["ModelAndApiMode"]</li><li>@L["AzureEndpointDeployment"]</li><li>@L["LastTestResult"]</li></ul>
+    </aside>
+    <div class="form-actions full"><button class="btn btn-light" type="submit" name="actionType" value="test">@L["SaveAndTest"]</button><button class="btn btn-primary" type="submit" name="actionType" value="save">@L["SaveConfiguration"]</button></div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,109 @@
+@model SharePointSettingsViewModel
+@{ ViewData["Title"] = L["SharePointIntegration"]; }
+<div class="page-heading compact">
+    <div>
+        <span class="eyebrow">@L["Admin"]</span>
+        <h1>@L["SharePointIntegration"]</h1>
+        <p>@L["SharePointSettingsDescription"]</p>
+    </div>
+</div>
+
+<form method="post" asp-controller="AdminSharePoint" asp-action="Save" class="settings-layout sharepoint-settings-form" id="sharepoint-settings-form"
+      data-test-url="@Url.Action("TestConnection", "AdminSharePoint")"
+      data-testing-text='@L["TestingConnection"]' data-connection-ready-text='@L["ConnectionReady"]'
+      data-connection-failed-text='@L["ConnectionFailed"]' data-choose-list-text='@L["ChooseSharePointList"]'
+      data-lists-loaded-text='@L["ListsAvailable"]' data-not-connected-text='@L["NotConnected"]'
+      data-list-not-loaded-text='@L["ListNotLoaded"]'>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SiteId" id="sharepoint-site-id" />
+    <input type="hidden" asp-for="TestedStateToken" id="sharepoint-tested-token" />
+    <input type="hidden" asp-for="SelectedListDisplayName" id="sharepoint-list-name" />
+    <input type="hidden" asp-for="SelectedListWebUrl" id="sharepoint-list-url" />
+
+    <section class="content-card">
+        <div class="section-head">
+            <div><h2>@L["MicrosoftEntra"]</h2><p>@L["SharePointCredentialsHint"]</p></div>
+            <label class="toggle-line"><input asp-for="Enabled" /><span>@L["Enabled"]</span></label>
+        </div>
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="settings-form">
+            <div class="form-grid two">
+                <div class="form-group">
+                    <label asp-for="TenantId">@L["TenantId"]</label>
+                    <input asp-for="TenantId" class="form-control sharepoint-input" autocomplete="off" spellcheck="false" />
+                    <span asp-validation-for="TenantId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ClientId">@L["ClientId"]</label>
+                    <input asp-for="ClientId" class="form-control sharepoint-input" autocomplete="off" spellcheck="false" />
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientSecret">@L["ClientSecret"]</label>
+                <input asp-for="ClientSecret" class="form-control sharepoint-input" placeholder="@(Model.HasStoredClientSecret ? L["StoredSecretPlaceholder"].Value : L["EnterClientSecret"].Value)" autocomplete="new-password" spellcheck="false" />
+                <small>@(Model.HasStoredClientSecret ? L["StoredSecretHint"] : L["SecretRequiredForTest"])</small>
+                <span asp-validation-for="ClientSecret" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SiteUrl">@L["SharePointSiteUrl"]</label>
+                <input asp-for="SiteUrl" class="form-control sharepoint-input" placeholder="https://tenant.sharepoint.com/sites/Office" autocomplete="url" spellcheck="false" />
+                <small>@L["SharePointSiteUrlHint"]</small>
+                <span asp-validation-for="SiteUrl" class="text-danger"></span>
+            </div>
+            <div class="form-actions sharepoint-test-actions">
+                <span id="sharepoint-test-status" class="model-load-status" aria-live="polite">@L["TestConnectionBeforeSave"]</span>
+                <button class="btn btn-light" type="button" id="sharepoint-test-button">@L["TestConnection"]</button>
+            </div>
+        </div>
+    </section>
+
+    <aside class="content-card connection-card sharepoint-destination-card">
+        <h2>@L["SharePointDestination"]</h2>
+        <p>@L["SharePointListHint"]</p>
+        <div id="sharepoint-site-status" class="sharepoint-site-status" data-has-site="@(Model.LastTestSucceeded == true ? "true" : "false")">
+            @if (Model.LastTestSucceeded == true && !string.IsNullOrWhiteSpace(Model.SiteDisplayName))
+            {
+                <strong>@Model.SiteDisplayName</strong><small>@Model.SiteId</small>
+            }
+            else
+            {
+                <span>@L["NotConnected"]</span>
+            }
+        </div>
+        <div class="form-group">
+            <label for="sharepoint-list-id">@L["SharePointList"]</label>
+            <select id="sharepoint-list-id" name="ListId" class="form-select" disabled required data-selected-list="@Model.SelectedListId">
+                @if (Model.LastTestSucceeded == true && !string.IsNullOrWhiteSpace(Model.SelectedListId))
+                {
+                    <option value="@Model.SelectedListId" selected>@Model.SelectedListDisplayName</option>
+                }
+                else
+                {
+                    <option value="">@L["TestConnectionToLoadLists"]</option>
+                }
+            </select>
+            <small id="sharepoint-list-status">@L["ListNotLoaded"]</small>
+        </div>
+        <hr />
+        <h3>@L["WhatWillBeSaved"]</h3>
+        <ul>
+            <li>@L["EncryptedClientSecret"]</li>
+            <li>@L["StableSiteAndListIds"]</li>
+            <li>@L["LastConnectionTest"]</li>
+        </ul>
+        @if (Model.LastTestSucceeded == false && !string.IsNullOrWhiteSpace(Model.LastError))
+        {
+            <div class="info-box danger-box">@Model.LastError</div>
+        }
+    </aside>
+
+    <div class="form-actions full">
+        <button class="btn btn-primary" type="submit" id="sharepoint-save-button" disabled>@L["SaveConfiguration"]</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/sharepoint-settings.js" asp-append-version="true"></script>
+}

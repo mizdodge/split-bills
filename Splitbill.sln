@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splitbill", "Splitbill.csproj", "{46A8B675-BA5A-4CE4-BE71-9281B33CFFCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splitbill.Tests", "Tests\Splitbill.Tests.csproj", "{8EF17096-632D-4631-9191-2222CAE05D04}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46A8B675-BA5A-4CE4-BE71-9281B33CFFCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46A8B675-BA5A-4CE4-BE71-9281B33CFFCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46A8B675-BA5A-4CE4-BE71-9281B33CFFCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46A8B675-BA5A-4CE4-BE71-9281B33CFFCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EF17096-632D-4631-9191-2222CAE05D04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EF17096-632D-4631-9191-2222CAE05D04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EF17096-632D-4631-9191-2222CAE05D04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EF17096-632D-4631-9191-2222CAE05D04}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

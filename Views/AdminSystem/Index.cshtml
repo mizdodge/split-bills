@@ -1,0 +1,13 @@
+@model SystemBackupViewModel
+@{ ViewData["Title"] = L["SystemTools"]; }
+<div class="page-heading compact"><div><span class="eyebrow">@L["Admin"]</span><h1>@L["SystemTools"]</h1><p>@L["SystemToolsDescription"]</p></div></div>
+<div class="system-tools-grid">
+    <section class="content-card"><div class="section-head"><div><h2>@L["CreateBackup"]</h2><p>@L["BackupDescription"]</p></div></div>
+        <form asp-action="Backup" method="post" class="form-grid"><div asp-validation-summary="All" class="validation-summary"></div><div class="form-group"><label asp-for="Password">@L["ConfirmAdminPassword"]</label><input asp-for="Password" class="form-control" autocomplete="current-password" /><small>@L["BackupPasswordHint"]</small></div><button class="btn btn-primary" type="submit">@L["DownloadBackup"]</button></form>
+    </section>
+    <section class="content-card"><div class="section-head"><div><h2>@L["StageRestore"]</h2><p>@L["RestoreDescription"]</p></div></div>
+        <form asp-action="StageRestore" method="post" enctype="multipart/form-data" class="form-grid"><div class="form-group"><label for="BackupFile">@L["BackupFile"]</label><input id="BackupFile" name="BackupFile" type="file" accept=".zip,application/zip" class="form-control" required /><small>@L["RestoreFileHint"]</small></div><div class="form-group"><label for="restore-password">@L["ConfirmAdminPassword"]</label><input id="restore-password" name="Password" type="password" class="form-control" autocomplete="current-password" required /></div><button class="btn btn-soft" type="submit">@L["ValidateAndStage"]</button></form>
+    </section>
+</div>
+<section class="content-card system-warning"><strong>@L["RestoreWarningTitle"]</strong><p>@L["RestoreWarning"]</p><code>restore-splitbill.ps1 -BackupZip &lt;zip&gt; -PublishPath &lt;folder&gt;</code></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

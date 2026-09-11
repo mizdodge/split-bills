@@ -1,0 +1,20 @@
+@model AdminUserCreateViewModel
+@{ ViewData["Title"] = L["AddUser"]; }
+<div class="page-heading compact"><div><a class="back-link" asp-action="Index">← @L["ManageUsers"]</a><h1>@L["AddUser"]</h1><p>@L["CreateUserHint"]</p></div></div>
+<form method="post" class="content-card admin-user-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <div class="form-grid two">
+        <div class="form-group"><label asp-for="Username">@L["Username"]</label><input asp-for="Username" class="form-control" autocomplete="off" /><span asp-validation-for="Username" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="DisplayName">@L["DisplayName"]</label><input asp-for="DisplayName" class="form-control" /><span asp-validation-for="DisplayName" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="Email">@L["Email"]</label><input asp-for="Email" class="form-control" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="Role">@L["UserRole"]</label><select asp-for="Role" class="form-select"><option value="Admin">Admin</option><option value="Moderator">Moderator</option><option value="Member">Member</option></select></div>
+    </div>
+    <div class="info-box">@L["TemporaryPasswordHint"]</div>
+    <div class="form-grid two">
+        <div class="form-group"><label asp-for="Password">@L["TemporaryPassword"]</label><input asp-for="Password" class="form-control" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="ConfirmPassword">@L["ConfirmPassword"]</label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+    </div>
+    <div class="form-actions"><a class="btn btn-light" asp-action="Index">@L["Cancel"]</a><button class="btn btn-primary" type="submit">@L["CreateUser"]</button></div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,38 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Login"; Layout = "_Layout"; }
+<div class="login-page">
+    <section class="login-showcase">
+        <a class="brand brand-light" href="/"><span class="brand-mark">S</span><span>SplitBill</span></a>
+        <div>
+            <span class="eyebrow light">@L["SplitWithoutHassle"]</span>
+            <h1>@L["OneReceipt"]</h1>
+            <p>@L["UploadAiTrack"]</p>
+        </div>
+        <div class="showcase-note"><span>✦</span><div><strong>AI receipt reader</strong><small>@L["ReviewInYourHands"]</small></div></div>
+    </section>
+    <section class="login-panel">
+        <div class="login-card">
+            <div class="mobile-login-brand"><span class="brand-mark">S</span> SplitBill</div>
+            <span class="eyebrow">@L["WelcomeBack"]</span>
+            <h2>@L["LoginTitle"]</h2>
+            <p class="text-muted">@L["LoginDescription"]</p>
+            <form method="post" asp-route-returnUrl="@ViewBag.ReturnUrl" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                <div class="form-group">
+                    <label asp-for="Username">@L["Username"]</label>
+                    <input asp-for="Username" class="form-control form-control-lg" autocomplete="username" placeholder='@L["EnterUsername"]' autofocus />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password">@L["Password"]</label>
+                    <div class="password-wrap"><input asp-for="Password" class="form-control form-control-lg" autocomplete="current-password" placeholder='@L["EnterPassword"]' /><button type="button" class="password-toggle" aria-label='@L["ShowPassword"]'>👁</button></div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <label class="check-line"><input asp-for="RememberMe" /> @L["RememberMe"]</label>
+                <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">@L["Login"] <span>→</span></button>
+            </form>
+            <p class="login-foot">@L["AdminAccess"]</p>
+        </div>
+    </section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

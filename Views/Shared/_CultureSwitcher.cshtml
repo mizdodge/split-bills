@@ -1,0 +1,14 @@
+@{ var returnUrl = Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString; var active = System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en-US" : "id-ID"; }
+<div class="language-switcher" role="group" aria-label="Language">
+    <form class="language-form" asp-controller="Culture" asp-action="Set" method="post">
+        <input type="hidden" name="culture" value="id-ID" />
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <button type="submit" class="language-option @(active == "id-ID" ? "active" : "")" aria-pressed="@(active == "id-ID" ? "true" : "false")" aria-label="Bahasa Indonesia">ID</button>
+    </form>
+    <span class="language-divider" aria-hidden="true"></span>
+    <form class="language-form" asp-controller="Culture" asp-action="Set" method="post">
+        <input type="hidden" name="culture" value="en-US" />
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <button type="submit" class="language-option @(active == "en-US" ? "active" : "")" aria-pressed="@(active == "en-US" ? "true" : "false")" aria-label="English">EN</button>
+    </form>
+</div>

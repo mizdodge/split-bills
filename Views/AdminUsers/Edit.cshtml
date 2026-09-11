@@ -1,0 +1,18 @@
+@model AdminUserEditViewModel
+@{ ViewData["Title"] = L["EditUser"]; }
+<div class="page-heading compact"><div><a class="back-link" asp-action="Index">← @L["ManageUsers"]</a><h1>@L["EditUser"]</h1><p>@Model.DisplayName</p></div><span class="status @(Model.IsDisabled ? "unpaid" : "paid")">@(Model.IsDisabled ? L["Disabled"] : L["Active"])</span></div>
+<form method="post" class="content-card admin-user-form">
+    @Html.AntiForgeryToken()<input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <div class="form-grid two">
+        <div class="form-group"><label asp-for="Username">@L["Username"]</label><input asp-for="Username" class="form-control" readonly /><small>@L["UsernameImmutable"]</small></div>
+        <div class="form-group"><label asp-for="DisplayName">@L["DisplayName"]</label><input asp-for="DisplayName" class="form-control" /><span asp-validation-for="DisplayName" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="Email">@L["Email"]</label><input asp-for="Email" class="form-control" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="Role">@L["UserRole"]</label><select asp-for="Role" class="form-select"><option value="Admin">Admin</option><option value="Moderator">Moderator</option><option value="Member">Member</option></select></div>
+    </div>
+    <div class="form-actions"><a class="btn btn-light" asp-action="Index">@L["Cancel"]</a><button class="btn btn-primary" type="submit">@L["SaveUser"]</button></div>
+</form>
+<section class="content-card admin-user-form reset-password-card"><div class="section-head"><div><h2>@L["ResetPassword"]</h2><p>@L["ResetPasswordHint"]</p></div></div>
+    <form method="post" asp-action="ResetPassword"><input type="hidden" name="UserId" value="@Model.Id" />@Html.AntiForgeryToken()<div class="form-grid two"><div class="form-group"><label for="reset-password">@L["NewPassword"]</label><input id="reset-password" name="Password" type="password" class="form-control" autocomplete="new-password" required /></div><div class="form-group"><label for="reset-confirm">@L["ConfirmPassword"]</label><input id="reset-confirm" name="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" required /></div></div><div class="form-actions"><button class="btn btn-light" type="submit" data-confirm='@L["ResetPasswordConfirm"]'>@L["ResetPassword"]</button></div></form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/admin-users.js" asp-append-version="true"></script> }

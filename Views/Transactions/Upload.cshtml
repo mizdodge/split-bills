@@ -1,0 +1,17 @@
+@model UploadReceiptViewModel
+@{ ViewData["Title"] = L["UploadReceipt"]; }
+<div class="page-heading compact"><div><span class="eyebrow">@L["StepOneOfThree"]</span><h1>@L["UploadReceipt"]</h1><p>@L["ChooseReceiptPhotos"]</p></div></div>
+<form method="post" enctype="multipart/form-data" id="upload-form" class="upload-layout">
+    <section class="content-card">
+        <div class="drop-zone" id="drop-zone">
+            <input asp-for="ReceiptImages" id="receipt-input" accept="image/*" multiple hidden />
+            <label for="receipt-input" id="upload-prompt"><span class="upload-icon">↑</span><h2>@L["DragPhotoHere"]</h2><p>@L["OrClickToChoose"]</p><span class="btn btn-soft">@L["ChoosePhoto"]</span><small>@L["PhotoLimits"]</small><small>@L["AllImageFormatsHint"]</small></label>
+            <div class="upload-preview-gallery" id="upload-preview-gallery" hidden></div>
+        </div>
+        <div class="upload-selection-bar" id="upload-selection-bar" hidden><span id="upload-selection-count"></span><button class="btn btn-sm btn-soft" type="button" id="add-more-images">@L["AddPhoto"]</button></div>
+        <span asp-validation-for="ReceiptImages" class="text-danger d-block mt-2"></span>
+    </section>
+    <aside class="tips-card"><h3>@L["BestResults"]</h3><ul><li><span>✓</span> @L["OrderPhotos"]</li><li><span>✓</span> @L["OverlapOkay"]</li><li><span>✓</span> @L["UseGoodLight"]</li></ul></aside>
+    <div class="form-actions full"><a class="btn btn-light" asp-action="Index">@L["Cancel"]</a><button type="submit" class="btn btn-primary" id="process-button">@L["ProcessWithAi"] <span>✦</span></button></div>
+</form>
+<div class="processing-overlay" id="processing-overlay" hidden><div class="processing-card"><div class="ai-orbit"><span>✦</span></div><h2>@L["ReadingReceipt"]</h2><p>@L["AiCombining"]</p><div class="progress-line"><i></i></div></div></div>

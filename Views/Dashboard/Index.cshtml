@@ -1,0 +1,154 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = L["Dashboard"]; }
+
+@if (Model.IsMemberDashboard)
+{
+    <div class="page-heading">
+        <div><span class="eyebrow">@L["PersonalOverview"]</span><h1>@L["HelloUser", User.Identity?.Name ?? string.Empty]</h1><p>@L["MemberDashboardDescription"]</p></div>
+        <a class="btn btn-primary" asp-controller="MyBills" asp-action="Index">@L["OpenMyBills"]</a>
+    </div>
+    <div class="stat-grid member-stat-grid">
+        <article class="stat-card accent"><span class="stat-icon">Rp</span><div><small>@L["ThisMonthBills"]</small><strong class="money-small">Rp @Model.MemberCurrentMonthAmount.ToString("N0")</strong></div></article>
+        <article class="stat-card"><span class="stat-icon warning">↶</span><div><small>@L["PreviousMonthBills"]</small><strong class="money-small">Rp @Model.MemberPreviousMonthAmount.ToString("N0")</strong></div></article>
+        <article class="stat-card"><span class="stat-icon success">✓</span><div><small>@L["TotalPaidByYou"]</small><strong class="money-small">Rp @Model.MemberPaidAmount.ToString("N0")</strong></div></article>
+        <article class="stat-card"><span class="stat-icon danger">Rp</span><div><small>@L["YourOutstanding"]</small><strong class="money-small">Rp @Model.OutstandingAmount.ToString("N0")</strong></div></article>
+    </div>
+    <div class="analytics-grid mt-4">
+        <section class="content-card analytics-wide">
+            <div class="section-head"><div><h2>@L["YourMonthlySpending"]</h2><p>@L["YourMonthlySpendingHint"]</p></div></div>
+            <div class="month-chart">
+                @foreach (var month in Model.MemberMonthlySpending)
+                {
+                    <div class="month-chart-row">
+                        <span class="month-label">@month.Month.ToString("MMM yyyy")</span>
+                        <div class="month-track"><span style="width:@month.BarPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                        <strong>Rp @month.TotalAmount.ToString("N0")</strong>
+                        <small>@L["PaidShort"] Rp @month.PaidAmount.ToString("N0") · @L["OutstandingShort"] Rp @month.OutstandingAmount.ToString("N0")</small>
+                    </div>
+                }
+            </div>
+        </section>
+        <section class="content-card">
+            <div class="section-head"><div><h2>@L["RecentPersonalBills"]</h2><p>@L["RecentPersonalBillsHint"]</p></div><a asp-controller="MyBills" asp-action="Index">@L["ViewAll"]</a></div>
+            @if (Model.RecentMemberBills.Count == 0)
+            {
+                <div class="empty-inline"><span>🧾</span><strong>@L["NoBills"]</strong></div>
+            }
+            else
+            {
+                <div class="analytics-list">
+                    @foreach (var bill in Model.RecentMemberBills)
+                    {
+                        <a class="analytics-list-row" asp-controller="MyBills" asp-action="Details" asp-route-id="@bill.ParticipantId">
+                            <span><strong>@bill.MerchantName</strong><small>@bill.Date.ToString("dd MMM yyyy") · @bill.TransactionNumber</small></span>
+                            <span class="analytics-value"><strong>Rp @bill.Amount.ToString("N0")</strong><small class="status @bill.PaymentStatus.ToString().ToLowerInvariant()">@L[bill.PaymentStatus.ToString()]</small></span>
+                        </a>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+}
+else
+{
+    <div class="page-heading">
+        <div><span class="eyebrow">@L["Overview"]</span><h1>@L["HelloUser", User.Identity?.Name ?? string.Empty]</h1><p>@L["MonitorBills"]</p></div>
+        <a class="btn btn-primary" asp-controller="Transactions" asp-action="Upload">@L["UploadReceiptButton"]</a>
+    </div>
+    <div class="stat-grid">
+        <article class="stat-card accent"><span class="stat-icon">▤</span><div><small>@L["TotalTransactions"]</small><strong>@Model.TotalTransactions</strong></div></article>
+        <article class="stat-card"><span class="stat-icon warning">◔</span><div><small>@L["UnpaidBills"]</small><strong>@(Model.UnpaidTransactions + Model.PartialTransactions)</strong></div></article>
+        <article class="stat-card"><span class="stat-icon success">✓</span><div><small>@L["PaidAmount"]</small><strong>@Model.PaidTransactions</strong></div></article>
+        <article class="stat-card"><span class="stat-icon danger">Rp</span><div><small>@L["RemainingBills"]</small><strong class="money-small">Rp @Model.OutstandingAmount.ToString("N0")</strong></div></article>
+    </div>
+
+    <div class="analytics-grid mt-4">
+        <section class="content-card analytics-wide">
+            <div class="section-head"><div><h2>@L["MonthlyBillValue"]</h2><p>@L["MonthlyBillValueHint"]</p></div></div>
+            <div class="month-chart">
+                @foreach (var month in Model.MonthlySpending)
+                {
+                    <div class="month-chart-row compact">
+                        <span class="month-label">@month.Month.ToString("MMM yyyy")</span>
+                        <div class="month-track"><span style="width:@month.BarPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                        <strong>Rp @month.Amount.ToString("N0")</strong>
+                    </div>
+                }
+            </div>
+        </section>
+        <section class="content-card analytics-highlight">
+            <div class="section-head"><div><h2>@L["OldestOutstandingBill"]</h2><p>@L["OldestOutstandingBillHint"]</p></div></div>
+            @if (Model.OldestOutstanding is null)
+            {
+                <div class="empty-inline compact-empty"><span>✓</span><strong>@L["NoOutstandingBills"]</strong></div>
+            }
+            else
+            {
+                <span class="analytics-kicker">@L["DaysOutstanding", Model.OldestOutstanding.AgeDays]</span>
+                <h3>@Model.OldestOutstanding.MerchantName</h3>
+                <p>@Model.OldestOutstanding.TransactionNumber · @Model.OldestOutstanding.Date.ToString("dd MMM yyyy")</p>
+                <strong class="analytics-money">Rp @Model.OldestOutstanding.Amount.ToString("N0")</strong>
+                <a class="btn btn-soft" asp-controller="Transactions" asp-action="Details" asp-route-id="@Model.OldestOutstanding.TransactionId">@L["Details"]</a>
+            }
+        </section>
+        <section class="content-card">
+            <div class="section-head"><div><h2>@L["HighestOutstandingPeople"]</h2><p>@L["HighestOutstandingPeopleHint"]</p></div></div>
+            @if (Model.TopOutstandingPeople.Count == 0)
+            {
+                <div class="empty-inline compact-empty"><strong>@L["NoOutstandingBills"]</strong></div>
+            }
+            else
+            {
+                <div class="analytics-list">
+                    @foreach (var person in Model.TopOutstandingPeople)
+                    {
+                        <div class="analytics-list-row"><span><strong>@person.Name</strong><small>@L["BillCount", person.BillCount]</small></span><strong>Rp @person.Amount.ToString("N0")</strong></div>
+                    }
+                </div>
+            }
+        </section>
+        <section class="content-card">
+            <div class="section-head"><div><h2>@L["TopMerchants"]</h2><p>@L["TopMerchantsHint"]</p></div></div>
+            @if (Model.TopMerchants.Count == 0)
+            {
+                <div class="empty-inline compact-empty"><strong>@L["NoTransactions"]</strong></div>
+            }
+            else
+            {
+                <div class="analytics-list">
+                    @foreach (var merchant in Model.TopMerchants)
+                    {
+                        <div class="analytics-list-row"><span><strong>@merchant.Name</strong><small>@L["TransactionCount", merchant.TransactionCount]</small></span><strong>Rp @merchant.TotalAmount.ToString("N0")</strong></div>
+                    }
+                </div>
+            }
+        </section>
+        <section class="content-card settlement-card">
+            <div class="section-head"><div><h2>@L["AverageSettlementTime"]</h2><p>@L["AverageSettlementTimeHint"]</p></div></div>
+            @if (Model.AverageSettlementHours.HasValue)
+            {
+                <strong class="settlement-number">@((Model.AverageSettlementHours.Value / 24m).ToString("N1"))</strong><span>@L["Days"]</span>
+                <small>@L["BasedOnSettledTransactions", Model.SettledTransactionCount]</small>
+            }
+            else
+            {
+                <div class="empty-inline compact-empty"><strong>@L["NoSettlementData"]</strong></div>
+            }
+        </section>
+    </div>
+
+    <section class="content-card mt-4">
+        <div class="section-head"><div><h2>@L["RecentTransactions"]</h2><p>@L["LatestBillActivity"]</p></div><a asp-controller="Transactions" asp-action="Index">@L["ViewAll"]</a></div>
+        @if (Model.RecentTransactions.Count == 0)
+        {
+            <div class="empty-inline"><span>🧾</span><strong>@L["NoTransactions"]</strong><p>@L["UploadFirstReceipt"]</p></div>
+        }
+        else
+        {
+            <div class="table-responsive"><table class="app-table"><thead><tr><th>@L["Date"]</th><th>@L["Merchant"]</th><th>@L["Total"]</th><th>@L["Participant"]</th><th>@L["PaymentStatus"]</th><th></th></tr></thead><tbody>
+            @foreach (var item in Model.RecentTransactions)
+            { <tr><td>@(item.TransactionDate?.ToString("dd MMM yyyy") ?? item.UploadDate.ToLocalTime().ToString("dd MMM yyyy"))</td><td><strong>@item.MerchantName</strong><small>@item.TransactionNumber</small></td><td>Rp @item.GrandTotal.ToString("N0")</td><td>@item.Participants.Count</td><td><span class="status @item.Status.ToString().ToLowerInvariant()">@L[item.Status.ToString()]</span></td><td><a class="icon-link" asp-controller="Transactions" asp-action="Details" asp-route-id="@item.Id" aria-label='@L["Detail"]'>→</a></td></tr> }
+            </tbody></table></div>
+        }
+    </section>
+}

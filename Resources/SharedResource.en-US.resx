@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="LanguageIndonesia" xml:space="preserve"><value>ID</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>EN</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="UploadReceipt" xml:space="preserve"><value>Upload receipt</value></data>
+  <data name="Transactions" xml:space="preserve"><value>Transactions</value></data>
+  <data name="Report" xml:space="preserve"><value>Report</value></data>
+  <data name="MyBills" xml:space="preserve"><value>My bills</value></data>
+  <data name="Approvals" xml:space="preserve"><value>Approvals</value></data>
+  <data name="Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="AISettings" xml:space="preserve"><value>AI settings</value></data>
+  <data name="ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="Logout" xml:space="preserve"><value>Log out</value></data>
+  <data name="Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="Moderator" xml:space="preserve"><value>Moderator</value></data>
+  <data name="Member" xml:space="preserve"><value>Member</value></data>
+  <data name="Paid" xml:space="preserve"><value>Paid</value></data>
+  <data name="Unpaid" xml:space="preserve"><value>Unpaid</value></data>
+  <data name="AwaitingConfirmation" xml:space="preserve"><value>Awaiting confirmation</value></data>
+  <data name="Partial" xml:space="preserve"><value>Partially paid</value></data>
+  <data name="Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="ExportExcel" xml:space="preserve"><value>Export to Excel</value></data>
+  <data name="ViewReport" xml:space="preserve"><value>View report</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="SavePassword" xml:space="preserve"><value>Save password</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="CurrentPassword" xml:space="preserve"><value>Current password</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="PasswordChanged" xml:space="preserve"><value>Password changed successfully.</value></data>
+  <data name="MyBillsDescription" xml:space="preserve"><value>See your bills and submit payment confirmation.</value></data>
+  <data name="NoBills" xml:space="preserve"><value>No bills yet</value></data>
+  <data name="NoNotifications" xml:space="preserve"><value>No notifications yet</value></data>
+  <data name="NoApprovals" xml:space="preserve"><value>No payments are waiting for confirmation</value></data>
+  <data name="NoData" xml:space="preserve"><value>No data found</value></data>
+  <data name="Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Merchant" xml:space="preserve"><value>Merchant</value></data>
+  <data name="Uploader" xml:space="preserve"><value>Uploader</value></data>
+  <data name="Participant" xml:space="preserve"><value>Participant</value></data>
+  <data name="Amount" xml:space="preserve"><value>Amount</value></data>
+  <data name="Total" xml:space="preserve"><value>Total</value></data>
+  <data name="PaidAmount" xml:space="preserve"><value>Paid</value></data>
+  <data name="UnpaidAmount" xml:space="preserve"><value>Unpaid</value></data>
+  <data name="AwaitingAmount" xml:space="preserve"><value>Awaiting confirmation</value></data>
+  <data name="Outstanding" xml:space="preserve"><value>Outstanding</value></data>
+  <data name="TotalTransactions" xml:space="preserve"><value>Total transactions</value></data>
+  <data name="TotalBills" xml:space="preserve"><value>Total billed</value></data>
+  <data name="Details" xml:space="preserve"><value>Details</value></data>
+  <data name="DetailsReport" xml:space="preserve"><value>Report details</value></data>
+  <data name="TransactionNumber" xml:space="preserve"><value>Transaction number</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menu</value></data>
+  <data name="PaymentStatus" xml:space="preserve"><value>Payment status</value></data>
+  <data name="IHavePaid" xml:space="preserve"><value>I've paid</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="MarkPaid" xml:space="preserve"><value>Mark paid</value></data>
+  <data name="Reopen" xml:space="preserve"><value>Reopen</value></data>
+  <data name="Submitted" xml:space="preserve"><value>Submitted</value></data>
+  <data name="Resolution" xml:space="preserve"><value>Resolved</value></data>
+  <data name="ResolvedBy" xml:space="preserve"><value>Resolved by</value></data>
+  <data name="LastAction" xml:space="preserve"><value>Last action</value></data>
+  <data name="AllStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="FromDate" xml:space="preserve"><value>From date</value></data>
+  <data name="ToDate" xml:space="preserve"><value>To date</value></data>
+  <data name="UploaderFilter" xml:space="preserve"><value>Uploader</value></data>
+  <data name="PaymentDetails" xml:space="preserve"><value>Payment details</value></data>
+  <data name="ReceiptDetails" xml:space="preserve"><value>Receipt details</value></data>
+  <data name="Subtotal" xml:space="preserve"><value>Subtotal</value></data>
+  <data name="Generated" xml:space="preserve"><value>Generated</value></data>
+  <data name="ByItem" xml:space="preserve"><value>By item</value></data>
+  <data name="EqualSplit" xml:space="preserve"><value>Equal split</value></data>
+  <data name="AllItemsEqual" xml:space="preserve"><value>All items (equal split)</value></data>
+  <data name="WelcomeBack" xml:space="preserve"><value>WELCOME BACK</value></data>
+  <data name="LoginTitle" xml:space="preserve"><value>Sign in to your account</value></data>
+  <data name="LoginDescription" xml:space="preserve"><value>Manage bills in a few steps.</value></data>
+  <data name="Username" xml:space="preserve"><value>Username</value></data>
+  <data name="Password" xml:space="preserve"><value>Password</value></data>
+  <data name="EnterUsername" xml:space="preserve"><value>Enter username</value></data>
+  <data name="EnterPassword" xml:space="preserve"><value>Enter password</value></data>
+  <data name="ShowPassword" xml:space="preserve"><value>Show password</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="Login" xml:space="preserve"><value>Sign in</value></data>
+  <data name="AdminAccess" xml:space="preserve"><value>Access is provided by an administrator.</value></data>
+  <data name="SplitWithoutHassle" xml:space="preserve"><value>NO-HASSLE SPLITS</value></data>
+  <data name="OneReceipt" xml:space="preserve"><value>One receipt. Everything is clear.</value></data>
+  <data name="UploadAiTrack" xml:space="preserve"><value>Upload a photo, let AI read it, then track who has paid.</value></data>
+  <data name="ReviewInYourHands" xml:space="preserve"><value>You stay in control of the review.</value></data>
+  <data name="Overview" xml:space="preserve"><value>OVERVIEW</value></data>
+  <data name="HelloUser" xml:space="preserve"><value>Hello, {0} 👋</value></data>
+  <data name="MonitorBills" xml:space="preserve"><value>Monitor every bill from one place.</value></data>
+  <data name="UnpaidBills" xml:space="preserve"><value>Unpaid</value></data>
+  <data name="RemainingBills" xml:space="preserve"><value>Outstanding</value></data>
+  <data name="RecentTransactions" xml:space="preserve"><value>Recent transactions</value></data>
+  <data name="LatestBillActivity" xml:space="preserve"><value>Your latest bill activity.</value></data>
+  <data name="ViewAll" xml:space="preserve"><value>View all →</value></data>
+  <data name="NoTransactions" xml:space="preserve"><value>No transactions yet</value></data>
+  <data name="UploadFirstReceipt" xml:space="preserve"><value>Upload your first receipt to start splitting a bill.</value></data>
+  <data name="PeopleCount" xml:space="preserve"><value>{0} people</value></data>
+  <data name="AllBills" xml:space="preserve"><value>All bills</value></data>
+  <data name="ReceiptHistory" xml:space="preserve"><value>Receipt history and payment status.</value></data>
+  <data name="UploadReceiptButton" xml:space="preserve"><value>＋ Upload receipt</value></data>
+  <data name="Detail" xml:space="preserve"><value>Details</value></data>
+  <data name="DeleteDraft" xml:space="preserve"><value>Delete draft</value></data>
+  <data name="DeleteDraftConfirm" xml:space="preserve"><value>Delete this draft with its details and receipt photos? This cannot be undone.</value></data>
+  <data name="StepOneOfThree" xml:space="preserve"><value>STEP 1 OF 3</value></data>
+  <data name="StepTwoOfThree" xml:space="preserve"><value>STEP 2 OF 3</value></data>
+  <data name="StepThreeOfThree" xml:space="preserve"><value>STEP 3 OF 3</value></data>
+  <data name="ChooseReceiptPhotos" xml:space="preserve"><value>Choose one or more ordered photos for one receipt.</value></data>
+  <data name="DragPhotoHere" xml:space="preserve"><value>Drag photos here</value></data>
+  <data name="OrClickToChoose" xml:space="preserve"><value>or click to choose from your device</value></data>
+  <data name="ChoosePhoto" xml:space="preserve"><value>Choose photos</value></data>
+  <data name="PhotoLimits" xml:space="preserve"><value>1–5 photos · max. 10 MB each · max. 30 MB total</value></data>
+  <data name="AllImageFormatsHint" xml:space="preserve"><value>Common photo formats are supported; files are normalized before processing.</value></data>
+  <data name="ImageRequired" xml:space="preserve"><value>An image file is required.</value></data>
+  <data name="ImageTooLarge" xml:space="preserve"><value>Images can be up to 10 MB.</value></data>
+  <data name="ImageFormatInvalid" xml:space="preserve"><value>The file is not a valid supported raster image.</value></data>
+  <data name="ImageDimensionsInvalid" xml:space="preserve"><value>The image resolution is too large.</value></data>
+  <data name="SelectedPhotos" xml:space="preserve"><value>{0} photos selected</value></data>
+  <data name="AddPhoto" xml:space="preserve"><value>＋ Add photos</value></data>
+  <data name="BestResults" xml:space="preserve"><value>For best results</value></data>
+  <data name="OrderPhotos" xml:space="preserve"><value>Order photos from top to bottom</value></data>
+  <data name="OverlapOkay" xml:space="preserve"><value>A little overlap is okay</value></data>
+  <data name="UseGoodLight" xml:space="preserve"><value>Use enough light and avoid blurry photos</value></data>
+  <data name="ProcessWithAi" xml:space="preserve"><value>Process with AI</value></data>
+  <data name="ReadingReceipt" xml:space="preserve"><value>Reading receipt...</value></data>
+  <data name="AiCombining" xml:space="preserve"><value>AI is combining photos, items, and amounts.</value></data>
+  <data name="ReviewAiResult" xml:space="preserve"><value>Review AI result</value></data>
+  <data name="ReviewReceiptHint" xml:space="preserve"><value>Make sure items and amounts match the receipt.</value></data>
+  <data name="NeedReview" xml:space="preserve"><value>Needs review:</value></data>
+  <data name="AmountNotRead" xml:space="preserve"><value>Amount not read</value></data>
+  <data name="RunAiAgain" xml:space="preserve"><value>Run AI again using all stored receipt photos.</value></data>
+  <data name="RetryAi" xml:space="preserve"><value>✦ Process again with AI</value></data>
+  <data name="ReceiptPhoto" xml:space="preserve"><value>Receipt photo</value></data>
+  <data name="PhotoNumber" xml:space="preserve"><value>Photo {0}</value></data>
+  <data name="ReceiptItem" xml:space="preserve"><value>Receipt items</value></data>
+  <data name="EditIfNeeded" xml:space="preserve"><value>Edit if the reading is inaccurate.</value></data>
+  <data name="AddItem" xml:space="preserve"><value>＋ Item</value></data>
+  <data name="ItemName" xml:space="preserve"><value>Item name</value></data>
+  <data name="Qty" xml:space="preserve"><value>Qty</value></data>
+  <data name="UnitPrice" xml:space="preserve"><value>Unit price</value></data>
+  <data name="GrandTotal" xml:space="preserve"><value>Grand total</value></data>
+  <data name="ChargesAndDiscounts" xml:space="preserve"><value>Charges &amp; discounts</value></data>
+  <data name="AddEachPrintedCharge" xml:space="preserve"><value>Add each nominal amount using its printed label.</value></data>
+  <data name="AddCharge" xml:space="preserve"><value>+ Charge</value></data>
+  <data name="Discount" xml:space="preserve"><value>- Discount</value></data>
+  <data name="ChargePlaceholder" xml:space="preserve"><value>Example: PB1, Service, Packaging</value></data>
+  <data name="RateFromAmount" xml:space="preserve"><value>Percentage will be shown from the amount</value></data>
+  <data name="SaveLater" xml:space="preserve"><value>Save for later</value></data>
+  <data name="ContinueSplit" xml:space="preserve"><value>Continue to split →</value></data>
+  <data name="SetSplit" xml:space="preserve"><value>Set split</value></data>
+  <data name="ChooseParticipants" xml:space="preserve"><value>Choose an available account or add a guest.</value></data>
+  <data name="RegisteredAccount" xml:space="preserve"><value>Registered account</value></data>
+  <data name="ChooseUser" xml:space="preserve"><value>Choose a user...</value></data>
+  <data name="Add" xml:space="preserve"><value>Add</value></data>
+  <data name="GuestName" xml:space="preserve"><value>Guest name</value></data>
+  <data name="GuestPlaceholder" xml:space="preserve"><value>Example: Office guest</value></data>
+  <data name="SplitMethod" xml:space="preserve"><value>Split method</value></data>
+  <data name="ChooseMethod" xml:space="preserve"><value>Choose the method that fits.</value></data>
+  <data name="EqualSplitHint" xml:space="preserve"><value>Grand total is divided equally.</value></data>
+  <data name="ByItemHint" xml:space="preserve"><value>Choose who owns each item.</value></data>
+  <data name="AddParticipantsFirst" xml:space="preserve"><value>Add participants to show item choices.</value></data>
+  <data name="CalculateAndSaveSplit" xml:space="preserve"><value>Calculate &amp; save split →</value></data>
+  <data name="AllTransactions" xml:space="preserve"><value>← All transactions</value></data>
+  <data name="TotalBill" xml:space="preserve"><value>Total bill</value></data>
+  <data name="PaymentStatusHeading" xml:space="preserve"><value>Payment status</value></data>
+  <data name="PeopleInTransaction" xml:space="preserve"><value>{0} participants in this transaction.</value></data>
+  <data name="WaitingForPayment" xml:space="preserve"><value>Waiting for payment</value></data>
+  <data name="ConfirmPayment" xml:space="preserve"><value>Confirm</value></data>
+  <data name="MarkPaidConfirm" xml:space="preserve"><value>Mark {0}'s payment as Paid?</value></data>
+  <data name="NotSplitYet" xml:space="preserve"><value>Not split yet</value></data>
+  <data name="SetParticipantsFirst" xml:space="preserve"><value>Set participants first to start payments.</value></data>
+  <data name="AllReceiptPhotos" xml:space="preserve"><value>All receipt photos</value></data>
+  <data name="PhotosStoredProcessed" xml:space="preserve"><value>{0} photos stored and processed as one receipt.</value></data>
+  <data name="ConfirmedByModerator" xml:space="preserve"><value>Results confirmed by the moderator.</value></data>
+  <data name="RejectReasonPrompt" xml:space="preserve"><value>Optional rejection reason for {0}:</value></data>
+  <data name="DuplicateUser" xml:space="preserve"><value>That user is already selected.</value></data>
+  <data name="DuplicateParticipant" xml:space="preserve"><value>Participant names must be unique.</value></data>
+  <data name="ChooseAtLeastOneParticipant" xml:space="preserve"><value>Choose at least one participant.</value></data>
+  <data name="ChooseItemParticipant" xml:space="preserve"><value>Choose at least one participant for every item.</value></data>
+  <data name="DeleteDraftError" xml:space="preserve"><value>Only Draft transactions can be deleted.</value></data>
+  <data name="RejectedPayment" xml:space="preserve"><value>Payment rejected</value></data>
+  <data name="NewBill" xml:space="preserve"><value>New bill</value></data>
+  <data name="NewPaymentClaim" xml:space="preserve"><value>New payment claim</value></data>
+  <data name="PaymentConfirmed" xml:space="preserve"><value>Payment confirmed</value></data>
+  <data name="PaymentReopened" xml:space="preserve"><value>Payment reopened</value></data>
+  <data name="MarkAllRead" xml:space="preserve"><value>Mark all as read</value></data>
+  <data name="BillUpdates" xml:space="preserve"><value>Bill and payment updates.</value></data>
+  <data name="NewRequestsAppear" xml:space="preserve"><value>New requests will appear here.</value></data>
+  <data name="BillAssignedHint" xml:space="preserve"><value>New bills appear when you are selected in a split.</value></data>
+  <data name="PaymentSubmitted" xml:space="preserve"><value>Submitted</value></data>
+  <data name="ChangePasswordTitle" xml:space="preserve"><value>Change password</value></data>
+  <data name="ChangePasswordDescription" xml:space="preserve"><value>Update your account password regularly.</value></data>
+  <data name="SaveAndTest" xml:space="preserve"><value>↻ Save &amp; test</value></data>
+  <data name="SaveConfiguration" xml:space="preserve"><value>Save configuration</value></data>
+  <data name="AiConfiguration" xml:space="preserve"><value>AI configuration</value></data>
+  <data name="ChooseAiConnection" xml:space="preserve"><value>Choose the connection used to read receipts.</value></data>
+  <data name="Provider" xml:space="preserve"><value>Provider</value></data>
+  <data name="ConfigUsedNextUpload" xml:space="preserve"><value>This configuration is used for the next upload.</value></data>
+  <data name="EncryptedKeyHint" xml:space="preserve"><value>Key is stored encrypted.</value></data>
+  <data name="StoredKeyPlaceholder" xml:space="preserve"><value>Stored encrypted · leave blank to keep it</value></data>
+  <data name="EnterProviderKey" xml:space="preserve"><value>Enter provider API key</value></data>
+  <data name="ApiKeySecurityHint" xml:space="preserve"><value>The key is never shown again and is encrypted with ASP.NET Core Data Protection before it enters the database. When switching providers, enter the key for the new provider.</value></data>
+  <data name="ApiMode" xml:space="preserve"><value>API mode</value></data>
+  <data name="AzureEndpoint" xml:space="preserve"><value>Azure endpoint</value></data>
+  <data name="Deployment" xml:space="preserve"><value>Deployment</value></data>
+  <data name="ApiVersion" xml:space="preserve"><value>API version</value></data>
+  <data name="ConnectionStatus" xml:space="preserve"><value>Connection status</value></data>
+  <data name="Connected" xml:space="preserve"><value>Connected</value></data>
+  <data name="LastTested" xml:space="preserve"><value>Last tested {0}</value></data>
+  <data name="NotTested" xml:space="preserve"><value>Not tested</value></data>
+  <data name="SaveAndTestBeforeUse" xml:space="preserve"><value>Save and test the configuration before using it.</value></data>
+  <data name="WhatWillBeSaved" xml:space="preserve"><value>What will be saved</value></data>
+  <data name="ActiveProvider" xml:space="preserve"><value>Active provider</value></data>
+  <data name="EncryptedApiKey" xml:space="preserve"><value>Encrypted API key</value></data>
+  <data name="ModelAndApiMode" xml:space="preserve"><value>Model and API mode</value></data>
+  <data name="AzureEndpointDeployment" xml:space="preserve"><value>Azure endpoint/deployment</value></data>
+  <data name="LastTestResult" xml:space="preserve"><value>Last test result</value></data>
+  <data name="CheckPaymentClaims" xml:space="preserve"><value>Review payment claims from participants.</value></data>
+  <data name="LoadModels" xml:space="preserve"><value>Load models</value></data>
+  <data name="ModelsFromProvider" xml:space="preserve"><value>Models will be loaded directly from the provider.</value></data>
+  <data name="OpenAiEncryptedKey" xml:space="preserve"><value>OpenAI uses the encrypted API key from this active configuration.</value></data>
+  <data name="ReportMemberDescription" xml:space="preserve"><value>Track the bills assigned to you.</value></data>
+  <data name="ReportAdminDescription" xml:space="preserve"><value>Track transactions for every user.</value></data>
+  <data name="ReportModeratorDescription" xml:space="preserve"><value>Track the transactions you manage.</value></data>
+  <data name="ReportFilterHint" xml:space="preserve"><value>Results for the selected filters. Open a separate report for people and menu details.</value></data>
+  <data name="AllUploaders" xml:space="preserve"><value>All uploaders</value></data>
+  <data name="TryAnotherFilter" xml:space="preserve"><value>Try a different date range or status.</value></data>
+  <data name="ReportDetailEyebrow" xml:space="preserve"><value>REPORT DETAIL</value></data>
+  <data name="AllReports" xml:space="preserve"><value>← All reports</value></data>
+  <data name="OneTimePerParticipant" xml:space="preserve"><value>Each participant amount is counted once.</value></data>
+  <data name="ReceiptMenuAndCharges" xml:space="preserve"><value>Menu items and charges read from the receipt.</value></data>
+  <data name="ExportReport" xml:space="preserve"><value>Export report</value></data>
+  <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="MarkRead" xml:space="preserve"><value>Mark as read</value></data>
+  <data name="ChooseModel" xml:space="preserve"><value>Choose a model</value></data>
+  <data name="AzureFieldsRequired" xml:space="preserve"><value>Enter the Azure endpoint and API version first.</value></data>
+  <data name="LoadingModels" xml:space="preserve"><value>Loading models...</value></data>
+  <data name="ModelsLoadFailed" xml:space="preserve"><value>Unable to load models.</value></data>
+  <data name="ModelsAvailable" xml:space="preserve"><value>{0} models available from the provider.</value></data>
+  <data name="StoredModel" xml:space="preserve"><value>{0} (stored)</value></data>
+  <data name="AzureConnectionHint" xml:space="preserve"><value>Enter the Azure connection, then load models.</value></data>
+  <data name="OpenAiModelHint" xml:space="preserve"><value>Models will be loaded from OpenAI.</value></data>
+  <data name="Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="AccountSuffix" xml:space="preserve"><value>account</value></data>
+  <data name="GuestSuffix" xml:space="preserve"><value>guest</value></data>
+  <data name="PasswordRule" xml:space="preserve"><value>At least 6 characters and one digit.</value></data>
+  <data name="EffectiveRate" xml:space="preserve"><value>≈ {0}% of subtotal</value></data>
+  <data name="BillNotFound" xml:space="preserve"><value>Bill not found.</value></data>
+  <data name="PaymentNotWaiting" xml:space="preserve"><value>This bill is not waiting for payment.</value></data>
+  <data name="PaymentAlreadyAwaiting" xml:space="preserve"><value>This payment is already awaiting confirmation.</value></data>
+  <data name="PaymentSubmittedSuccess" xml:space="preserve"><value>Payment submitted and awaiting confirmation.</value></data>
+  <data name="PaymentAlreadyPaid" xml:space="preserve"><value>Payment is already marked Paid.</value></data>
+  <data name="PaymentMarkedPaid" xml:space="preserve"><value>Payment marked Paid.</value></data>
+  <data name="PaymentNotPaid" xml:space="preserve"><value>This payment is not marked Paid.</value></data>
+  <data name="PaymentReopenedSuccess" xml:space="preserve"><value>Payment returned to Unpaid.</value></data>
+  <data name="NoPaymentAwaiting" xml:space="preserve"><value>No payment is awaiting confirmation.</value></data>
+  <data name="PaymentRequestProcessed" xml:space="preserve"><value>The payment request was already processed.</value></data>
+  <data name="PaymentConfirmedSuccess" xml:space="preserve"><value>Payment confirmed.</value></data>
+  <data name="PaymentRejectedSuccess" xml:space="preserve"><value>Payment rejected and returned to Unpaid.</value></data>
+  <data name="InvalidCredentials" xml:space="preserve"><value>Invalid username or password.</value></data>
+  <data name="AccountLocked" xml:space="preserve"><value>This account is temporarily locked after too many login attempts.</value></data>
+  <data name="ProviderKeyRequired" xml:space="preserve"><value>{0} API key is required.</value></data>
+  <data name="AzureEndpointRequired" xml:space="preserve"><value>Azure endpoint is required.</value></data>
+  <data name="AzureDeploymentRequired" xml:space="preserve"><value>Azure deployment is required.</value></data>
+  <data name="AzureApiVersionRequired" xml:space="preserve"><value>API version is required.</value></data>
+  <data name="ConfigurationTestSuccess" xml:space="preserve"><value>Configuration saved and AI connection succeeded.</value></data>
+  <data name="ConfigurationTestFailed" xml:space="preserve"><value>Configuration saved, but the connection test failed. Review the details below.</value></data>
+  <data name="ConfigurationSaved" xml:space="preserve"><value>AI configuration saved.</value></data>
+  <data name="DateRangeInvalid" xml:space="preserve"><value>The start date cannot be after the end date.</value></data>
+  <data name="AccessDeniedTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="AccessDeniedDescription" xml:space="preserve"><value>You do not have permission to open this page.</value></data>
+  <data name="BackDashboard" xml:space="preserve"><value>Back to dashboard</value></data>
+  <data name="ReceiptReadSuccess" xml:space="preserve"><value>Receipt read successfully. Review the AI result before continuing.</value></data>
+  <data name="AiReadFailed" xml:space="preserve"><value>AI could not read the receipt: {0} The data is saved and can be entered manually.</value></data>
+  <data name="NegativeAmount" xml:space="preserve"><value>Amounts cannot be negative. Enter a discount in the Discount field.</value></data>
+  <data name="MissingReceiptTotals" xml:space="preserve"><value>Enter Grand total, Subtotal, or at least one item amount to continue.</value></data>
+  <data name="SplitLocked" xml:space="preserve"><value>The split cannot be changed because a payment is already paid or awaiting confirmation.</value></data>
+  <data name="SplitSaved" xml:space="preserve"><value>Split saved successfully.</value></data>
+  <data name="InvalidParticipantData" xml:space="preserve"><value>Participant data is invalid.</value></data>
+  <data name="InvalidParticipantAccount" xml:space="preserve"><value>One or more participant accounts are invalid.</value></data>
+  <data name="DuplicateParticipants" xml:space="preserve"><value>Participants must be unique.</value></data>
+  <data name="ReprocessDraftOnly" xml:space="preserve"><value>Retry is only available for Draft transactions with a zero grand total.</value></data>
+  <data name="ReceiptMissingRetry" xml:space="preserve"><value>The receipt photo was not found, so it cannot be retried.</value></data>
+  <data name="ReprocessSuccess" xml:space="preserve"><value>{0} receipt photos were processed again. Review the AI result.</value></data>
+  <data name="AiRetryFailed" xml:space="preserve"><value>AI still failed: {0} Manual data is safe.</value></data>
+  <data name="DraftOnlyDelete" xml:space="preserve"><value>Only Draft transactions can be deleted.</value></data>
+  <data name="DraftFileCleanupFailed" xml:space="preserve"><value>The draft was deleted, but one or more receipt files could not be removed from the server.</value></data>
+  <data name="DraftDeleted" xml:space="preserve"><value>Draft {0} deleted successfully.</value></data>
+  <data name="UsernameRequired" xml:space="preserve"><value>Username is required.</value></data>
+  <data name="FirstAdminSetup" xml:space="preserve"><value>First admin setup</value></data>
+  <data name="SetupDescription" xml:space="preserve"><value>Create the first administrator account for this installation.</value></data>
+  <data name="SetupCodeHint" xml:space="preserve"><value>Get the one-time code by running --print-bootstrap-code on the server.</value></data>
+  <data name="BootstrapCode" xml:space="preserve"><value>Bootstrap code</value></data>
+  <data name="BootstrapCodeHint" xml:space="preserve"><value>This code expires after 24 hours and is deleted after setup.</value></data>
+  <data name="BootstrapCodeInvalid" xml:space="preserve"><value>The bootstrap code is invalid or expired.</value></data>
+  <data name="CreateAdmin" xml:space="preserve"><value>Create administrator</value></data>
+  <data name="EmailOptional" xml:space="preserve"><value>Email (optional)</value></data>
+  <data name="SetupComplete" xml:space="preserve"><value>Administrator created successfully. Please sign in.</value></data>
+  <data name="InstallApp" xml:space="preserve"><value>Install app</value></data>
+  <data name="InstallAppHint" xml:space="preserve"><value>Install SplitBill for quick access from your home screen.</value></data>
+  <data name="RefreshApp" xml:space="preserve"><value>Refresh now</value></data>
+  <data name="UpdateAppHint" xml:space="preserve"><value>A new SplitBill version is available.</value></data>
+  <data name="SystemTools" xml:space="preserve"><value>System tools</value></data>
+  <data name="SystemToolsDescription" xml:space="preserve"><value>Back up and restore installation data with admin confirmation.</value></data>
+  <data name="CreateBackup" xml:space="preserve"><value>Create backup</value></data>
+  <data name="BackupDescription" xml:space="preserve"><value>Download a consistent SQLite snapshot, receipt photos, payment proofs, and the key ring for same-install recovery.</value></data>
+  <data name="ConfirmAdminPassword" xml:space="preserve"><value>Confirm admin password</value></data>
+  <data name="BackupPasswordHint" xml:space="preserve"><value>The backup is not created until the admin password is verified.</value></data>
+  <data name="DownloadBackup" xml:space="preserve"><value>Download backup</value></data>
+  <data name="StageRestore" xml:space="preserve"><value>Validate restore package</value></data>
+  <data name="RestoreDescription" xml:space="preserve"><value>Upload a ZIP to validate and stage. Execution happens through the IIS handoff script.</value></data>
+  <data name="BackupFile" xml:space="preserve"><value>Backup ZIP file</value></data>
+  <data name="RestoreFileHint" xml:space="preserve"><value>Maximum 512 MB. The manifest checksums must match.</value></data>
+  <data name="ValidateAndStage" xml:space="preserve"><value>Validate and stage</value></data>
+  <data name="RestoreWarningTitle" xml:space="preserve"><value>Restore replaces local data</value></data>
+  <data name="RestoreWarning" xml:space="preserve"><value>Run the server script with an App_Data backup first. Migration mode clears machine-bound secrets and requires them to be entered again.</value></data>
+  <data name="RestoreStaged" xml:space="preserve"><value>Backup {0} is valid and contains {1} files. Continue with restore-splitbill.ps1 on the server.</value></data>
+  <data name="RestoreInvalid" xml:space="preserve"><value>Backup is invalid: {0}</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>Password is required.</value></data>
+  <data name="CurrentPasswordRequired" xml:space="preserve"><value>Current password is required.</value></data>
+  <data name="NewPasswordRequired" xml:space="preserve"><value>New password is required.</value></data>
+  <data name="PasswordMinLength" xml:space="preserve"><value>New password must be at least {2} characters.</value></data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve"><value>Password confirmation is required.</value></data>
+  <data name="PasswordMismatch" xml:space="preserve"><value>Password confirmation does not match.</value></data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve"><value>Current password is incorrect.</value></data>
+  <data name="PasswordRequiresDigit" xml:space="preserve"><value>Password must contain a digit.</value></data>
+  <data name="PasswordRequiresLower" xml:space="preserve"><value>Password must contain a lowercase letter.</value></data>
+  <data name="PasswordTooShort" xml:space="preserve"><value>New password must be at least 6 characters.</value></data>
+  <data name="PaymentProof" xml:space="preserve"><value>Payment proof</value></data>
+  <data name="PaymentProofHint" xml:space="preserve"><value>Upload a JPG, PNG, or WebP image up to 10 MB.</value></data>
+  <data name="PaymentAttempts" xml:space="preserve"><value>Payment request history</value></data>
+  <data name="PaymentAttemptsHint" xml:space="preserve"><value>Every submission and resolution is kept here.</value></data>
+  <data name="ViewProof" xml:space="preserve"><value>View proof</value></data>
+  <data name="MissingProof" xml:space="preserve"><value>Proof unavailable</value></data>
+  <data name="RejectReason" xml:space="preserve"><value>Rejection reason</value></data>
+  <data name="RejectReasonPlaceholder" xml:space="preserve"><value>Write a rejection reason</value></data>
+  <data name="InvalidPaymentProof" xml:space="preserve"><value>A JPG, PNG, or WebP payment proof image is required.</value></data>
+  <data name="PaymentProofTooLarge" xml:space="preserve"><value>Payment proof must be 10 MB or smaller.</value></data>
+  <data name="PaymentProofFormatInvalid" xml:space="preserve"><value>The payment proof must be a supported raster image.</value></data>
+  <data name="PaymentProofContentInvalid" xml:space="preserve"><value>The file contents are not a valid image.</value></data>
+  <data name="Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="EditLocked" xml:space="preserve"><value>This transaction cannot be edited after payment activity begins.</value></data>
+  <data name="DeleteUnpaid" xml:space="preserve"><value>Delete unpaid</value></data>
+  <data name="DeleteUnpaidConfirm" xml:space="preserve"><value>Delete this unpaid transaction with participants, payment history, proofs, and receipt photos? This cannot be undone.</value></data>
+  <data name="AdminOnlyUnpaidDelete" xml:space="preserve"><value>Only Admin can delete an unpaid transaction.</value></data>
+  <data name="AllocationGroup" xml:space="preserve"><value>Group</value></data>
+  <data name="OwnedQuantity" xml:space="preserve"><value>Owned by this person</value></data>
+  <data name="SharedEqually" xml:space="preserve"><value>Shared equally</value></data>
+  <data name="RemoveGroup" xml:space="preserve"><value>Remove group</value></data>
+  <data name="AddGroup" xml:space="preserve"><value>Add group</value></data>
+  <data name="AssignedQuantity" xml:space="preserve"><value>Assigned {0} of {1}</value></data>
+  <data name="RemainingQuantity" xml:space="preserve"><value>Remaining {0}</value></data>
+  <data name="SharedByPeople" xml:space="preserve"><value>Shared equally · {0} people</value></data>
+  <data name="ChooseGroupParticipant" xml:space="preserve"><value>Choose a participant</value></data>
+  <data name="AssignmentIncomplete" xml:space="preserve"><value>Reduce another group or complete participants</value></data>
+  <data name="AssignmentGroupHint" xml:space="preserve"><value>Set the quantity and participants for each item group.</value></data>
+  <data name="Row" xml:space="preserve"><value>Row</value></data>
+  <data name="PushNotificationsTitle" xml:space="preserve"><value>Browser notifications</value></data>
+  <data name="PushNotificationsDescription" xml:space="preserve"><value>Get notified when a member submits a payment claim.</value></data>
+  <data name="PushEnabledDevices" xml:space="preserve"><value>Active devices</value></data>
+  <data name="PushEnable" xml:space="preserve"><value>Enable notifications</value></data>
+  <data name="PushDisable" xml:space="preserve"><value>Disable notifications</value></data>
+  <data name="PushChecking" xml:space="preserve"><value>Checking browser support...</value></data>
+  <data name="PushEnablePrompt" xml:space="preserve"><value>Enable browser notifications for this device.</value></data>
+  <data name="PushEnabled" xml:space="preserve"><value>Browser notifications are active.</value></data>
+  <data name="PushDisabled" xml:space="preserve"><value>Browser notifications are disabled.</value></data>
+  <data name="PushUnsupported" xml:space="preserve"><value>This browser does not support push notifications.</value></data>
+  <data name="PushInsecure" xml:space="preserve"><value>Push notifications require HTTPS or localhost.</value></data>
+  <data name="PushDenied" xml:space="preserve"><value>Browser notification permission was denied.</value></data>
+  <data name="PushRequesting" xml:space="preserve"><value>Requesting browser permission...</value></data>
+  <data name="PushError" xml:space="preserve"><value>Push notification failed. Try again.</value></data>
+  <data name="PushTestButton" xml:space="preserve"><value>Send test notification</value></data>
+  <data name="PushTestSent" xml:space="preserve"><value>Test notification sent.</value></data>
+  <data name="PushTest" xml:space="preserve"><value>Test notification</value></data>
+  <data name="ReceiptDateRequired" xml:space="preserve"><value>The receipt date could not be read. Enter it manually to continue.</value></data>
+  <data name="YourBillBreakdown" xml:space="preserve"><value>Your bill breakdown</value></data>
+  <data name="MenuAndReceiptCharges" xml:space="preserve"><value>Menu and receipt adjustments</value></data>
+  <data name="FullReceiptAmount" xml:space="preserve"><value>Full receipt</value></data>
+  <data name="YourShare" xml:space="preserve"><value>Your share</value></data>
+  <data name="YourMenuSubtotal" xml:space="preserve"><value>Your menu subtotal</value></data>
+  <data name="DiscountsAndOtherCharges" xml:space="preserve"><value>Discounts and other charges</value></data>
+  <data name="YourAdjustmentTotal" xml:space="preserve"><value>Your adjustment total</value></data>
+  <data name="YourBillTotal" xml:space="preserve"><value>Your bill total</value></data>
+  <data name="OtherAdjustment" xml:space="preserve"><value>Other adjustment</value></data>
+  <data name="RoundingAdjustment" xml:space="preserve"><value>Rounding adjustment</value></data>
+  <data name="AdjustmentAllocationHint" xml:space="preserve"><value>The total combines receipt items with adjustments allocated to your share.</value></data>
+  <data name="MoreMenuItems" xml:space="preserve"><value>more items</value></data>
+  <data name="ReceiptPhotos" xml:space="preserve"><value>Receipt photos</value></data>
+  <data name="OpenReceiptPhoto" xml:space="preserve"><value>Open receipt photo</value></data>
+  <data name="ReceiptPhotoCounter" xml:space="preserve"><value>Photo {0} of {1}</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Zoom in</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Zoom out</value></data>
+  <data name="ResetZoom" xml:space="preserve"><value>Reset zoom</value></data>
+  <data name="PreviousPhoto" xml:space="preserve"><value>Previous photo</value></data>
+  <data name="NextPhoto" xml:space="preserve"><value>Next photo</value></data>
+  <data name="CloseReceiptViewer" xml:space="preserve"><value>Close receipt viewer</value></data>
+  <data name="Photos" xml:space="preserve"><value>photos</value></data>
+  <data name="ViewOrderDetails" xml:space="preserve"><value>View order details</value></data>
+  <data name="OrderItemCount" xml:space="preserve"><value>{0} ordered items</value></data>
+  <data name="ParticipantShare" xml:space="preserve"><value>Participant share</value></data>
+  <data name="QuantityShare" xml:space="preserve"><value>Quantity share {0}</value></data>
+  <data name="MenuSubtotal" xml:space="preserve"><value>Menu subtotal</value></data>
+  <data name="AdjustmentTotal" xml:space="preserve"><value>Adjustment total</value></data>
+  <data name="ParticipantBillTotal" xml:space="preserve"><value>Participant bill total</value></data>
+  <data name="SharePointIntegration" xml:space="preserve"><value>SharePoint integration</value></data>
+  <data name="SharePointSettingsDescription" xml:space="preserve"><value>Connect SplitBill to the selected SharePoint site.</value></data>
+  <data name="MicrosoftEntra" xml:space="preserve"><value>Microsoft Entra</value></data>
+  <data name="SharePointCredentialsHint" xml:space="preserve"><value>Use Entra application credentials to read a site and its lists.</value></data>
+  <data name="Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="TenantId" xml:space="preserve"><value>Tenant ID</value></data>
+  <data name="ClientId" xml:space="preserve"><value>Client ID</value></data>
+  <data name="ClientSecret" xml:space="preserve"><value>Client secret</value></data>
+  <data name="StoredSecretPlaceholder" xml:space="preserve"><value>Secret stored — fill only to replace it</value></data>
+  <data name="EnterClientSecret" xml:space="preserve"><value>Enter client secret</value></data>
+  <data name="StoredSecretHint" xml:space="preserve"><value>The secret is encrypted. Leave blank to reuse it.</value></data>
+  <data name="SecretRequiredForTest" xml:space="preserve"><value>A client secret is required to test the connection.</value></data>
+  <data name="SharePointSiteUrl" xml:space="preserve"><value>SharePoint Site URL</value></data>
+  <data name="SharePointSiteUrlHint" xml:space="preserve"><value>Example: https://company.sharepoint.com/sites/Office</value></data>
+  <data name="TestConnectionBeforeSave" xml:space="preserve"><value>Test the connection to load available lists.</value></data>
+  <data name="TestConnection" xml:space="preserve"><value>Test connection</value></data>
+  <data name="SharePointDestination" xml:space="preserve"><value>SharePoint destination</value></data>
+  <data name="SharePointListHint" xml:space="preserve"><value>Lists appear automatically after the site connects.</value></data>
+  <data name="NotConnected" xml:space="preserve"><value>Not connected</value></data>
+  <data name="SharePointList" xml:space="preserve"><value>SharePoint list</value></data>
+  <data name="TestConnectionToLoadLists" xml:space="preserve"><value>Test connection to load lists</value></data>
+  <data name="ListNotLoaded" xml:space="preserve"><value>Lists have not been loaded.</value></data>
+  <data name="EncryptedClientSecret" xml:space="preserve"><value>Encrypted client secret</value></data>
+  <data name="StableSiteAndListIds" xml:space="preserve"><value>Stable site and list IDs</value></data>
+  <data name="LastConnectionTest" xml:space="preserve"><value>Last connection test result</value></data>
+  <data name="SharePointConfigurationSaved" xml:space="preserve"><value>SharePoint configuration saved.</value></data>
+  <data name="SharePointInvalidInput" xml:space="preserve"><value>Check the Tenant ID, Client ID, secret, and SharePoint URL.</value></data>
+  <data name="SharePointClientSecretRequired" xml:space="preserve"><value>A client secret is required for this connection.</value></data>
+  <data name="SharePointTestRequired" xml:space="preserve"><value>Run Test Connection again before saving a list selection.</value></data>
+  <data name="SharePointAuthenticationFailed" xml:space="preserve"><value>Microsoft Entra authentication failed.</value></data>
+  <data name="SharePointInvalidClientSecret" xml:space="preserve"><value>Microsoft Entra rejected the client secret (AADSTS7000215). Use the Secret Value from the same App Registration, not the Secret ID.</value></data>
+  <data name="SharePointExpiredClientSecret" xml:space="preserve"><value>The client secret has expired (AADSTS7000222). Create a new secret and copy its Secret Value.</value></data>
+  <data name="SharePointApplicationNotFound" xml:space="preserve"><value>The Application (Client) ID was not found in this tenant (AADSTS700016). Check the Tenant ID and Application ID.</value></data>
+  <data name="SharePointApplicationDisabled" xml:space="preserve"><value>The App Registration is disabled in Microsoft Entra (AADSTS7000112).</value></data>
+  <data name="SharePointTenantInvalid" xml:space="preserve"><value>Microsoft Entra did not recognize the Tenant ID (AADSTS900023).</value></data>
+  <data name="SharePointAuthenticationFailedWithCode" xml:space="preserve"><value>Microsoft Entra authentication failed ({0}). Check the sign-in logs for details.</value></data>
+  <data name="SharePointGraphTokenRejected" xml:space="preserve"><value>Microsoft Entra sign-in succeeded, but Microsoft Graph rejected the access token (GRAPH_HTTP_401). Check Microsoft Graph Application permissions and admin consent.</value></data>
+  <data name="SharePointGraphRequestFailedWithCode" xml:space="preserve"><value>Microsoft Graph returned a failure ({0}). Check that code, or wait a few minutes if permissions were just changed.</value></data>
+  <data name="SharePointGraphRequestFailedWithDetail" xml:space="preserve"><value>Microsoft Graph returned a failure ({0}): {1}</value></data>
+  <data name="SharePointPermissionDenied" xml:space="preserve"><value>The app does not have access to this SharePoint site.</value></data>
+  <data name="SharePointSiteNotFound" xml:space="preserve"><value>The SharePoint site could not be found.</value></data>
+  <data name="SharePointNoLists" xml:space="preserve"><value>No selectable SharePoint lists were found.</value></data>
+  <data name="SharePointRateLimited" xml:space="preserve"><value>Microsoft Graph is rate limiting requests. Try again later.</value></data>
+  <data name="SharePointNetworkFailure" xml:space="preserve"><value>Microsoft 365 could not be reached. Try again.</value></data>
+  <data name="SharePointInvalidResponse" xml:space="preserve"><value>Microsoft Graph returned an invalid response.</value></data>
+  <data name="TestingConnection" xml:space="preserve"><value>Testing connection…</value></data>
+  <data name="ConnectionReady" xml:space="preserve"><value>Connection successful. Choose a list.</value></data>
+  <data name="ConnectionFailed" xml:space="preserve"><value>Connection failed.</value></data>
+  <data name="ChooseSharePointList" xml:space="preserve"><value>Choose a SharePoint list.</value></data>
+  <data name="ListsAvailable" xml:space="preserve"><value>lists available.</value></data>
+  <data name="ManageUsers" xml:space="preserve"><value>Manage users</value></data>
+  <data name="AdminUsersDescription" xml:space="preserve"><value>Manage SplitBill accounts, emails, roles, and sign-in access.</value></data>
+  <data name="AddUser" xml:space="preserve"><value>Add user</value></data>
+  <data name="SearchUsers" xml:space="preserve"><value>Search users</value></data>
+  <data name="SearchUsersPlaceholder" xml:space="preserve"><value>Name, username, or email</value></data>
+  <data name="AllRoles" xml:space="preserve"><value>All roles</value></data>
+  <data name="AllUserStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="User" xml:space="preserve"><value>User</value></data>
+  <data name="Email" xml:space="preserve"><value>Email</value></data>
+  <data name="DisplayName" xml:space="preserve"><value>Display name</value></data>
+  <data name="UserRole" xml:space="preserve"><value>Role</value></data>
+  <data name="UserStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="UserList" xml:space="preserve"><value>User list</value></data>
+  <data name="AdminUserCount" xml:space="preserve"><value>{0} users</value></data>
+  <data name="NoUsersFound" xml:space="preserve"><value>No users found</value></data>
+  <data name="MissingEmail" xml:space="preserve"><value>Email is missing</value></data>
+  <data name="CreateUserHint" xml:space="preserve"><value>Create an internal account and choose its access role.</value></data>
+  <data name="EditUser" xml:space="preserve"><value>Edit user</value></data>
+  <data name="CreateUser" xml:space="preserve"><value>Create user</value></data>
+  <data name="SaveUser" xml:space="preserve"><value>Save changes</value></data>
+  <data name="TemporaryPassword" xml:space="preserve"><value>Temporary password</value></data>
+  <data name="TemporaryPasswordHint" xml:space="preserve"><value>Share the temporary password through a secure internal channel. It is not sent automatically.</value></data>
+  <data name="ResetPasswordHint" xml:space="preserve"><value>Set a new password for this user and revoke existing login sessions.</value></data>
+  <data name="UsernameImmutable" xml:space="preserve"><value>Username cannot change so transaction history stays consistent.</value></data>
+  <data name="ResetPassword" xml:space="preserve"><value>Reset password</value></data>
+  <data name="DisableUser" xml:space="preserve"><value>Disable</value></data>
+  <data name="EnableUser" xml:space="preserve"><value>Enable</value></data>
+  <data name="DisableUserConfirm" xml:space="preserve"><value>Disable this user? Active login sessions will be revoked.</value></data>
+  <data name="EnableUserConfirm" xml:space="preserve"><value>Enable this user again?</value></data>
+  <data name="ResetPasswordConfirm" xml:space="preserve"><value>Reset this user's password?</value></data>
+  <data name="AdminUserCreated" xml:space="preserve"><value>User created successfully.</value></data>
+  <data name="AdminUserUpdated" xml:space="preserve"><value>User details updated.</value></data>
+  <data name="AdminUserPasswordReset" xml:space="preserve"><value>User password reset successfully.</value></data>
+  <data name="AdminUserDisabled" xml:space="preserve"><value>User disabled successfully.</value></data>
+  <data name="AdminUserEnabled" xml:space="preserve"><value>User enabled successfully.</value></data>
+  <data name="AdminDuplicateUsername" xml:space="preserve"><value>That username is already in use.</value></data>
+  <data name="AdminDuplicateEmail" xml:space="preserve"><value>That email is already in use.</value></data>
+  <data name="AdminInvalidRole" xml:space="preserve"><value>The user role is invalid.</value></data>
+  <data name="AdminUserNotFound" xml:space="preserve"><value>User not found.</value></data>
+  <data name="AdminSelfDemotion" xml:space="preserve"><value>An Admin cannot lower their own role.</value></data>
+  <data name="AdminSelfDisable" xml:space="preserve"><value>An Admin cannot disable their own account.</value></data>
+  <data name="AdminLastAdmin" xml:space="preserve"><value>The last active Admin cannot be disabled or demoted.</value></data>
+  <data name="AdminInvalidUserInput" xml:space="preserve"><value>Check the entered user details.</value></data>
+  <data name="AdminUserOperationFailed" xml:space="preserve"><value>The user change failed. Try again.</value></data>
+  <data name="SharePointCurrencyAmount" xml:space="preserve"><value>IDR {0:N0}</value></data>
+  <data name="SharePointBillAssignedTitle" xml:space="preserve"><value>New bill from {0}</value></data>
+  <data name="SharePointBillAssignedBody" xml:space="preserve"><value>Hello {0},
+
+A new bill has been assigned to you.
+
+Merchant: {1}
+Amount: {2}
+Created by: {3}
+
+Open My bills in SplitBill to view the details.</value></data>
+  <data name="SharePointPaymentRequestedTitle" xml:space="preserve"><value>Payment confirmation request from {0}</value></data>
+  <data name="SharePointPaymentRequestedBody" xml:space="preserve"><value>Hello {0},
+
+{1} has submitted payment proof.
+
+Merchant: {2}
+Transaction: {3}
+Amount: {4}
+
+Open Approvals in SplitBill to review and confirm it.</value></data>
+  <data name="SharePointPaymentRejectedTitle" xml:space="preserve"><value>Payment rejected by {0}</value></data>
+  <data name="SharePointPaymentRejectedBody" xml:space="preserve"><value>Hello {0},
+
+Your payment request was rejected.
+
+Merchant: {1}
+Transaction: {2}
+Amount: {3}
+Rejected by: {4}
+Reason: {5}
+
+Open My bills in SplitBill to view the details.</value></data>
+  <data name="SharePointNoRejectionReason" xml:space="preserve"><value>No reason was provided.</value></data>
+  <data name="SharePointOpenBillDetails" xml:space="preserve"><value>View bill details</value></data>
+  <data name="SharePointOpenApprovals" xml:space="preserve"><value>Open payment approvals</value></data>
+  <data name="SharePointFoodPickupTitle" xml:space="preserve"><value>🎉 You were selected as pickup person</value></data>
+  <data name="SharePointFoodPickupBody" xml:space="preserve"><value>🎉 Congratulations, {0}!
+
+You were selected to pick up the food this time.
+
+Merchant: {1}
+Transaction: {2}
+Participants: {3}
+Draw probability: {4}
+
+Go, hero of hungry bellies! 🛵😆</value></data>
+  <data name="SharePointFoodPickupRoundRobinBody" xml:space="preserve"><value>🎉 Congratulations, {0}!
+
+It is your turn to pick up the food.
+
+Merchant: {1}
+Transaction: {2}
+Participants: {3}
+Method: Round robin based on pickup history
+
+Go, hero of hungry bellies! 🛵😆</value></data>
+  <data name="PersonalOverview" xml:space="preserve"><value>Personal overview</value></data>
+  <data name="MemberDashboardDescription" xml:space="preserve"><value>Track your spending and bill status month by month.</value></data>
+  <data name="OpenMyBills" xml:space="preserve"><value>Open my bills</value></data>
+  <data name="ThisMonthBills" xml:space="preserve"><value>This month's bills</value></data>
+  <data name="PreviousMonthBills" xml:space="preserve"><value>Previous month's bills</value></data>
+  <data name="TotalPaidByYou" xml:space="preserve"><value>Total paid by you</value></data>
+  <data name="YourOutstanding" xml:space="preserve"><value>Your outstanding</value></data>
+  <data name="YourMonthlySpending" xml:space="preserve"><value>Your monthly spending</value></data>
+  <data name="YourMonthlySpendingHint" xml:space="preserve"><value>Your share of bills over the last six months.</value></data>
+  <data name="PaidShort" xml:space="preserve"><value>Paid</value></data>
+  <data name="OutstandingShort" xml:space="preserve"><value>Outstanding</value></data>
+  <data name="RecentPersonalBills" xml:space="preserve"><value>Your recent bills</value></data>
+  <data name="RecentPersonalBillsHint" xml:space="preserve"><value>Open the latest details and payment status.</value></data>
+  <data name="MonthlyBillValue" xml:space="preserve"><value>Monthly bill value</value></data>
+  <data name="MonthlyBillValueHint" xml:space="preserve"><value>Total non-draft transactions over the last six months.</value></data>
+  <data name="OldestOutstandingBill" xml:space="preserve"><value>Oldest outstanding bill</value></data>
+  <data name="OldestOutstandingBillHint" xml:space="preserve"><value>The transaction that has been outstanding the longest.</value></data>
+  <data name="NoOutstandingBills" xml:space="preserve"><value>There are no outstanding bills.</value></data>
+  <data name="DaysOutstanding" xml:space="preserve"><value>{0} days outstanding</value></data>
+  <data name="HighestOutstandingPeople" xml:space="preserve"><value>Highest outstanding</value></data>
+  <data name="HighestOutstandingPeopleHint" xml:space="preserve"><value>Five people with the largest remaining balances.</value></data>
+  <data name="BillCount" xml:space="preserve"><value>{0} bills</value></data>
+  <data name="TopMerchants" xml:space="preserve"><value>Top merchants</value></data>
+  <data name="TopMerchantsHint" xml:space="preserve"><value>Ranked by transaction count.</value></data>
+  <data name="TransactionCount" xml:space="preserve"><value>{0} transactions</value></data>
+  <data name="AverageSettlementTime" xml:space="preserve"><value>Average settlement time</value></data>
+  <data name="AverageSettlementTimeHint" xml:space="preserve"><value>From transaction creation until every participant has paid.</value></data>
+  <data name="Days" xml:space="preserve"><value>days</value></data>
+  <data name="BasedOnSettledTransactions" xml:space="preserve"><value>Based on {0} settled transactions.</value></data>
+  <data name="NoSettlementData" xml:space="preserve"><value>No complete settlement data yet.</value></data>
+  <data name="FoodPickupRotation" xml:space="preserve"><value>Food pickup rotation</value></data>
+  <data name="FoodPickupSettingsDescription" xml:space="preserve"><value>Choose the accounts that may be selected and monitor the rotation.</value></data>
+  <data name="FoodPickupControl" xml:space="preserve"><value>Rotation settings</value></data>
+  <data name="FoodPickupControlHint" xml:space="preserve"><value>Choose a method, then the system selects from registered participants when the transaction is saved.</value></data>
+  <data name="FoodPickupStrategy" xml:space="preserve"><value>Selection method</value></data>
+  <data name="FoodPickupStrategyWeightedRandom" xml:space="preserve"><value>Weighted random</value></data>
+  <data name="FoodPickupStrategyWeightedRandomHint" xml:space="preserve"><value>Draws randomly with lower odds for members who have picked up more often.</value></data>
+  <data name="FoodPickupStrategyRoundRobin" xml:space="preserve"><value>Round robin</value></data>
+  <data name="FoodPickupStrategyRoundRobinHint" xml:space="preserve"><value>Chooses the member who has never picked up or has waited the longest.</value></data>
+  <data name="FoodPickupInvalidStrategy" xml:space="preserve"><value>The selection method is invalid.</value></data>
+  <data name="FoodPickupRoundRobinPreview" xml:space="preserve"><value>Round-robin order</value></data>
+  <data name="FoodPickupNextInRotation" xml:space="preserve"><value>Next</value></data>
+  <data name="FoodPickupSelectedByRoundRobin" xml:space="preserve"><value>Selected from pickup history order</value></data>
+  <data name="FoodPickupInvalidAccounts" xml:space="preserve"><value>Some accounts are invalid or currently disabled.</value></data>
+  <data name="FoodPickupSettingsSaved" xml:space="preserve"><value>Food pickup rotation settings saved.</value></data>
+  <data name="FoodPickupTimes" xml:space="preserve"><value>pickups</value></data>
+  <data name="FoodPickupParticipations" xml:space="preserve"><value>participations</value></data>
+  <data name="FoodPickupNever" xml:space="preserve"><value>Never</value></data>
+  <data name="FoodPickupNoMerchant" xml:space="preserve"><value>No merchant yet</value></data>
+  <data name="FoodPickupAddUsersHint" xml:space="preserve"><value>Add accounts through Manage users first.</value></data>
+  <data name="FoodPickupHistory" xml:space="preserve"><value>Pickup history</value></data>
+  <data name="FoodPickupHistoryHint" xml:space="preserve"><value>Current draws and winner-change history.</value></data>
+  <data name="FoodPickupNoHistory" xml:space="preserve"><value>No history yet</value></data>
+  <data name="FoodPickupNoHistoryHint" xml:space="preserve"><value>History appears after rotation is enabled and a split is saved.</value></data>
+  <data name="FoodPickupWinner" xml:space="preserve"><value>Pickup person</value></data>
+  <data name="FoodPickupDrawType" xml:space="preserve"><value>Draw type</value></data>
+  <data name="FoodPickupReason" xml:space="preserve"><value>Reason</value></data>
+  <data name="FoodPickupChangedFrom" xml:space="preserve"><value>From {0}</value></data>
+  <data name="FoodPickupDrawInitial" xml:space="preserve"><value>Initial draw</value></data>
+  <data name="FoodPickupDrawAutomaticRedraw" xml:space="preserve"><value>Automatic redraw</value></data>
+  <data name="FoodPickupDrawAdminReroll" xml:space="preserve"><value>Admin reroll</value></data>
+  <data name="FoodPickupPreview" xml:space="preserve"><value>Pickup odds preview</value></data>
+  <data name="FoodPickupPreviewHint" xml:space="preserve"><value>This is only a preview. The server securely chooses the final winner when saved.</value></data>
+  <data name="FoodPickupCandidateCount" xml:space="preserve"><value>{0} candidates</value></data>
+  <data name="FoodPickupPriorPickups" xml:space="preserve"><value>{0} prior pickups</value></data>
+  <data name="FoodPickupWinnerHint" xml:space="preserve"><value>This person was selected to pick up the order for this transaction.</value></data>
+  <data name="FoodPickupDrawProbability" xml:space="preserve"><value>Draw probability</value></data>
+  <data name="FoodPickupRerollReasonPlaceholder" xml:space="preserve"><value>Reason for reroll (required)</value></data>
+  <data name="FoodPickupRerollConfirm" xml:space="preserve"><value>Reroll the pickup person? The current winner will be excluded.</value></data>
+  <data name="FoodPickupReroll" xml:space="preserve"><value>Reroll</value></data>
+  <data name="FoodPickupRerolled" xml:space="preserve"><value>Pickup person was rerolled.</value></data>
+  <data name="FoodPickupRerollReasonRequired" xml:space="preserve"><value>Enter a reason for the reroll first.</value></data>
+  <data name="FoodPickupRerollUnavailable" xml:space="preserve"><value>Reroll is unavailable for this transaction.</value></data>
+  <data name="FoodPickupNoWinner" xml:space="preserve"><value>No pickup person yet</value></data>
+  <data name="FoodPickupNoWinnerHint" xml:space="preserve"><value>Enable rotation and save a split with registered participants to choose a pickup person.</value></data>
+  <data name="FoodPickupBadge" xml:space="preserve"><value>pickup person</value></data>
+  <data name="FoodPickupSelectedMessage" xml:space="preserve"><value>Congratulations! You were selected to pick up the food. The order details are below.</value></data>
+  <data name="FoodPickupOtherMessage" xml:space="preserve"><value>The pickup person for this transaction is the member shown above.</value></data>
+  <data name="FoodPickupReportHint" xml:space="preserve"><value>Pickup statistics follow the visible transactions and the filters above.</value></data>
+  <data name="FoodPickupNoReportData" xml:space="preserve"><value>No pickup statistics yet</value></data>
+  <data name="FoodPickupNoReportDataHint" xml:space="preserve"><value>Registered participants appear after matching transactions are available.</value></data>
+  <data name="PickupRatio" xml:space="preserve"><value>Pickup ratio</value></data>
+  <data name="FoodPickupLastPickup" xml:space="preserve"><value>Last pickup</value></data>
+  <data name="FoodPickupEligibility" xml:space="preserve"><value>Eligibility</value></data>
+</root>

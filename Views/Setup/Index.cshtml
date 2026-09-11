@@ -1,0 +1,23 @@
+@model FirstAdminSetupViewModel
+@{ ViewData["Title"] = L["FirstAdminSetup"]; Layout = "_Layout"; }
+<div class="login-page setup-page">
+    <section class="login-showcase">
+        <a class="brand brand-light" href="/"><span class="brand-mark">S</span><span>SplitBill</span></a>
+        <div><span class="eyebrow light">@L["FirstAdminSetup"]</span><h1>@L["SetupDescription"]</h1><p>@L["SetupCodeHint"]</p></div>
+    </section>
+    <section class="login-panel"><div class="login-card">
+        <div class="mobile-login-brand"><span class="brand-mark">S</span> SplitBill</div>
+        <span class="eyebrow">@L["FirstAdminSetup"]</span><h2>@L["CreateAdmin"]</h2>
+        <form method="post" class="mt-4">
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <div class="form-group"><label asp-for="BootstrapCode">@L["BootstrapCode"]</label><input asp-for="BootstrapCode" class="form-control form-control-lg" autocomplete="one-time-code" /><small>@L["BootstrapCodeHint"]</small><span asp-validation-for="BootstrapCode" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Username">@L["Username"]</label><input asp-for="Username" class="form-control" autocomplete="username" /><span asp-validation-for="Username" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="DisplayName">@L["DisplayName"]</label><input asp-for="DisplayName" class="form-control" autocomplete="name" /><span asp-validation-for="DisplayName" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Email">@L["EmailOptional"]</label><input asp-for="Email" class="form-control" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Password">@L["Password"]</label><input asp-for="Password" class="form-control" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="ConfirmPassword">@L["ConfirmPassword"]</label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+            <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">@L["CreateAdmin"] <span>→</span></button>
+        </form>
+    </div></section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

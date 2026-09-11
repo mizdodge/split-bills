@@ -1,0 +1,38 @@
+bin/
+obj/
+publish/
+artifacts/
+Tests/bin/
+Tests/obj/
+.vs/
+.idea/
+*.user
+*.suo
+
+# Local runtime data and uploaded receipts
+App_Data/*.db
+App_Data/*.db-shm
+App_Data/*.db-wal
+App_Data/*.log
+App_Data/receipts/*
+!App_Data/receipts/.gitkeep
+App_Data/payment-proofs/*
+!App_Data/payment-proofs/.gitkeep
+App_Data/data-protection-keys/*
+!App_Data/data-protection-keys/.gitkeep
+App_Data/backups/
+App_Data/build-temp/
+App_Data/*.json
+*.db-backup
+
+# Local secrets and environment overrides
+appsettings.Local.json
+.env
+DataProtection-Keys/
+.codex-remote-attachments/
+.codex-deploy-stage.txt
+
+# Local agent workflow and private operational history
+AGENTS.md
+status.md
+documentation/plans/

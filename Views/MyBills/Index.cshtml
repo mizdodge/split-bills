@@ -1,0 +1,16 @@
+@model MyBillsViewModel
+@using Splitbill.Models
+@{ ViewData["Title"] = L["MyBills"]; }
+<div class="page-heading"><div><span class="eyebrow">@L["MyBills"]</span><h1>@L["MyBills"]</h1><p>@L["MyBillsDescription"]</p></div></div>
+<div class="stat-grid report-stats">
+    <article class="stat-card"><span class="stat-icon warning">◔</span><div><small>@L["UnpaidAmount"]</small><strong class="money-small">Rp @Model.UnpaidAmount.ToString("N0")</strong></div></article>
+    <article class="stat-card"><span class="stat-icon">…</span><div><small>@L["AwaitingAmount"]</small><strong class="money-small">Rp @Model.AwaitingAmount.ToString("N0")</strong></div></article>
+    <article class="stat-card"><span class="stat-icon success">✓</span><div><small>@L["PaidAmount"]</small><strong class="money-small">Rp @Model.PaidAmount.ToString("N0")</strong></div></article>
+</div>
+<section class="content-card mt-4">
+    <div class="section-head"><div><h2>@L["Details"]</h2><p>@L["MyBillsDescription"]</p></div></div>
+    @if (Model.Bills.Count == 0) { <div class="empty-inline"><span>✓</span><strong>@L["NoBills"]</strong><p>@L["BillAssignedHint"]</p></div> }
+    else { <div class="table-responsive"><table class="app-table"><thead><tr><th>@L["Date"]</th><th>@L["Merchant"]</th><th>@L["Menu"]</th><th>@L["Amount"]</th><th>@L["PaymentStatus"]</th><th></th></tr></thead><tbody>
+        @foreach (var bill in Model.Bills) { <tr><td>@(bill.TransactionDate?.ToString("dd MMM yyyy") ?? "-")</td><td><strong>@bill.MerchantName</strong><small>@bill.TransactionNumber</small></td><td class="text-wrap member-item-summary"><div class="member-menu-list">@foreach (var item in bill.ItemDetails.Take(2)) { <div><span>@item.Name <small>× @item.Quantity.ToString("0.##")</small></span><strong>Rp @item.Amount.ToString("N0")</strong></div> }@if (bill.AdditionalItemCount > 0) { <small class="more-items">+@bill.AdditionalItemCount @L["MoreMenuItems"]</small> }</div>@if (bill.ItemDetails.Count == 0) { <span>@bill.MenuDetail</span> }</td><td><strong>Rp @bill.Amount.ToString("N0")</strong></td><td><span class="status @bill.PaymentStatus.ToString().ToLowerInvariant()">@L[bill.PaymentStatus.ToString()]</span></td><td><a class="btn btn-sm btn-soft" asp-action="Details" asp-route-id="@bill.ParticipantId">@L["Details"]</a></td></tr> }
+    </tbody></table></div> }
+</section>

@@ -1,0 +1,39 @@
+@model ReportViewModel
+@using Splitbill.Models
+@{ ViewData["Title"] = "Report"; }
+<div class="page-heading"><div><span class="eyebrow">@L["Report"]</span><h1>@L["PaymentDetails"]</h1><p>@(Model.IsMember ? L["ReportMemberDescription"] : Model.IsAdmin ? L["ReportAdminDescription"] : L["ReportModeratorDescription"])</p></div><a class="btn btn-primary" asp-action="Export" asp-route-from="@Model.From?.ToString("yyyy-MM-dd")" asp-route-to="@Model.To?.ToString("yyyy-MM-dd")" asp-route-status="@Model.Status" asp-route-uploaderId="@Model.UploaderId">↓ @L["ExportExcel"]</a></div>
+<form method="get" class="filter-card">
+    <div><label>@L["FromDate"]</label><input name="from" value="@Model.From?.ToString("yyyy-MM-dd")" type="date" class="form-control" /></div>
+    <div><label>@L["ToDate"]</label><input name="to" value="@Model.To?.ToString("yyyy-MM-dd")" type="date" class="form-control" /></div>
+    <div><label>@L["PaymentStatus"]</label><select name="status" class="form-select"><option value="">@L["AllStatuses"]</option>@foreach(var value in Enum.GetValues<TransactionStatus>()){if(Model.Status == value){<option value="@value" selected>@L[value.ToString()]</option>}else{<option value="@value">@L[value.ToString()]</option>}}</select></div>
+    @if (Model.IsAdmin) { <div><label>@L["UploaderFilter"]</label><select name="uploaderId" class="form-select"><option value="">@L["AllUploaders"]</option>@foreach(var uploader in Model.Uploaders){if(Model.UploaderId == uploader.Id){<option value="@uploader.Id" selected>@uploader.DisplayName</option>}else{<option value="@uploader.Id">@uploader.DisplayName</option>}}</select></div> }
+    <button class="btn btn-primary" type="submit">@L["Apply"]</button><a class="btn btn-light" asp-action="Index">@L["Reset"]</a>
+</form>
+<div class="stat-grid report-stats">
+    <article class="stat-card"><span class="stat-icon">▤</span><div><small>@L["TotalTransactions"]</small><strong>@Model.TotalTransactions</strong></div></article>
+    <article class="stat-card accent"><span class="stat-icon">Rp</span><div><small>@L["TotalBills"]</small><strong class="money-small">Rp @Model.TotalAmount.ToString("N0")</strong></div></article>
+    <article class="stat-card"><span class="stat-icon success">✓</span><div><small>@L["PaidAmount"]</small><strong class="money-small">Rp @Model.PaidAmount.ToString("N0")</strong></div></article>
+    <article class="stat-card"><span class="stat-icon warning">…</span><div><small>@L["AwaitingAmount"]</small><strong class="money-small">Rp @Model.AwaitingAmount.ToString("N0")</strong></div></article>
+    <article class="stat-card"><span class="stat-icon warning">◔</span><div><small>@L["Outstanding"]</small><strong class="money-small">Rp @Model.OutstandingAmount.ToString("N0")</strong></div></article>
+</div>
+<section class="content-card mt-4"><div class="section-head"><div><h2>@L["DetailsReport"]</h2><p>@L["ReportFilterHint"]</p></div></div>
+@if(Model.Transactions.Count == 0){<div class="empty-inline"><span>◫</span><strong>@L["NoData"]</strong><p>@L["TryAnotherFilter"]</p></div>}
+else {<div class="table-responsive"><table class="app-table"><thead><tr><th>@L["Date"]</th><th>@L["Merchant"]</th>@if(Model.IsAdmin){<th>@L["Uploader"]</th>}<th>@L["Total"]</th><th>@L["PaidAmount"]</th><th>@L["AwaitingAmount"]</th><th>@L["UnpaidAmount"]</th><th>@L["FoodPickupWinner"]</th><th>@L["PaymentStatus"]</th><th></th></tr></thead><tbody>
+@foreach(var tx in Model.Transactions){<tr><td>@tx.EffectiveDate.ToString("dd MMM yyyy")</td><td><strong>@tx.MerchantName</strong><small>@tx.TransactionNumber · @L["PeopleCount", tx.ParticipantCount]</small></td>@if(Model.IsAdmin){<td>@tx.UploaderName</td>}<td>Rp @tx.GrandTotal.ToString("N0")</td><td class="text-success">Rp @tx.PaidAmount.ToString("N0")</td><td>Rp @tx.AwaitingAmount.ToString("N0")</td><td>Rp @tx.UnpaidAmount.ToString("N0")</td><td>@(tx.PickupPersonName ?? L["FoodPickupNoWinner"])</td><td><span class="status @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span></td><td><a class="btn btn-sm btn-soft" asp-action="Details" asp-route-id="@tx.Id">@L["ViewReport"]</a></td></tr>}
+</tbody></table></div>}
+</section>
+<section class="content-card mt-4 pickup-report-card"><div class="section-head"><div><h2>@L["FoodPickupRotation"]</h2><p>@L["FoodPickupReportHint"]</p></div></div>
+@if (Model.PickupPeople.Count == 0)
+{
+    <div class="empty-inline"><span>★</span><strong>@L["FoodPickupNoReportData"]</strong><p>@L["FoodPickupNoReportDataHint"]</p></div>
+}
+else
+{
+    <div class="table-responsive"><table class="app-table pickup-report-table"><thead><tr><th>@L["Participant"]</th><th>@L["FoodPickupParticipations"]</th><th>@L["FoodPickupTimes"]</th><th>@L["PickupRatio"]</th><th>@L["FoodPickupLastPickup"]</th>@if(Model.IsAdmin){<th>@L["FoodPickupEligibility"]</th>}</tr></thead><tbody>
+    @foreach (var person in Model.PickupPeople)
+    {
+        <tr><td><strong>@person.ParticipantName</strong><small>@@@person.Username</small></td><td>@person.ParticipationCount</td><td>@person.PickupCount</td><td>@person.PickupRatio.ToString("P1")</td><td>@(person.LastPickupAt.HasValue ? $"{person.LastPickupAt.Value.ToLocalTime():dd MMM yyyy} · {person.LastPickupMerchant}" : L["FoodPickupNever"])</td>@if(Model.IsAdmin){<td>@(person.IsEligible == true ? L["Enabled"] : L["Disabled"])</td>}</tr>
+    }
+    </tbody></table></div>
+}
+</section>

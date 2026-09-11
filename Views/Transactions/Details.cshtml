@@ -1,0 +1,143 @@
+@model TransactionDetailsViewModel
+@{ ViewData["Title"] = L["Details"]; var tx = Model.Transaction; }
+@{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); }
+@{ var pickupName = !string.IsNullOrWhiteSpace(Model.PickupAssignment?.SelectedUser?.DisplayName) ? Model.PickupAssignment.SelectedUser!.DisplayName : tx.Participants.FirstOrDefault(p => p.Id == Model.PickupAssignment?.SelectedParticipantId)?.Name; }
+<div class="page-heading compact"><div><a class="back-link" asp-action="Index">@L["AllTransactions"]</a><h1>@tx.MerchantName</h1><p>@tx.TransactionNumber · @(tx.TransactionDate?.ToString("dd MMMM yyyy") ?? tx.UploadDate.ToLocalTime().ToString("dd MMMM yyyy"))</p></div><span class="status large @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span></div>
+<div class="detail-grid">
+    <section class="content-card bill-summary">
+        <div class="bill-summary-main">
+            <button type="button" class="receipt-thumb receipt-viewer-trigger" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = tx.Id, index = 0 })" aria-label='@L["OpenReceiptPhoto"] 1'><img src="@Url.Action("ReceiptImage", new { id = tx.Id, index = 0 })" alt='@L["ReceiptPhotos"] 1' /></button>
+            <div class="bill-summary-copy"><span>@L["TotalBill"]</span><strong>Rp @tx.GrandTotal.ToString("N0")</strong><small>@tx.Items.Count item · @L["PeopleCount", tx.Participants.Count]</small></div>
+        </div>
+        @if (Model.PickupAssignment is not null && pickupName is not null)
+        {
+            <aside class="bill-summary-pickup">
+                <span class="bill-summary-pickup-icon" aria-hidden="true">🛵</span>
+                <div class="bill-summary-pickup-copy"><span>@L["FoodPickupWinner"]</span><strong>@pickupName</strong><small>@L[$"FoodPickupDraw{Model.PickupAssignment.DrawKind}"] · @Model.PickupAssignment.SelectedAt.ToLocalTime().ToString("dd MMM, HH:mm")</small></div>
+                <div class="bill-summary-pickup-meta">
+                    @if (Model.PickupAssignment.Strategy == FoodPickupSelectionStrategy.RoundRobin)
+                    {
+                        <strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong><small>@L["FoodPickupSelectedByRoundRobin"]</small>
+                    }
+                    else
+                    {
+                        <strong>@Model.PickupAssignment.RecordedProbability.ToString("0.##%")</strong><small>@L["FoodPickupDrawProbability"]</small>
+                    }
+                </div>
+                @if (User.IsInRole(DatabaseSeeder.AdminRole))
+                {
+                    <details class="bill-summary-reroll">
+                        <summary>@L["FoodPickupReroll"]</summary>
+                        <form asp-action="RerollPickup" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@tx.Id" />
+                            <input class="form-control" name="reason" maxlength="500" required placeholder='@L["FoodPickupRerollReasonPlaceholder"]' />
+                            <button class="btn btn-light btn-sm" type="submit" onclick="return confirm('@L["FoodPickupRerollConfirm"]')">@L["FoodPickupReroll"]</button>
+                        </form>
+                    </details>
+                }
+            </aside>
+        }
+        else
+        {
+            <aside class="bill-summary-pickup is-empty">
+                <span class="bill-summary-pickup-icon" aria-hidden="true">○</span>
+                <div class="bill-summary-pickup-copy"><strong>@L["FoodPickupNoWinner"]</strong><small>@L["FoodPickupNoWinnerHint"]</small></div>
+            </aside>
+        }
+        <div class="bill-summary-actions">
+            @if ((User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole)) && TransactionEditPolicy.Evaluate(tx).Allowed) { <a class="btn btn-soft" asp-action="Split" asp-route-id="@tx.Id">@L["SetSplit"]</a> }
+            @if (canEdit) { <a class="btn btn-light" asp-action="Review" asp-route-id="@tx.Id">@L["Edit"]</a> }
+            @if (tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && User.IsInRole(DatabaseSeeder.AdminRole)))
+            {
+                <form asp-action="Delete" method="post" class="m-0" onsubmit="return confirm('@(tx.Status == TransactionStatus.Unpaid ? L["DeleteUnpaidConfirm"] : L["DeleteDraftConfirm"])')">
+                    <input type="hidden" name="id" value="@tx.Id" />
+                    <button class="btn btn-outline-danger" type="submit">@(tx.Status == TransactionStatus.Unpaid ? L["DeleteUnpaid"] : L["DeleteDraft"])</button>
+                </form>
+            }
+            @if (tx.Status == TransactionStatus.Draft && tx.GrandTotal <= 0 && Model.ReceiptImageCount > 0)
+            {
+                <form asp-action="Reprocess" method="post" class="m-0"><input type="hidden" name="id" value="@tx.Id" /><button class="btn btn-soft" type="submit">@L["RetryAi"]</button></form>
+            }
+        </div>
+    </section>
+    <section class="content-card"><div class="section-head"><div><h2>@L["PaymentStatusHeading"]</h2><p>@L["PeopleInTransaction", tx.Participants.Count]</p></div><span class="paid-count">@tx.Participants.Count(x => x.PaymentStatus == ParticipantPaymentStatus.Paid)/@tx.Participants.Count @L["Paid"]</span></div>
+        <div class="payment-list">
+        @foreach (var person in tx.Participants.OrderBy(x => x.Name))
+        {
+            var latestApproval = person.PaymentApprovals.OrderByDescending(x => x.ResolvedAt ?? x.RequestedAt).FirstOrDefault();
+            var isPickupWinner = Model.PickupAssignment?.SelectedParticipantId == person.Id;
+            Model.ParticipantBreakdowns.TryGetValue(person.Id, out var breakdown);
+            <article class="payment-entry @(isPickupWinner ? "pickup-winner-entry" : null)">
+                <div class="payment-person">
+                    <span class="avatar">@person.Name[0].ToString().ToUpperInvariant()</span>
+                    <div>
+                        <strong>@person.Name @if (isPickupWinner) { <span class="pickup-inline-badge">★ @L["FoodPickupBadge"]</span> }</strong>
+                        <small>@(person.PaidAt.HasValue ? string.Format("{0} {1:dd MMM, HH:mm}", L["Paid"].Value, person.PaidAt.Value.ToLocalTime()) : L["WaitingForPayment"].Value)</small>
+                        @if (latestApproval?.Status == PaymentApprovalStatus.Rejected && !string.IsNullOrWhiteSpace(latestApproval.Note)) { <small class="text-danger">@L["RejectReason"]: @latestApproval.Note</small> }
+                        @if (latestApproval is not null && !string.IsNullOrWhiteSpace(latestApproval.ProofFileName)) { <button type="button" class="btn btn-sm btn-soft mt-1" data-proof-viewer data-viewer-group="proof" data-viewer-url="@Url.Action("Proof", "Payments", new { id = latestApproval.Id })" data-viewer-title='@L["PaymentProof"]' aria-label='@L["ViewProof"]'>@L["ViewProof"]</button> }
+                    </div>
+                    <strong class="person-amount">Rp @person.Amount.ToString("N0")</strong>
+                    @if (person.PaymentStatus == ParticipantPaymentStatus.Paid)
+                    {
+                        <span class="paid-check">✓ @L["Paid"]</span>
+                        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole)) { <form asp-action="ReopenPayment" method="post"><input type="hidden" name="id" value="@person.Id" /><button class="btn btn-light btn-sm" type="submit">@L["Reopen"]</button></form> }
+                    }
+                    else if (person.PaymentStatus == ParticipantPaymentStatus.AwaitingConfirmation && (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole)))
+                    {
+                        <span class="status partial">@L["AwaitingConfirmation"]</span>
+                        <form asp-controller="Payments" asp-action="Confirm" method="post"><input type="hidden" name="id" value="@person.Id" /><button class="btn btn-primary btn-sm" type="submit">@L["Confirm"]</button></form>
+                        <form asp-controller="Payments" asp-action="Reject" method="post" class="reject-payment-form"><input type="hidden" name="id" value="@person.Id" /><textarea name="note" class="form-control reject-note-input" maxlength="500" required placeholder="@L["RejectReasonPlaceholder"]"></textarea><button class="btn btn-outline-danger btn-sm" type="submit">@L["Reject"]</button></form>
+                    }
+                    else if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+                    {
+                        <span class="status unpaid">@L["Unpaid"]</span>
+                        <form asp-action="MarkPaid" method="post"><input type="hidden" name="id" value="@person.Id" /><button class="btn btn-primary btn-sm" type="submit" onclick="return confirm('@L["MarkPaidConfirm", person.Name]')">@L["MarkPaid"]</button></form>
+                    }
+                    else { <span class="status unpaid">@L["Unpaid"]</span> }
+                </div>
+                @if (breakdown is not null)
+                {
+                    <details class="participant-order-details">
+                        <summary><span>@L["ViewOrderDetails"]</span><small>@L["OrderItemCount", breakdown.Items.Count]</small></summary>
+                        <div class="participant-breakdown">
+                            @foreach (var item in breakdown.Items)
+                            {
+                                <div class="participant-breakdown-row">
+                                    <span><strong>@item.Name</strong><small>@L["QuantityShare", item.QuantityShare.ToString("0.##")] · @L["FullReceiptAmount"] Rp @item.ReceiptAmount.ToString("N0")</small></span>
+                                    <strong>Rp @item.ParticipantAmount.ToString("N0")</strong>
+                                </div>
+                            }
+                            <div class="participant-breakdown-row participant-subtotal"><span>@L["MenuSubtotal"]</span><strong>Rp @breakdown.ItemSubtotal.ToString("N0")</strong></div>
+                            @if (breakdown.Adjustments.Count > 0)
+                            {
+                                <div class="participant-breakdown-label">@L["DiscountsAndOtherCharges"]</div>
+                                @foreach (var adjustment in breakdown.Adjustments)
+                                {
+                                    var adjustmentLabel = adjustment.Label ?? (adjustment.Kind == ParticipantAdjustmentKind.UnitemizedAdjustment ? L["OtherAdjustment"].Value : L["RoundingAdjustment"].Value);
+                                    var adjustmentSign = adjustment.Operation == ChargeOperation.Subtract ? "-" : "+";
+                                    <div class="participant-breakdown-row participant-adjustment @(adjustment.Operation == ChargeOperation.Subtract ? "subtract" : "add")">
+                                        <span><strong>@adjustmentLabel</strong><small>@if (adjustment.ReceiptPercentage.HasValue) { @L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")] }@if (adjustment.ReceiptAmount > 0) { <text> · @L["FullReceiptAmount"] @adjustmentSign Rp @adjustment.ReceiptAmount.ToString("N0")</text> }</small></span>
+                                        <strong>@adjustmentSign Rp @adjustment.ParticipantAmount.ToString("N0")</strong>
+                                    </div>
+                                }
+                            }
+                            <div class="participant-breakdown-row participant-subtotal"><span>@L["AdjustmentTotal"]</span><strong>Rp @breakdown.AdjustmentTotal.ToString("N0")</strong></div>
+                            <div class="participant-breakdown-row participant-total"><span>@L["ParticipantBillTotal"]</span><strong>Rp @breakdown.FinalAmount.ToString("N0")</strong></div>
+                        </div>
+                    </details>
+                }
+            </article>
+        }
+        @if (tx.Participants.Count == 0) { <div class="empty-inline"><span>👥</span><strong>@L["NotSplitYet"]</strong><p>@L["SetParticipantsFirst"]</p></div> }
+        </div>
+    </section>
+    @if (Model.ReceiptImageCount > 1)
+    {
+        <section class="content-card"><div class="section-head"><div><h2>@L["AllReceiptPhotos"]</h2><p>@L["PhotosStoredProcessed", Model.ReceiptImageCount]</p></div></div><div class="detail-receipt-gallery">@for(var imageIndex = 0; imageIndex < Model.ReceiptImageCount; imageIndex++){<button type="button" class="detail-receipt-button" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = tx.Id, index = imageIndex })" aria-label='@L["OpenReceiptPhoto"] @(imageIndex + 1)'><img src="@Url.Action("ReceiptImage", new { id = tx.Id, index = imageIndex })" alt='@L["PhotoNumber", imageIndex + 1]' loading="lazy" /><span>@L["PhotoNumber", imageIndex + 1]</span></button>}</div></section>
+    }
+    <section class="content-card"><div class="section-head"><div><h2>@L["ReceiptDetails"]</h2><p>@L["ConfirmedByModerator"]</p></div></div>
+        <div class="compact-items">@foreach(var item in tx.Items.OrderBy(x => x.LineNumber)){<div><span>@item.Name <small>@item.Quantity × Rp @item.UnitPrice.ToString("N0")</small></span><strong>Rp @item.TotalPrice.ToString("N0")</strong></div>}</div>
+        <div class="compact-totals"><div><span>@L["Subtotal"]</span><strong>Rp @tx.Subtotal.ToString("N0")</strong></div>@foreach(var charge in Model.Charges){var rate=ReceiptReviewNormalizer.CalculateEffectivePercentage(charge.Amount ?? 0,tx.Subtotal);<div><span>@charge.Label @if(rate.HasValue){<small>@L["EffectiveRate", rate.Value.ToString("0.##")].Value</small>}</span><strong>@(charge.Operation == ChargeOperation.Subtract ? "-" : "+") Rp @charge.Amount.GetValueOrDefault().ToString("N0")</strong></div>}<div><span>@L["Total"]</span><strong>Rp @tx.GrandTotal.ToString("N0")</strong></div></div>
+    </section>
+</div>

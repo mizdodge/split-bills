@@ -1,0 +1,35 @@
+@model NotificationListViewModel
+@using Splitbill.Models
+@{ ViewData["Title"] = L["Notifications"]; }
+<div class="page-heading"><div><span class="eyebrow">@L["Notifications"]</span><h1>@L["Notifications"]</h1><p>@L["BillUpdates"]</p></div><form asp-action="ReadAll" method="post" class="m-0"><button class="btn btn-light" type="submit">@L["MarkAllRead"]</button></form></div>
+@if (Model.WebPush is not null)
+{
+    <section class="content-card push-settings-card" data-push-panel>
+        @Html.AntiForgeryToken()
+        <div class="section-head"><div><h2>@L["PushNotificationsTitle"]</h2><p>@L["PushNotificationsDescription"]</p></div><span class="push-state" data-push-status data-state="checking">@L["PushChecking"]</span></div>
+        <div class="push-settings-body"><div><p class="push-detail" data-push-detail>@L["PushChecking"]</p><small class="text-muted">@L["PushEnabledDevices"]: @Model.WebPush.ActiveSubscriptions</small></div><div class="push-actions"><button type="button" class="btn btn-primary" data-push-enable>@L["PushEnable"]</button><button type="button" class="btn btn-light" data-push-disable hidden>@L["PushDisable"]</button><button type="button" class="btn btn-light" data-push-test hidden>@L["PushTestButton"]</button></div></div>
+    </section>
+}
+<section class="content-card">
+    @if (Model.Notifications.Count == 0) { <div class="empty-inline"><span>✓</span><strong>@L["NoNotifications"]</strong><p>@L["BillUpdates"]</p></div> }
+    else { <div class="notification-list">@foreach (var item in Model.Notifications) { var isPayment = item.Type is NotificationType.PaymentApproved or NotificationType.PaymentRejected or NotificationType.PaymentReopened; var heading = item.Type == NotificationType.BillAssigned ? L["NewBill"] : item.Type == NotificationType.PaymentSubmitted ? L["NewPaymentClaim"] : item.Type == NotificationType.PaymentApproved ? L["PaymentConfirmed"] : item.Type == NotificationType.PaymentRejected ? L["RejectedPayment"] : item.Type == NotificationType.PaymentReopened ? L["PaymentReopened"] : L["PushTest"]; var icon = item.Type == NotificationType.BillAssigned ? "▣" : item.Type == NotificationType.PaymentSubmitted ? "↗" : item.Type == NotificationType.PaymentApproved ? "✓" : item.Type == NotificationType.PaymentRejected ? "!" : item.Type == NotificationType.PaymentReopened ? "↺" : "•"; <article class="notification-row notification-type-@item.Type.ToString().ToLowerInvariant() @(item.IsRead ? "read" : "unread")"><div class="notification-icon" aria-hidden="true">@icon</div><div class="notification-body"><strong>@heading</strong><p>@item.MerchantName · @item.TransactionNumber · Rp @item.Amount.ToString("N0")</p>@if (item.Type == NotificationType.PaymentRejected && !string.IsNullOrWhiteSpace(item.RejectionReason)) { <p class="notification-reason"><strong>@L["RejectReason"]:</strong> @item.RejectionReason</p> }<small>@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</small></div><div class="d-flex gap-2">@if (item.Type == NotificationType.PaymentSubmitted && (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))) { <a class="btn btn-sm btn-soft" asp-controller="Payments" asp-action="Approvals">@L["Approvals"]</a> } else if (item.ParticipantId.HasValue && (User.IsInRole(DatabaseSeeder.MemberRole) || isPayment)) { <a class="btn btn-sm btn-soft" asp-controller="MyBills" asp-action="Details" asp-route-id="@item.ParticipantId">@L["Details"]</a> } @if (!item.IsRead) { <form asp-action="Read" method="post" class="m-0"><input type="hidden" name="id" value="@item.Id" /><button class="btn btn-sm btn-light" type="submit">@L["MarkRead"]</button></form> }</div></article> } </div> }
+</section>
+@if (Model.WebPush is not null)
+{
+    <script>
+        window.splitBillPush = {
+            strings: {
+                enablePrompt: @Json.Serialize(L["PushEnablePrompt"].Value),
+                enabled: @Json.Serialize(L["PushEnabled"].Value),
+                disabled: @Json.Serialize(L["PushDisabled"].Value),
+                unsupported: @Json.Serialize(L["PushUnsupported"].Value),
+                insecure: @Json.Serialize(L["PushInsecure"].Value),
+                denied: @Json.Serialize(L["PushDenied"].Value),
+                requesting: @Json.Serialize(L["PushRequesting"].Value),
+                error: @Json.Serialize(L["PushError"].Value)
+                ,testSent: @Json.Serialize(L["PushTestSent"].Value)
+            }
+        };
+    </script>
+    <script src="~/js/push-notifications.js" asp-append-version="true"></script>
+}

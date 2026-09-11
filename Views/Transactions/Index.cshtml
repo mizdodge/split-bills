@@ -1,0 +1,27 @@
+@model TransactionListViewModel
+@{ ViewData["Title"] = L["Transactions"]; }
+<div class="page-heading"><div><span class="eyebrow">@L["Transactions"]</span><h1>@L["AllBills"]</h1><p>@L["ReceiptHistory"]</p></div>@if ((User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))){<a class="btn btn-primary" asp-action="Upload">@L["UploadReceiptButton"]</a>}</div>
+<section class="content-card">
+@if (Model.Transactions.Count == 0) { <div class="empty-inline"><span>🧾</span><strong>@L["NoTransactions"]</strong><p>@L["UploadFirstReceipt"]</p></div> }
+else { <div class="table-responsive"><table class="app-table"><thead><tr><th>@L["Date"]</th><th>@L["Merchant"]</th><th>@L["Total"]</th><th>@L["Participant"]</th><th>@L["PaymentStatus"]</th><th></th></tr></thead><tbody>
+@foreach (var item in Model.Transactions) {
+    var canEdit = item.Status == TransactionStatus.Draft || (item.Status == TransactionStatus.Unpaid && item.Participants.Count > 0 && item.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0));
+    <tr><td>@(item.TransactionDate?.ToString("dd MMM yyyy") ?? item.UploadDate.ToLocalTime().ToString("dd MMM yyyy"))</td><td><strong>@item.MerchantName</strong><small>@item.TransactionNumber</small></td><td><strong>Rp @item.GrandTotal.ToString("N0")</strong></td><td>@L["PeopleCount", item.Participants.Count]</td><td><span class="status @item.Status.ToString().ToLowerInvariant()">@L[item.Status.ToString()]</span></td>
+        <td><div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-soft" asp-action="Details" asp-route-id="@item.Id">@L["Detail"]</a>
+            @if (canEdit)
+            {
+                <a class="btn btn-sm btn-light" asp-action="Review" asp-route-id="@item.Id">@L["Edit"]</a>
+            }
+            @if (item.Status == TransactionStatus.Draft || (item.Status == TransactionStatus.Unpaid && User.IsInRole(DatabaseSeeder.AdminRole)))
+            {
+                <form asp-action="Delete" method="post" class="m-0" onsubmit="return confirm('@(item.Status == TransactionStatus.Unpaid ? L["DeleteUnpaidConfirm"] : L["DeleteDraftConfirm"])')">
+                    <input type="hidden" name="id" value="@item.Id" />
+                    <button class="btn btn-sm btn-outline-danger" type="submit">@(item.Status == TransactionStatus.Unpaid ? L["DeleteUnpaid"] : L["DeleteDraft"])</button>
+                </form>
+            }
+        </div></td>
+    </tr>
+}
+</tbody></table></div>}
+</section>

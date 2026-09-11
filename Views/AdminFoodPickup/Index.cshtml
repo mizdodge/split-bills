@@ -1,0 +1,68 @@
+@model FoodPickupSettingsViewModel
+@using Splitbill.Models
+@{ ViewData["Title"] = L["FoodPickupRotation"]; }
+
+<div class="page-heading compact">
+    <div><span class="eyebrow">@L["Admin"]</span><h1>@L["FoodPickupRotation"]</h1><p>@L["FoodPickupSettingsDescription"]</p></div>
+</div>
+
+<form method="post" asp-action="Save" class="content-card food-pickup-settings-form">
+    @Html.AntiForgeryToken()
+    <div class="section-head">
+        <div><h2>@L["FoodPickupControl"]</h2><p>@L["FoodPickupControlHint"]</p></div>
+        <label class="toggle-line"><input type="checkbox" name="Enabled" value="true" checked="@(Model.Enabled ? "checked" : null)" /><span>@L["Enabled"]</span></label>
+    </div>
+    <fieldset class="food-pickup-strategy">
+        <legend>@L["FoodPickupStrategy"]</legend>
+        <label><input type="radio" name="Strategy" value="WeightedRandom" checked="@(Model.Strategy == FoodPickupSelectionStrategy.WeightedRandom ? "checked" : null)" /><span><strong>⚖ @L["FoodPickupStrategyWeightedRandom"]</strong><small>@L["FoodPickupStrategyWeightedRandomHint"]</small></span></label>
+        <label><input type="radio" name="Strategy" value="RoundRobin" checked="@(Model.Strategy == FoodPickupSelectionStrategy.RoundRobin ? "checked" : null)" /><span><strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong><small>@L["FoodPickupStrategyRoundRobinHint"]</small></span></label>
+    </fieldset>
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <div class="food-pickup-account-grid">
+        @foreach (var user in Model.Users)
+        {
+            <label class="food-pickup-account-card @(user.IsDisabled ? "is-disabled" : string.Empty)">
+                <input type="checkbox" name="EligibleUserIds" value="@user.Id" checked="@(user.IsEligible ? "checked" : null)" disabled="@(user.IsDisabled ? "disabled" : null)" />
+                <span class="avatar">@user.DisplayName[..1].ToUpperInvariant()</span>
+                <span class="food-pickup-account-main"><strong>@user.DisplayName</strong><small>@@@user.Username · @L[user.Role]</small></span>
+                <span class="food-pickup-account-stats"><span><b>@user.PickupCount</b><small>@L["FoodPickupTimes"]</small></span><span><b>@user.ParticipationCount</b><small>@L["FoodPickupParticipations"]</small></span></span>
+                <span class="food-pickup-account-last"><span>@L["FoodPickupLastPickup"]</span><b>@(user.LastPickupAt.HasValue ? user.LastPickupAt.Value.ToLocalTime().ToString("dd MMM yyyy") : L["FoodPickupNever"].Value)</b><small>@(user.LastPickupMerchant ?? L["FoodPickupNoMerchant"].Value)</small></span>
+                @if (user.IsDisabled) { <span class="status unpaid">@L["Disabled"]</span> }
+            </label>
+        }
+    </div>
+    @if (Model.Users.Count == 0)
+    {
+        <div class="empty-inline"><span>♙</span><strong>@L["NoUsersFound"]</strong><p>@L["FoodPickupAddUsersHint"]</p></div>
+    }
+    <div class="form-actions"><button class="btn btn-primary" type="submit">@L["SaveConfiguration"]</button></div>
+</form>
+
+<section class="content-card mt-4">
+    <div class="section-head"><div><h2>@L["FoodPickupHistory"]</h2><p>@L["FoodPickupHistoryHint"]</p></div></div>
+    @if (Model.History.Count == 0)
+    {
+        <div class="empty-inline"><span>↻</span><strong>@L["FoodPickupNoHistory"]</strong><p>@L["FoodPickupNoHistoryHint"]</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="app-table food-pickup-history-table">
+                <thead><tr><th>@L["Date"]</th><th>@L["Merchant"]</th><th>@L["FoodPickupWinner"]</th><th>@L["FoodPickupDrawType"]</th><th>@L["FoodPickupReason"]</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var row in Model.History)
+                {
+                    <tr>
+                        <td>@row.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td><strong>@row.MerchantName</strong><small>@row.TransactionNumber</small></td>
+                        <td><span class="pickup-winner-pill">★ @row.SelectedUserName</span>@if (row.PreviousSelectedUserName is not null) { <small>@L["FoodPickupChangedFrom", row.PreviousSelectedUserName]</small> }</td>
+                        <td>@L[$"FoodPickupDraw{row.DrawKind}"]<small>@L[$"FoodPickupStrategy{row.Strategy}"]</small></td>
+                        <td>@(string.IsNullOrWhiteSpace(row.Reason) ? "—" : row.Reason)</td>
+                        <td><a class="btn btn-light btn-sm" asp-controller="Transactions" asp-action="Details" asp-route-id="@row.TransactionId">@L["Details"]</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

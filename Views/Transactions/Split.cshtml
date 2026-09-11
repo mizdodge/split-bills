@@ -1,0 +1,49 @@
+@model SplitTransactionViewModel
+@using Splitbill.Models
+@{ ViewData["Title"] = L["SetSplit"]; }
+<div class="page-heading compact"><div><span class="eyebrow">@L["StepThreeOfThree"]</span><h1>@L["SetSplit"]</h1><p>@Model.MerchantName · @L["Total"] Rp @Model.GrandTotal.ToString("N0")</p></div></div>
+<form method="post" id="split-form" data-pickup-preview-url="@Url.Action("PickupPreview", "Transactions")" data-pickup-transaction-id="@Model.TransactionId">
+    @Html.AntiForgeryToken()
+    <input asp-for="TransactionId" type="hidden" /><input asp-for="AssignmentsJson" type="hidden" /><input asp-for="ParticipantsJson" type="hidden" /><input asp-for="ParticipantNames" type="hidden" />
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="split-layout">
+        <section class="content-card">
+            <div class="section-head"><div><h2>@L["Participant"]</h2><p>@L["ChooseParticipants"]</p></div></div>
+            <div class="form-group"><label>@L["RegisteredAccount"]</label><div id="registered-user-picker" class="account-grid" role="group" aria-label='@L["RegisteredAccount"]'>
+                @foreach (var user in Model.AvailableUsers)
+                {
+                    <button type="button" class="account-option" data-user-id="@user.Id" data-name="@user.DisplayName" aria-pressed="false"><span class="account-check">✓</span><strong>@user.DisplayName</strong><small>@@@user.UserName</small></button>
+                }
+            </div></div>
+            <div class="form-group"><label for="guest-name-input">@L["GuestName"]</label><div class="d-flex gap-2"><input id="guest-name-input" class="form-control" placeholder='@L["GuestPlaceholder"]' /><button class="btn btn-light" id="add-guest" type="button">@L["Add"]</button></div></div>
+            <div id="participant-chips" class="participant-chips"></div>
+            <span asp-validation-for="ParticipantNames" class="text-danger"></span>
+            <div id="pickup-preview" class="pickup-preview-card" hidden>
+                <div class="pickup-preview-head"><div><strong>★ @L["FoodPickupPreview"]</strong><small>@L["FoodPickupPreviewHint"]</small></div><span class="pickup-preview-state"></span></div>
+                <div class="pickup-preview-candidates"></div>
+            </div>
+        </section>
+        <section class="content-card">
+            <div class="section-head"><div><h2>@L["SplitMethod"]</h2><p>@L["ChooseMethod"]</p></div></div>
+            <div class="method-options">
+                <label><input asp-for="SplitMethod" type="radio" value="Equal" /><span><strong>⚖ @L["EqualSplit"]</strong><small>@L["EqualSplitHint"]</small></span></label>
+                <label><input asp-for="SplitMethod" type="radio" value="ByItem" /><span><strong>▦ @L["ByItem"]</strong><small>@L["ByItemHint"]</small></span></label>
+            </div>
+            <div id="assignment-area" class="assignment-area" data-assignment-help='@L["AssignmentGroupHint"]'>
+                <div class="assignment-intro">@L["AddParticipantsFirst"]</div>
+                @foreach (var item in Model.Items.OrderBy(x => x.LineNumber))
+                {
+                    <article class="assignment-item" data-item-id="@item.Id" data-item-quantity="@item.Quantity.ToString("0", System.Globalization.CultureInfo.InvariantCulture)" data-item-total="@item.TotalPrice.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                        <div class="assignment-item-head"><div><span class="row-caption">@L["Row"] @item.LineNumber</span><strong>@item.Name</strong><small>@item.Quantity.ToString("0") × Rp @item.UnitPrice.ToString("N0")</small></div><strong>Rp @item.TotalPrice.ToString("N0")</strong></div>
+                        <div class="assignment-progress"><div><span data-assigned-label>@L["AssignedQuantity", 0, item.Quantity.ToString("0") ]</span><span data-remaining-label>@L["RemainingQuantity", item.Quantity.ToString("0")]</span></div><div class="progress-track"><span data-progress-bar></span></div></div>
+                        <div class="assignment-groups"></div>
+                        <button type="button" class="btn btn-sm btn-soft add-group" data-add-group>@L["AddGroup"]</button>
+                    </article>
+                }
+            </div>
+            <div id="participant-assignment-summary" class="assignment-summary" hidden></div>
+        </section>
+    </div>
+    <div class="form-actions"><a class="btn btn-light" asp-action="Review" asp-route-id="@Model.TransactionId">@L["Back"]</a><button class="btn btn-primary" type="submit">@L["CalculateAndSaveSplit"]</button></div>
+</form>
+@section Scripts { <script>window.splitBillAssignmentLocale = { owned: @Json.Serialize(L["OwnedQuantity"].Value), shared: @Json.Serialize(L["SharedEqually"].Value), group: @Json.Serialize(L["AllocationGroup"].Value), remove: @Json.Serialize(L["RemoveGroup"].Value), add: @Json.Serialize(L["AddGroup"].Value), assigned: @Json.Serialize(L["AssignedQuantity"].Value), remaining: @Json.Serialize(L["RemainingQuantity"].Value), sharedBy: @Json.Serialize(L["SharedByPeople"].Value), choose: @Json.Serialize(L["ChooseGroupParticipant"].Value), incomplete: @Json.Serialize(L["AssignmentIncomplete"].Value) }; window.splitBillPickupLocale = { candidateCount: @Json.Serialize(L["FoodPickupCandidateCount"].Value), priorPickups: @Json.Serialize(L["FoodPickupPriorPickups"].Value), roundRobinPreview: @Json.Serialize(L["FoodPickupRoundRobinPreview"].Value), nextInRotation: @Json.Serialize(L["FoodPickupNextInRotation"].Value) };</script> }

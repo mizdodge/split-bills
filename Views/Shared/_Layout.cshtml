@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#003A40" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="~/manifest.webmanifest" />
+    <title>@ViewData["Title"] · SplitBill</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="@(User.Identity?.IsAuthenticated == true ? "app-shell" : "auth-shell")">
+@if (User.Identity?.IsAuthenticated == true)
+{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var uploadWorkflowActive = currentController == "Transactions" && currentAction is "Upload" or "Review" or "Split";
+    var transactionsActive = currentController == "Transactions" && !uploadWorkflowActive;
+    var isMemberOnly = User.IsInRole(DatabaseSeeder.MemberRole) && !User.IsInRole(DatabaseSeeder.AdminRole) && !User.IsInRole(DatabaseSeeder.ModeratorRole);
+    var roleLabel = User.IsInRole(DatabaseSeeder.AdminRole) ? "Admin" : User.IsInRole(DatabaseSeeder.ModeratorRole) ? "Moderator" : "Member";
+    <aside class="sidebar">
+        <a class="brand" asp-controller="Dashboard" asp-action="Index"><span class="brand-mark">S</span><span>SplitBill</span></a>
+        <partial name="_CultureSwitcher" />
+        <nav class="side-nav">
+            <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")"><span>⌂</span> @L["Dashboard"]</a>
+            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+            {
+                <a asp-controller="Transactions" asp-action="Upload" class="@(uploadWorkflowActive ? "active" : "")"><span>＋</span> @L["UploadReceipt"]</a>
+            }
+            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+            {
+                <a asp-controller="Transactions" asp-action="Index" class="@(transactionsActive ? "active" : "")"><span>▤</span> @L["Transactions"]</a>
+            }
+            <a asp-controller="Reports" asp-action="Index" class="@(currentController == "Reports" ? "active" : "")"><span>◫</span> @L["Report"]</a>
+            <a asp-controller="MyBills" asp-action="Index" class="@(currentController == "MyBills" ? "active" : "")"><span>◎</span> @L["MyBills"]</a>
+            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+            {
+                <a asp-controller="Payments" asp-action="Approvals" class="@(currentController == "Payments" ? "active" : "")"><span>✓</span> @L["Approvals"]</a>
+            }
+            <a asp-controller="Notifications" asp-action="Index" class="@(currentController == "Notifications" ? "active" : "")"><span>♢</span> @L["Notifications"] @await Component.InvokeAsync("NotificationBadge")</a>
+            @if (User.IsInRole(DatabaseSeeder.AdminRole))
+            {
+                <div class="nav-label">@L["Admin"]</div>
+                <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span> @L["AISettings"]</a>
+                <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span> @L["SharePointIntegration"]</a>
+                <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span> @L["ManageUsers"]</a>
+                <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span> @L["FoodPickupRotation"]</a>
+                <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span> @L["SystemTools"]</a>
+            }
+        </nav>
+        <div class="sidebar-user">
+            <span class="avatar">@User.Identity.Name![0].ToString().ToUpperInvariant()</span>
+            <div><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a></small></div>
+            <form asp-controller="Account" asp-action="Logout" method="post"><button title='@L["Logout"]'>↗</button></form>
+        </div>
+    </aside>
+    <header class="mobile-header">
+        <a class="brand" asp-controller="Dashboard" asp-action="Index"><span class="brand-mark">S</span><span>SplitBill</span></a>
+        <div class="mobile-account"><partial name="_CultureSwitcher" /><a class="mobile-notification-link" asp-controller="Notifications" asp-action="Index" aria-label='@L["Notifications"]'>♢ @await Component.InvokeAsync("NotificationBadge")</a><a asp-controller="Account" asp-action="ChangePassword" class="avatar" aria-label='@L["ChangePassword"]'>@User.Identity.Name![0].ToString().ToUpperInvariant()</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="mobile-logout" type="submit" aria-label='@L["Logout"]'><span>@L["Logout"]</span> ↗</button></form></div>
+    </header>
+    <main class="main-content">
+        <div class="pwa-install-banner" data-pwa-install-hint hidden><span>@L["InstallAppHint"]</span><button type="button" class="btn btn-soft" data-pwa-install>@L["InstallApp"]</button></div>
+        <div class="pwa-install-banner" data-pwa-update-hint hidden><span>@L["UpdateAppHint"]</span><button type="button" class="btn btn-soft" data-pwa-update hidden>@L["RefreshApp"]</button></div>
+        @if (TempData["Success"] is string success)
+        {
+            <div class="alert alert-success app-alert" role="alert">✓ @success</div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-danger app-alert" role="alert">! @error</div>
+        }
+        @RenderBody()
+    </main>
+    <nav class="bottom-nav">
+        <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")"><span>⌂</span>@L["Dashboard"]</a>
+        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+        {
+            <a asp-controller="Transactions" asp-action="Upload" class="bottom-upload @(uploadWorkflowActive ? "active" : "")"><span>＋</span>@L["UploadReceipt"]</a>
+        }
+        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+        {
+            <a asp-controller="Transactions" asp-action="Index" class="@(transactionsActive ? "active" : "")"><span>▤</span>@L["Transactions"]</a>
+        }
+        <a asp-controller="Reports" asp-action="Index" class="@(currentController == "Reports" ? "active" : "")"><span>◫</span>@L["Report"]</a>
+        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+        {
+            <a asp-controller="Payments" asp-action="Approvals" class="@(currentController == "Payments" ? "active" : "")"><span>✓</span>@L["Approvals"]</a>
+        }
+        @if (User.IsInRole(DatabaseSeeder.MemberRole))
+        {
+            <a asp-controller="MyBills" asp-action="Index" class="@(currentController == "MyBills" ? "active" : "")"><span>◎</span>@L["MyBills"]</a>
+        }
+        @if (User.IsInRole(DatabaseSeeder.AdminRole))
+        {
+            <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span>@L["AISettings"]</a>
+            <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span>@L["SharePointIntegration"]</a>
+            <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span>@L["ManageUsers"]</a>
+            <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span>@L["FoodPickupRotation"]</a>
+            <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span>@L["SystemTools"]</a>
+        }
+    </nav>
+}
+else
+{
+    <partial name="_CultureSwitcher" /><main>@RenderBody()</main>
+}
+<partial name="_ReceiptModal" />
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.splitBillStrings = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+        duplicateUser = L["DuplicateUser"].Value,
+        duplicateParticipant = L["DuplicateParticipant"].Value,
+        chooseParticipant = L["ChooseAtLeastOneParticipant"].Value,
+        chooseItemParticipant = L["ChooseItemParticipant"].Value,
+        rateFromAmount = L["RateFromAmount"].Value,
+        selectedPhotos = L["SelectedPhotos"].Value,
+        photoNumber = L["PhotoNumber"].Value,
+        removePhoto = L["DeleteDraft"].Value,
+        rejectReason = L["RejectReasonPrompt"].Value,
+        deleteDraftConfirm = L["DeleteDraftConfirm"].Value,
+        markPaidConfirm = L["MarkPaidConfirm"].Value,
+        chooseModel = L["ChooseModel"].Value,
+        azureFieldsRequired = L["AzureFieldsRequired"].Value,
+        loadingModels = L["LoadingModels"].Value,
+        modelsLoadFailed = L["ModelsLoadFailed"].Value,
+        modelsAvailable = L["ModelsAvailable"].Value,
+        storedModel = L["StoredModel"].Value,
+        azureConnectionHint = L["AzureConnectionHint"].Value,
+        openAiModelHint = L["OpenAiModelHint"].Value,
+        remove = L["Remove"].Value,
+        accountSuffix = L["AccountSuffix"].Value,
+        guestSuffix = L["GuestSuffix"].Value,
+        effectiveRate = L["EffectiveRate"].Value,
+        receiptPhotoCounter = L["ReceiptPhotoCounter"].Value,
+        receiptPhotos = L["ReceiptPhotos"].Value,
+        paymentProof = L["PaymentProof"].Value
+    }));
+</script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/pwa.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

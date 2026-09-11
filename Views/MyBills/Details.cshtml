@@ -1,0 +1,116 @@
+@model MyBillDetailsViewModel
+@using Splitbill.Models
+@{
+    ViewData["Title"] = L["Details"];
+    var receiptCount = Model.ReceiptImageUrls.Count;
+}
+
+<div class="page-heading compact member-detail-heading">
+    <div>
+        <a class="back-link" asp-action="Index">← @L["MyBills"]</a>
+        <span class="eyebrow">@L["YourBillBreakdown"]</span>
+        <h1>@Model.MerchantName</h1>
+        <p>@Model.TransactionNumber · @(Model.TransactionDate?.ToString("dd MMMM yyyy") ?? "-")</p>
+    </div>
+    <span class="status large @Model.PaymentStatus.ToString().ToLowerInvariant()">@L[Model.PaymentStatus.ToString()]</span>
+</div>
+
+<section class="member-total-strip">
+    <div><span>@L["YourBillTotal"]</span><strong>Rp @Model.Amount.ToString("N0")</strong></div>
+    <div class="member-total-equation"><span>@L["YourMenuSubtotal"]</span><strong>Rp @Model.ItemSubtotal.ToString("N0")</strong><span aria-hidden="true">·</span><span>@L["YourAdjustmentTotal"]</span><strong>Rp @Model.AdjustmentTotal.ToString("N0")</strong></div>
+</section>
+
+@if (Model.PickupPersonName is not null)
+{
+    <section class="content-card member-pickup-callout @(Model.IsPickupPerson ? "member-pickup-callout-winner" : string.Empty)">
+        <div class="member-pickup-icon">★</div>
+        <div>
+            <span class="eyebrow">@L["FoodPickupWinner"]</span>
+            <h2>@Model.PickupPersonName</h2>
+            <p>@(Model.IsPickupPerson ? L["FoodPickupSelectedMessage"] : L["FoodPickupOtherMessage"])</p>
+            @if (Model.PickupStrategy == FoodPickupSelectionStrategy.RoundRobin)
+            {
+                <small><strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong> · @L["FoodPickupSelectedByRoundRobin"]</small>
+            }
+            else if (Model.PickupProbability.HasValue)
+            {
+                <small>@L["FoodPickupDrawProbability"]: <strong>@Model.PickupProbability.Value.ToString("0.##%")</strong></small>
+            }
+        </div>
+    </section>
+}
+
+<div class="member-detail-layout">
+    <main>
+        <section class="content-card member-breakdown-card">
+            <div class="section-head"><div><h2>@L["YourBillBreakdown"]</h2><p>@L["AdjustmentAllocationHint"]</p></div></div>
+            <div class="member-breakdown-table" role="table" aria-label='@L["MenuAndReceiptCharges"]'>
+                <div class="member-breakdown-row member-breakdown-header" role="row"><span role="columnheader">@L["Description"]</span><span role="columnheader">@L["FullReceiptAmount"]</span><span role="columnheader">@L["YourShare"]</span></div>
+                @foreach (var item in Model.Items)
+                {
+                    <div class="member-breakdown-row" role="row"><span role="cell"><strong>@item.Name</strong><small>× @item.Quantity.ToString("0.##")</small></span><span role="cell">Rp @item.ReceiptAmount.ToString("N0")</span><strong role="cell">Rp @item.Amount.ToString("N0")</strong></div>
+                }
+                @if (Model.Items.Count == 0)
+                {
+                    <div class="member-breakdown-empty">@Model.MenuDetail</div>
+                }
+                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourMenuSubtotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.ItemSubtotal.ToString("N0")</strong></div>
+                @if (Model.Adjustments.Count > 0)
+                {
+                    <div class="breakdown-section-label">@L["DiscountsAndOtherCharges"]</div>
+                    @foreach (var adjustment in Model.Adjustments)
+                    {
+                        var label = adjustment.Label ?? (adjustment.Kind == ParticipantAdjustmentKind.UnitemizedAdjustment ? L["OtherAdjustment"].Value : L["RoundingAdjustment"].Value);
+                        var sign = adjustment.Operation == ChargeOperation.Subtract ? "-" : "+";
+                        <div class="member-breakdown-row adjustment-row @(adjustment.Operation == ChargeOperation.Subtract ? "subtract" : "add")" role="row"><span role="cell"><strong>@label</strong>@if (adjustment.ReceiptPercentage.HasValue) { <small class="member-rate">@L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")].Value</small> }</span><span role="cell">@sign Rp @adjustment.ReceiptAmount.ToString("N0")</span><strong role="cell">@sign Rp @adjustment.Amount.ToString("N0")</strong></div>
+                    }
+                }
+                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourAdjustmentTotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.AdjustmentTotal.ToString("N0")</strong></div>
+                <div class="member-breakdown-row total-row" role="row"><span role="cell">@L["YourBillTotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.Amount.ToString("N0")</strong></div>
+            </div>
+        </section>
+
+        @if (Model.PaymentAttempts.Count > 0)
+        {
+            <section class="content-card mt-4">
+                <div class="section-head"><div><h2>@L["PaymentAttempts"]</h2><p>@L["PaymentAttemptsHint"]</p></div></div>
+                <div class="payment-attempt-list">
+                    @foreach (var attempt in Model.PaymentAttempts)
+                    {
+                        <article class="payment-attempt"><div><strong>@L[attempt.Status.ToString()]</strong><small>@attempt.RequestedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")@(attempt.ResolvedAt.HasValue ? $" · {attempt.ResolvedAt.Value.ToLocalTime():dd MMM yyyy HH:mm}" : string.Empty)</small>@if (!string.IsNullOrWhiteSpace(attempt.Note)) { <p class="text-danger mb-0">@attempt.Note</p> }</div>@if (attempt.HasProof) { <button type="button" class="btn btn-sm btn-soft" data-proof-viewer data-viewer-group="proof" data-viewer-url="@Url.Action("Proof", new { id = attempt.ApprovalId })" aria-label='@L["ViewProof"]'>@L["ViewProof"]</button> }</article>
+                    }
+                </div>
+            </section>
+        }
+    </main>
+
+    <aside class="member-detail-side">
+        @if (receiptCount > 0)
+        {
+            <section class="content-card receipt-viewer-card">
+                <div class="section-head"><div><h2>@L["ReceiptPhotos"]</h2><p>@receiptCount @L["Photos"]</p></div></div>
+                <div class="member-receipt-gallery">
+                    @for (var index = 0; index < receiptCount; index++)
+                    {
+                        <button type="button" class="member-receipt-thumb" data-receipt-viewer data-viewer-group="receipt" data-receipt-index="@index" data-receipt-url="@Model.ReceiptImageUrls[index]" aria-label='@L["OpenReceiptPhoto"] @(index + 1)'><img src="@Model.ReceiptImageUrls[index]" alt='@L["ReceiptPhotos"] @(index + 1)' loading="lazy" /></button>
+                    }
+                </div>
+            </section>
+        }
+        <section class="content-card member-payment-card">
+            @if (Model.PaymentStatus == ParticipantPaymentStatus.Unpaid)
+            {
+                <h2>@L["IHavePaid"]</h2><p>@L["PaymentProofHint"]</p>
+                <form asp-action="SubmitPayment" method="post" enctype="multipart/form-data" class="payment-proof-form"><input type="hidden" name="ParticipantId" value="@Model.ParticipantId" /><label for="ProofImage">@L["PaymentProof"]</label><input id="ProofImage" name="ProofImage" type="file" accept="image/*" required class="form-control" /><small class="field-hint">@L["AllImageFormatsHint"]</small><button class="btn btn-primary" type="submit">@L["IHavePaid"]</button></form>
+            }
+            else if (Model.PaymentStatus == ParticipantPaymentStatus.AwaitingConfirmation)
+            {
+                <span class="status partial">@L["AwaitingConfirmation"]</span><p>@L["PaymentAttemptsHint"]</p>
+            }
+            else
+            {
+                <span class="paid-check">✓ @L["Paid"]</span>
+            }
+        </section>
+    </aside>
+</div>

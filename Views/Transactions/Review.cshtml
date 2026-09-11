@@ -1,0 +1,39 @@
+@model ReviewTransactionViewModel
+@{ ViewData["Title"] = L["ReviewAiResult"]; }
+<div class="page-heading compact"><div><span class="eyebrow">@L["StepTwoOfThree"]</span><h1>@L["ReviewAiResult"]</h1><p>@L["ReviewReceiptHint"]</p></div><span class="confidence @(Model.AiConfidence >= .8m ? "good" : "warn")">✦ @Model.AiConfidence.ToString("P0") confidence</span></div>
+@if (Model.Warnings.Count > 0) { <div class="alert alert-warning app-alert"><strong>@L["NeedReview"]</strong><ul class="mb-0">@foreach(var warning in Model.Warnings){<li>@warning</li>}</ul></div> }
+@if (Model.GrandTotal.GetValueOrDefault() <= 0 && Model.ReceiptImageCount > 0)
+{
+    <div class="retry-ai-card"><div><strong>@L["AmountNotRead"]</strong><small>@L["RunAiAgain"]</small></div><form asp-action="Reprocess" method="post" class="m-0"><input type="hidden" name="id" value="@Model.Id" /><button class="btn btn-soft" type="submit">@L["RetryAi"]</button></form></div>
+}
+<form method="post" id="review-form" novalidate>
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
+    <div class="review-layout">
+        <section class="receipt-preview content-card"><div class="section-head"><h2>@L["ReceiptPhoto"]</h2><span>@Model.ReceiptImageCount foto · @Model.TransactionNumber</span></div><div class="stored-receipt-gallery">@for(var imageIndex = 0; imageIndex < Model.ReceiptImageCount; imageIndex++){<figure><button type="button" class="stored-receipt-button" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = Model.Id, index = imageIndex })" aria-label='@L["OpenReceiptPhoto"] @(imageIndex + 1)'><img src="@Url.Action("ReceiptImage", new { id = Model.Id, index = imageIndex })" alt='@L["PhotoNumber", imageIndex + 1]' loading="@(imageIndex == 0 ? "eager" : "lazy")" /></button><figcaption>@L["PhotoNumber", imageIndex + 1]</figcaption></figure>}</div></section>
+        <section class="content-card">
+            <div class="form-grid two"><div class="form-group"><label asp-for="MerchantName">@L["Merchant"]</label><input asp-for="MerchantName" class="form-control" /><span asp-validation-for="MerchantName" class="text-danger"></span></div><div class="form-group"><label asp-for="TransactionDate">@L["Date"]</label><input asp-for="TransactionDate" class="form-control" type="date" /><span asp-validation-for="TransactionDate" class="text-danger"></span></div></div>
+            <div class="section-head item-head"><div><h2>@L["ReceiptItem"]</h2><p>@L["EditIfNeeded"]</p></div><button type="button" class="btn btn-sm btn-soft" id="add-item">@L["AddItem"]</button></div>
+            <div class="item-editor" id="item-editor">
+                @for (var i = 0; i < Model.Items.Count; i++)
+                {
+                    <div class="item-row"><span class="item-number">@(i + 1)</span><div><label>@L["ItemName"]</label><input asp-for="Items[i].Name" class="form-control item-name" /></div><div><label>@L["Qty"]</label><input asp-for="Items[i].Quantity" class="form-control" type="number" min="1" step="1" /></div><div><label>@L["UnitPrice"]</label><input asp-for="Items[i].UnitPrice" class="form-control item-unit" type="number" step="0.01" /></div><div><label>@L["Total"]</label><input asp-for="Items[i].TotalPrice" class="form-control item-total" type="number" step="0.01" /></div><button type="button" class="remove-item" title='@L["DeleteDraft"]'>×</button></div>
+                }
+            </div>
+            <div class="totals-editor"><label>@L["Subtotal"] <input asp-for="Subtotal" type="number" step="0.01" /></label></div>
+            <div class="section-head charge-head"><div><h2>@L["ChargesAndDiscounts"]</h2><p>@L["AddEachPrintedCharge"]</p></div><button type="button" class="btn btn-sm btn-soft" id="add-charge">@L["AddCharge"]</button></div>
+            <div class="charge-editor" id="charge-editor">
+                @for (var i = 0; i < Model.Charges.Count; i++)
+                {
+                    var rate = ReceiptReviewNormalizer.CalculateEffectivePercentage(Model.Charges[i].Amount ?? 0, Model.Subtotal ?? 0);
+                    <div class="charge-row"><select asp-for="Charges[i].Operation" class="form-select charge-operation"><option value="Add">@L["AddCharge"]</option><option value="Subtract">@L["Discount"]</option></select><div><input asp-for="Charges[i].Label" class="form-control charge-label" placeholder='@L["ChargePlaceholder"]' /><small class="charge-rate">@(rate.HasValue ? L["EffectiveRate", rate.Value.ToString("0.##")].Value : L["RateFromAmount"].Value)</small></div><div class="money-input"><span>Rp</span><input asp-for="Charges[i].Amount" class="form-control charge-amount" type="number" step="0.01" placeholder="0" /></div><button type="button" class="remove-charge" title='@L["DeleteDraft"]'>x</button></div>
+                }
+            </div>
+            <div class="totals-editor"><label class="grand-total">@L["GrandTotal"] <span>Rp</span><input asp-for="GrandTotal" type="number" step="0.01" /></label></div>
+        </section>
+    </div>
+    <div class="form-actions"><a class="btn btn-light" asp-action="Index">@L["SaveLater"]</a><button class="btn btn-primary" type="submit">@L["ContinueSplit"]</button></div>
+</form>
+<template id="item-template"><div class="item-row"><span class="item-number"></span><div><label>@L["ItemName"]</label><input data-field="Name" class="form-control item-name" /></div><div><label>@L["Qty"]</label><input data-field="Quantity" class="form-control" type="number" min="1" step="1" value="1" /></div><div><label>@L["UnitPrice"]</label><input data-field="UnitPrice" class="form-control item-unit" type="number" step="0.01" value="0" /></div><div><label>@L["Total"]</label><input data-field="TotalPrice" class="form-control item-total" type="number" step="0.01" value="0" /></div><button type="button" class="remove-item" title='@L["DeleteDraft"]'>×</button></div></template>
+<template id="charge-template"><div class="charge-row"><select data-field="Operation" class="form-select charge-operation"><option value="Add">@L["AddCharge"]</option><option value="Subtract">@L["Discount"]</option></select><div><input data-field="Label" class="form-control charge-label" placeholder='@L["ChargePlaceholder"]' /><small class="charge-rate">@L["RateFromAmount"]</small></div><div class="money-input"><span>Rp</span><input data-field="Amount" class="form-control charge-amount" type="number" step="0.01" placeholder="0" /></div><button type="button" class="remove-charge" title='@L["DeleteDraft"]'>x</button></div></template>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

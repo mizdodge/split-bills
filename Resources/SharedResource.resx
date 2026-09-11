@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0</value></resheader>
+  <data name="LanguageIndonesia" xml:space="preserve"><value>ID</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>EN</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="UploadReceipt" xml:space="preserve"><value>Upload struk</value></data>
+  <data name="Transactions" xml:space="preserve"><value>Transaksi</value></data>
+  <data name="Report" xml:space="preserve"><value>Report</value></data>
+  <data name="MyBills" xml:space="preserve"><value>Tagihan saya</value></data>
+  <data name="Approvals" xml:space="preserve"><value>Konfirmasi</value></data>
+  <data name="Notifications" xml:space="preserve"><value>Notifikasi</value></data>
+  <data name="AISettings" xml:space="preserve"><value>AI Settings</value></data>
+  <data name="ChangePassword" xml:space="preserve"><value>Ganti password</value></data>
+  <data name="Logout" xml:space="preserve"><value>Keluar</value></data>
+  <data name="Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="Moderator" xml:space="preserve"><value>Moderator</value></data>
+  <data name="Member" xml:space="preserve"><value>Member</value></data>
+  <data name="Paid" xml:space="preserve"><value>Sudah dibayar</value></data>
+  <data name="Unpaid" xml:space="preserve"><value>Belum dibayar</value></data>
+  <data name="AwaitingConfirmation" xml:space="preserve"><value>Menunggu konfirmasi</value></data>
+  <data name="Partial" xml:space="preserve"><value>Sebagian dibayar</value></data>
+  <data name="Draft" xml:space="preserve"><value>Draft</value></data>
+  <data name="Apply" xml:space="preserve"><value>Terapkan</value></data>
+  <data name="Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="ExportExcel" xml:space="preserve"><value>Export Excel</value></data>
+  <data name="ViewReport" xml:space="preserve"><value>Lihat report</value></data>
+  <data name="Back" xml:space="preserve"><value>Kembali</value></data>
+  <data name="SavePassword" xml:space="preserve"><value>Simpan password</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Batal</value></data>
+  <data name="CurrentPassword" xml:space="preserve"><value>Password saat ini</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>Password baru</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Ulangi password baru</value></data>
+  <data name="PasswordChanged" xml:space="preserve"><value>Password berhasil diubah.</value></data>
+  <data name="MyBillsDescription" xml:space="preserve"><value>Lihat status dan ajukan konfirmasi pembayaran.</value></data>
+  <data name="NoBills" xml:space="preserve"><value>Belum ada tagihan</value></data>
+  <data name="NoNotifications" xml:space="preserve"><value>Belum ada notifikasi</value></data>
+  <data name="NoApprovals" xml:space="preserve"><value>Tidak ada pembayaran yang menunggu</value></data>
+  <data name="NoData" xml:space="preserve"><value>Data tidak ditemukan</value></data>
+  <data name="Date" xml:space="preserve"><value>Tanggal</value></data>
+  <data name="Merchant" xml:space="preserve"><value>Merchant</value></data>
+  <data name="Uploader" xml:space="preserve"><value>Uploader</value></data>
+  <data name="Participant" xml:space="preserve"><value>Peserta</value></data>
+  <data name="Amount" xml:space="preserve"><value>Nominal</value></data>
+  <data name="Total" xml:space="preserve"><value>Total</value></data>
+  <data name="PaidAmount" xml:space="preserve"><value>Sudah dibayar</value></data>
+  <data name="UnpaidAmount" xml:space="preserve"><value>Belum dibayar</value></data>
+  <data name="AwaitingAmount" xml:space="preserve"><value>Menunggu konfirmasi</value></data>
+  <data name="Outstanding" xml:space="preserve"><value>Outstanding</value></data>
+  <data name="TotalTransactions" xml:space="preserve"><value>Total transaksi</value></data>
+  <data name="TotalBills" xml:space="preserve"><value>Total tagihan</value></data>
+  <data name="Details" xml:space="preserve"><value>Detail</value></data>
+  <data name="DetailsReport" xml:space="preserve"><value>Detail report</value></data>
+  <data name="TransactionNumber" xml:space="preserve"><value>Nomor transaksi</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menu</value></data>
+  <data name="PaymentStatus" xml:space="preserve"><value>Status pembayaran</value></data>
+  <data name="IHavePaid" xml:space="preserve"><value>Saya sudah bayar</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Konfirmasi</value></data>
+  <data name="Reject" xml:space="preserve"><value>Tolak</value></data>
+  <data name="MarkPaid" xml:space="preserve"><value>Tandai Paid</value></data>
+  <data name="Reopen" xml:space="preserve"><value>Buka kembali</value></data>
+  <data name="Submitted" xml:space="preserve"><value>Diajukan</value></data>
+  <data name="Resolution" xml:space="preserve"><value>Diselesaikan</value></data>
+  <data name="ResolvedBy" xml:space="preserve"><value>Dikonfirmasi oleh</value></data>
+  <data name="LastAction" xml:space="preserve"><value>Aksi terakhir</value></data>
+  <data name="AllStatuses" xml:space="preserve"><value>Semua status</value></data>
+  <data name="FromDate" xml:space="preserve"><value>Dari tanggal</value></data>
+  <data name="ToDate" xml:space="preserve"><value>Sampai tanggal</value></data>
+  <data name="UploaderFilter" xml:space="preserve"><value>Uploader</value></data>
+  <data name="PaymentDetails" xml:space="preserve"><value>Rincian pembayaran</value></data>
+  <data name="ReceiptDetails" xml:space="preserve"><value>Rincian struk</value></data>
+  <data name="Subtotal" xml:space="preserve"><value>Subtotal</value></data>
+  <data name="Generated" xml:space="preserve"><value>Dibuat</value></data>
+  <data name="ByItem" xml:space="preserve"><value>Berdasarkan item</value></data>
+  <data name="EqualSplit" xml:space="preserve"><value>Bagi rata</value></data>
+  <data name="AllItemsEqual" xml:space="preserve"><value>Semua item (bagi rata)</value></data>
+  <data name="WelcomeBack" xml:space="preserve"><value>SELAMAT DATANG KEMBALI</value></data>
+  <data name="LoginTitle" xml:space="preserve"><value>Masuk ke akunmu</value></data>
+  <data name="LoginDescription" xml:space="preserve"><value>Kelola tagihan dalam beberapa langkah.</value></data>
+  <data name="Username" xml:space="preserve"><value>Username</value></data>
+  <data name="Password" xml:space="preserve"><value>Password</value></data>
+  <data name="EnterUsername" xml:space="preserve"><value>Masukkan username</value></data>
+  <data name="EnterPassword" xml:space="preserve"><value>Masukkan password</value></data>
+  <data name="ShowPassword" xml:space="preserve"><value>Lihat password</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Ingat saya</value></data>
+  <data name="Login" xml:space="preserve"><value>Login</value></data>
+  <data name="AdminAccess" xml:space="preserve"><value>Akses diberikan oleh administrator.</value></data>
+  <data name="SplitWithoutHassle" xml:space="preserve"><value>SPLIT TANPA RIBET</value></data>
+  <data name="OneReceipt" xml:space="preserve"><value>Satu struk. Semua jadi jelas.</value></data>
+  <data name="UploadAiTrack" xml:space="preserve"><value>Upload foto, biarkan AI membaca, lalu pantau siapa yang sudah bayar.</value></data>
+  <data name="ReviewInYourHands" xml:space="preserve"><value>Review tetap di tangan kamu.</value></data>
+  <data name="Overview" xml:space="preserve"><value>RINGKASAN</value></data>
+  <data name="HelloUser" xml:space="preserve"><value>Halo, {0} 👋</value></data>
+  <data name="MonitorBills" xml:space="preserve"><value>Pantau semua tagihan dari satu tempat.</value></data>
+  <data name="UnpaidBills" xml:space="preserve"><value>Belum lunas</value></data>
+  <data name="RemainingBills" xml:space="preserve"><value>Sisa tagihan</value></data>
+  <data name="RecentTransactions" xml:space="preserve"><value>Transaksi terbaru</value></data>
+  <data name="LatestBillActivity" xml:space="preserve"><value>Aktivitas tagihan paling baru.</value></data>
+  <data name="ViewAll" xml:space="preserve"><value>Lihat semua →</value></data>
+  <data name="NoTransactions" xml:space="preserve"><value>Belum ada transaksi</value></data>
+  <data name="UploadFirstReceipt" xml:space="preserve"><value>Upload struk pertama untuk mulai membagi tagihan.</value></data>
+  <data name="PeopleCount" xml:space="preserve"><value>{0} orang</value></data>
+  <data name="AllBills" xml:space="preserve"><value>Semua tagihan</value></data>
+  <data name="ReceiptHistory" xml:space="preserve"><value>Riwayat struk dan status pembayaran.</value></data>
+  <data name="UploadReceiptButton" xml:space="preserve"><value>＋ Upload struk</value></data>
+  <data name="Detail" xml:space="preserve"><value>Detail</value></data>
+  <data name="DeleteDraft" xml:space="preserve"><value>Hapus draft</value></data>
+  <data name="DeleteDraftConfirm" xml:space="preserve"><value>Hapus draft ini beserta rincian dan foto struk? Tindakan ini tidak dapat dibatalkan.</value></data>
+  <data name="StepOneOfThree" xml:space="preserve"><value>LANGKAH 1 DARI 3</value></data>
+  <data name="StepTwoOfThree" xml:space="preserve"><value>LANGKAH 2 DARI 3</value></data>
+  <data name="StepThreeOfThree" xml:space="preserve"><value>LANGKAH 3 DARI 3</value></data>
+  <data name="ChooseReceiptPhotos" xml:space="preserve"><value>Pilih satu atau beberapa foto berurutan untuk satu struk.</value></data>
+  <data name="DragPhotoHere" xml:space="preserve"><value>Tarik foto ke sini</value></data>
+  <data name="OrClickToChoose" xml:space="preserve"><value>atau klik untuk memilih dari perangkat</value></data>
+  <data name="ChoosePhoto" xml:space="preserve"><value>Pilih foto</value></data>
+  <data name="PhotoLimits" xml:space="preserve"><value>1–5 foto · masing-masing maks. 10 MB · total maks. 30 MB</value></data>
+  <data name="AllImageFormatsHint" xml:space="preserve"><value>Format foto umum didukung; file akan dinormalisasi agar aman diproses.</value></data>
+  <data name="ImageRequired" xml:space="preserve"><value>File gambar wajib diunggah.</value></data>
+  <data name="ImageTooLarge" xml:space="preserve"><value>Ukuran gambar maksimal 10 MB.</value></data>
+  <data name="ImageFormatInvalid" xml:space="preserve"><value>File bukan gambar raster yang valid atau formatnya belum didukung.</value></data>
+  <data name="ImageDimensionsInvalid" xml:space="preserve"><value>Resolusi gambar terlalu besar.</value></data>
+  <data name="SelectedPhotos" xml:space="preserve"><value>{0} foto dipilih</value></data>
+  <data name="AddPhoto" xml:space="preserve"><value>＋ Tambah foto</value></data>
+  <data name="BestResults" xml:space="preserve"><value>Supaya hasil maksimal</value></data>
+  <data name="OrderPhotos" xml:space="preserve"><value>Urutkan foto dari atas ke bawah</value></data>
+  <data name="OverlapOkay" xml:space="preserve"><value>Boleh ada sedikit bagian yang tumpang tindih</value></data>
+  <data name="UseGoodLight" xml:space="preserve"><value>Gunakan cahaya cukup dan hindari foto buram</value></data>
+  <data name="ProcessWithAi" xml:space="preserve"><value>Proses dengan AI</value></data>
+  <data name="ReadingReceipt" xml:space="preserve"><value>Membaca struk...</value></data>
+  <data name="AiCombining" xml:space="preserve"><value>AI sedang menggabungkan foto, item, dan nominal.</value></data>
+  <data name="ReviewAiResult" xml:space="preserve"><value>Review hasil AI</value></data>
+  <data name="ReviewReceiptHint" xml:space="preserve"><value>Pastikan item dan nominal sudah sesuai dengan struk.</value></data>
+  <data name="NeedReview" xml:space="preserve"><value>Perlu diperiksa:</value></data>
+  <data name="AmountNotRead" xml:space="preserve"><value>Nominal belum terbaca</value></data>
+  <data name="RunAiAgain" xml:space="preserve"><value>Jalankan AI lagi memakai seluruh foto struk yang tersimpan.</value></data>
+  <data name="RetryAi" xml:space="preserve"><value>✦ Proses ulang dengan AI</value></data>
+  <data name="ReceiptPhoto" xml:space="preserve"><value>Foto struk</value></data>
+  <data name="PhotoNumber" xml:space="preserve"><value>Foto {0}</value></data>
+  <data name="ReceiptItem" xml:space="preserve"><value>Item struk</value></data>
+  <data name="EditIfNeeded" xml:space="preserve"><value>Edit jika hasil pembacaan kurang tepat.</value></data>
+  <data name="AddItem" xml:space="preserve"><value>＋ Item</value></data>
+  <data name="ItemName" xml:space="preserve"><value>Nama item</value></data>
+  <data name="Qty" xml:space="preserve"><value>Qty</value></data>
+  <data name="UnitPrice" xml:space="preserve"><value>Harga satuan</value></data>
+  <data name="GrandTotal" xml:space="preserve"><value>Grand total</value></data>
+  <data name="ChargesAndDiscounts" xml:space="preserve"><value>Biaya &amp; potongan</value></data>
+  <data name="AddEachPrintedCharge" xml:space="preserve"><value>Tambahkan setiap nominal sesuai label yang tercetak.</value></data>
+  <data name="AddCharge" xml:space="preserve"><value>+ Biaya</value></data>
+  <data name="Discount" xml:space="preserve"><value>- Potongan</value></data>
+  <data name="ChargePlaceholder" xml:space="preserve"><value>Contoh: PB1, Service, Packaging</value></data>
+  <data name="RateFromAmount" xml:space="preserve"><value>Persentase akan tampil dari nominal</value></data>
+  <data name="SaveLater" xml:space="preserve"><value>Simpan nanti</value></data>
+  <data name="ContinueSplit" xml:space="preserve"><value>Lanjut atur pembagian →</value></data>
+  <data name="SetSplit" xml:space="preserve"><value>Atur pembagian</value></data>
+  <data name="ChooseParticipants" xml:space="preserve"><value>Pilih akun yang tersedia atau tambahkan tamu.</value></data>
+  <data name="RegisteredAccount" xml:space="preserve"><value>Akun terdaftar</value></data>
+  <data name="ChooseUser" xml:space="preserve"><value>Pilih user...</value></data>
+  <data name="Add" xml:space="preserve"><value>Tambah</value></data>
+  <data name="GuestName" xml:space="preserve"><value>Nama tamu</value></data>
+  <data name="GuestPlaceholder" xml:space="preserve"><value>Contoh: Tamu kantor</value></data>
+  <data name="SplitMethod" xml:space="preserve"><value>Metode pembagian</value></data>
+  <data name="ChooseMethod" xml:space="preserve"><value>Pilih cara paling sesuai.</value></data>
+  <data name="EqualSplitHint" xml:space="preserve"><value>Grand total dibagi sama rata.</value></data>
+  <data name="ByItemHint" xml:space="preserve"><value>Pilih pemilik setiap item.</value></data>
+  <data name="AddParticipantsFirst" xml:space="preserve"><value>Masukkan nama peserta untuk menampilkan pilihan item.</value></data>
+  <data name="CalculateAndSaveSplit" xml:space="preserve"><value>Hitung &amp; simpan pembagian →</value></data>
+  <data name="AllTransactions" xml:space="preserve"><value>← Semua transaksi</value></data>
+  <data name="TotalBill" xml:space="preserve"><value>Total tagihan</value></data>
+  <data name="PaymentStatusHeading" xml:space="preserve"><value>Status pembayaran</value></data>
+  <data name="PeopleInTransaction" xml:space="preserve"><value>{0} peserta dalam transaksi ini.</value></data>
+  <data name="WaitingForPayment" xml:space="preserve"><value>Menunggu pembayaran</value></data>
+  <data name="ConfirmPayment" xml:space="preserve"><value>Konfirmasi</value></data>
+  <data name="MarkPaidConfirm" xml:space="preserve"><value>Tandai pembayaran {0} sebagai Paid?</value></data>
+  <data name="NotSplitYet" xml:space="preserve"><value>Belum dibagi</value></data>
+  <data name="SetParticipantsFirst" xml:space="preserve"><value>Atur peserta terlebih dahulu untuk memulai pembayaran.</value></data>
+  <data name="AllReceiptPhotos" xml:space="preserve"><value>Semua foto struk</value></data>
+  <data name="PhotosStoredProcessed" xml:space="preserve"><value>{0} foto tersimpan dan diproses sebagai satu struk.</value></data>
+  <data name="ConfirmedByModerator" xml:space="preserve"><value>Hasil yang telah dikonfirmasi moderator.</value></data>
+  <data name="RejectReasonPrompt" xml:space="preserve"><value>Alasan penolakan (opsional) untuk {0}:</value></data>
+  <data name="DuplicateUser" xml:space="preserve"><value>User tersebut sudah dipilih.</value></data>
+  <data name="DuplicateParticipant" xml:space="preserve"><value>Nama peserta tidak boleh duplikat.</value></data>
+  <data name="ChooseAtLeastOneParticipant" xml:space="preserve"><value>Pilih minimal satu peserta.</value></data>
+  <data name="ChooseItemParticipant" xml:space="preserve"><value>Pilih minimal satu peserta untuk setiap item.</value></data>
+  <data name="DeleteDraftError" xml:space="preserve"><value>Hapus draft ini beserta rincian dan foto struk? Tindakan ini tidak dapat dibatalkan.</value></data>
+  <data name="RejectedPayment" xml:space="preserve"><value>Pembayaran ditolak</value></data>
+  <data name="NewBill" xml:space="preserve"><value>Tagihan baru</value></data>
+  <data name="NewPaymentClaim" xml:space="preserve"><value>Klaim pembayaran baru</value></data>
+  <data name="PaymentConfirmed" xml:space="preserve"><value>Pembayaran dikonfirmasi</value></data>
+  <data name="PaymentReopened" xml:space="preserve"><value>Pembayaran dibuka kembali</value></data>
+  <data name="MarkAllRead" xml:space="preserve"><value>Tandai semua dibaca</value></data>
+  <data name="BillUpdates" xml:space="preserve"><value>Update tagihan dan pembayaranmu.</value></data>
+  <data name="NewRequestsAppear" xml:space="preserve"><value>Permintaan baru akan muncul di sini.</value></data>
+  <data name="BillAssignedHint" xml:space="preserve"><value>Tagihan baru akan muncul saat kamu dipilih di pembagian.</value></data>
+  <data name="PaymentSubmitted" xml:space="preserve"><value>Diajukan</value></data>
+  <data name="ChangePasswordTitle" xml:space="preserve"><value>Ganti password</value></data>
+  <data name="ChangePasswordDescription" xml:space="preserve"><value>Perbarui password akunmu secara berkala.</value></data>
+  <data name="SaveAndTest" xml:space="preserve"><value>↻ Simpan &amp; test</value></data>
+  <data name="SaveConfiguration" xml:space="preserve"><value>Simpan konfigurasi</value></data>
+  <data name="AiConfiguration" xml:space="preserve"><value>Konfigurasi AI</value></data>
+  <data name="ChooseAiConnection" xml:space="preserve"><value>Pilih koneksi yang dipakai untuk membaca struk.</value></data>
+  <data name="Provider" xml:space="preserve"><value>Provider</value></data>
+  <data name="ConfigUsedNextUpload" xml:space="preserve"><value>Konfigurasi ini langsung dipakai untuk upload berikutnya.</value></data>
+  <data name="EncryptedKeyHint" xml:space="preserve"><value>Key disimpan terenkripsi.</value></data>
+  <data name="StoredKeyPlaceholder" xml:space="preserve"><value>Tersimpan terenkripsi · kosongkan jika tidak diubah</value></data>
+  <data name="EnterProviderKey" xml:space="preserve"><value>Masukkan API key provider</value></data>
+  <data name="ApiKeySecurityHint" xml:space="preserve"><value>Key tidak pernah ditampilkan kembali dan dienkripsi memakai ASP.NET Core Data Protection sebelum masuk database. Saat mengganti provider, masukkan key untuk provider baru.</value></data>
+  <data name="ApiMode" xml:space="preserve"><value>API mode</value></data>
+  <data name="AzureEndpoint" xml:space="preserve"><value>Azure endpoint</value></data>
+  <data name="Deployment" xml:space="preserve"><value>Deployment</value></data>
+  <data name="ApiVersion" xml:space="preserve"><value>API version</value></data>
+  <data name="ConnectionStatus" xml:space="preserve"><value>Status koneksi</value></data>
+  <data name="Connected" xml:space="preserve"><value>Terhubung</value></data>
+  <data name="LastTested" xml:space="preserve"><value>Terakhir dites {0}</value></data>
+  <data name="NotTested" xml:space="preserve"><value>Belum dites</value></data>
+  <data name="SaveAndTestBeforeUse" xml:space="preserve"><value>Simpan lalu tes konfigurasi sebelum digunakan.</value></data>
+  <data name="WhatWillBeSaved" xml:space="preserve"><value>Yang akan disimpan</value></data>
+  <data name="ActiveProvider" xml:space="preserve"><value>Provider aktif</value></data>
+  <data name="EncryptedApiKey" xml:space="preserve"><value>API key terenkripsi</value></data>
+  <data name="ModelAndApiMode" xml:space="preserve"><value>Model dan mode API</value></data>
+  <data name="AzureEndpointDeployment" xml:space="preserve"><value>Endpoint/deployment Azure</value></data>
+  <data name="LastTestResult" xml:space="preserve"><value>Hasil tes terakhir</value></data>
+  <data name="CheckPaymentClaims" xml:space="preserve"><value>Periksa klaim pembayaran dari peserta.</value></data>
+  <data name="LoadModels" xml:space="preserve"><value>Ambil model</value></data>
+  <data name="ModelsFromProvider" xml:space="preserve"><value>Daftar model akan diambil langsung dari provider.</value></data>
+  <data name="OpenAiEncryptedKey" xml:space="preserve"><value>OpenAI memakai API key terenkripsi dari konfigurasi aktif ini.</value></data>
+  <data name="ReportMemberDescription" xml:space="preserve"><value>Pantau tagihan yang menjadi bagianmu.</value></data>
+  <data name="ReportAdminDescription" xml:space="preserve"><value>Pantau transaksi seluruh pengguna.</value></data>
+  <data name="ReportModeratorDescription" xml:space="preserve"><value>Pantau transaksi yang kamu kelola.</value></data>
+  <data name="ReportFilterHint" xml:space="preserve"><value>Hasil sesuai filter yang dipilih. Buka report terpisah untuk melihat rincian orang dan menu.</value></data>
+  <data name="AllUploaders" xml:space="preserve"><value>Semua uploader</value></data>
+  <data name="TryAnotherFilter" xml:space="preserve"><value>Coba ubah rentang tanggal atau status.</value></data>
+  <data name="ReportDetailEyebrow" xml:space="preserve"><value>REPORT DETAIL</value></data>
+  <data name="AllReports" xml:space="preserve"><value>← Semua report</value></data>
+  <data name="OneTimePerParticipant" xml:space="preserve"><value>Nominal dihitung satu kali per peserta.</value></data>
+  <data name="ReceiptMenuAndCharges" xml:space="preserve"><value>Menu dan biaya yang terbaca dari struk.</value></data>
+  <data name="ExportReport" xml:space="preserve"><value>Export report</value></data>
+  <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="MarkRead" xml:space="preserve"><value>Tandai dibaca</value></data>
+  <data name="ChooseModel" xml:space="preserve"><value>Pilih model</value></data>
+  <data name="AzureFieldsRequired" xml:space="preserve"><value>Isi endpoint dan API version Azure terlebih dahulu.</value></data>
+  <data name="LoadingModels" xml:space="preserve"><value>Mengambil daftar model...</value></data>
+  <data name="ModelsLoadFailed" xml:space="preserve"><value>Daftar model gagal dimuat.</value></data>
+  <data name="ModelsAvailable" xml:space="preserve"><value>{0} model tersedia dari provider.</value></data>
+  <data name="StoredModel" xml:space="preserve"><value>{0} (tersimpan)</value></data>
+  <data name="AzureConnectionHint" xml:space="preserve"><value>Isi koneksi Azure lalu ambil model.</value></data>
+  <data name="OpenAiModelHint" xml:space="preserve"><value>Daftar model akan diambil dari OpenAI.</value></data>
+  <data name="Remove" xml:space="preserve"><value>Hapus</value></data>
+  <data name="AccountSuffix" xml:space="preserve"><value>akun</value></data>
+  <data name="GuestSuffix" xml:space="preserve"><value>tamu</value></data>
+  <data name="PasswordRule" xml:space="preserve"><value>Minimal 6 karakter dan wajib mengandung angka.</value></data>
+  <data name="EffectiveRate" xml:space="preserve"><value>≈ {0}% dari subtotal</value></data>
+  <data name="BillNotFound" xml:space="preserve"><value>Tagihan tidak ditemukan.</value></data>
+  <data name="PaymentNotWaiting" xml:space="preserve"><value>Tagihan ini tidak sedang menunggu pembayaran.</value></data>
+  <data name="PaymentAlreadyAwaiting" xml:space="preserve"><value>Pembayaran ini sudah menunggu konfirmasi.</value></data>
+  <data name="PaymentSubmittedSuccess" xml:space="preserve"><value>Pembayaran dikirim dan menunggu konfirmasi.</value></data>
+  <data name="PaymentAlreadyPaid" xml:space="preserve"><value>Pembayaran sudah ditandai Paid.</value></data>
+  <data name="PaymentMarkedPaid" xml:space="preserve"><value>Pembayaran ditandai Paid.</value></data>
+  <data name="PaymentNotPaid" xml:space="preserve"><value>Pembayaran ini belum berstatus Paid.</value></data>
+  <data name="PaymentReopenedSuccess" xml:space="preserve"><value>Pembayaran dikembalikan ke status Unpaid.</value></data>
+  <data name="NoPaymentAwaiting" xml:space="preserve"><value>Tidak ada pembayaran yang menunggu konfirmasi.</value></data>
+  <data name="PaymentRequestProcessed" xml:space="preserve"><value>Permintaan pembayaran sudah diproses.</value></data>
+  <data name="PaymentConfirmedSuccess" xml:space="preserve"><value>Pembayaran dikonfirmasi.</value></data>
+  <data name="PaymentRejectedSuccess" xml:space="preserve"><value>Pembayaran ditolak dan dikembalikan ke Unpaid.</value></data>
+  <data name="InvalidCredentials" xml:space="preserve"><value>Username atau password salah.</value></data>
+  <data name="AccountLocked" xml:space="preserve"><value>Akun dikunci sementara karena terlalu banyak percobaan login.</value></data>
+  <data name="ProviderKeyRequired" xml:space="preserve"><value>API key {0} wajib diisi.</value></data>
+  <data name="AzureEndpointRequired" xml:space="preserve"><value>Endpoint Azure wajib diisi.</value></data>
+  <data name="AzureDeploymentRequired" xml:space="preserve"><value>Deployment Azure wajib diisi.</value></data>
+  <data name="AzureApiVersionRequired" xml:space="preserve"><value>API version wajib diisi.</value></data>
+  <data name="ConfigurationTestSuccess" xml:space="preserve"><value>Konfigurasi tersimpan dan koneksi AI berhasil.</value></data>
+  <data name="ConfigurationTestFailed" xml:space="preserve"><value>Konfigurasi tersimpan, tetapi tes koneksi gagal. Periksa detail di bawah.</value></data>
+  <data name="ConfigurationSaved" xml:space="preserve"><value>Konfigurasi AI berhasil disimpan.</value></data>
+  <data name="DateRangeInvalid" xml:space="preserve"><value>Tanggal mulai tidak boleh melewati tanggal akhir.</value></data>
+  <data name="AccessDeniedTitle" xml:space="preserve"><value>Akses ditolak</value></data>
+  <data name="AccessDeniedDescription" xml:space="preserve"><value>Kamu tidak memiliki izin untuk membuka halaman ini.</value></data>
+  <data name="BackDashboard" xml:space="preserve"><value>Kembali ke dashboard</value></data>
+  <data name="ReceiptReadSuccess" xml:space="preserve"><value>Struk berhasil dibaca. Periksa hasil AI sebelum melanjutkan.</value></data>
+  <data name="AiReadFailed" xml:space="preserve"><value>AI belum berhasil membaca struk: {0} Data tetap disimpan dan bisa diisi manual.</value></data>
+  <data name="NegativeAmount" xml:space="preserve"><value>Nominal tidak boleh negatif. Masukkan potongan harga di kolom Diskon.</value></data>
+  <data name="MissingReceiptTotals" xml:space="preserve"><value>Isi Grand total, Subtotal, atau minimal satu nominal item untuk melanjutkan.</value></data>
+  <data name="SplitLocked" xml:space="preserve"><value>Pembagian tidak dapat diubah karena ada pembayaran yang sudah dibayar atau menunggu konfirmasi.</value></data>
+  <data name="SplitSaved" xml:space="preserve"><value>Pembagian berhasil disimpan.</value></data>
+  <data name="InvalidParticipantData" xml:space="preserve"><value>Data peserta tidak valid.</value></data>
+  <data name="InvalidParticipantAccount" xml:space="preserve"><value>Ada akun peserta yang tidak valid.</value></data>
+  <data name="DuplicateParticipants" xml:space="preserve"><value>Peserta tidak boleh duplikat.</value></data>
+  <data name="ReprocessDraftOnly" xml:space="preserve"><value>Proses ulang hanya tersedia untuk Draft dengan grand total masih 0.</value></data>
+  <data name="ReceiptMissingRetry" xml:space="preserve"><value>Foto struk tidak ditemukan sehingga belum dapat diproses ulang.</value></data>
+  <data name="ReprocessSuccess" xml:space="preserve"><value>{0} foto struk berhasil diproses ulang. Periksa kembali hasil AI.</value></data>
+  <data name="AiRetryFailed" xml:space="preserve"><value>AI masih belum berhasil: {0} Data manual tetap aman.</value></data>
+  <data name="DraftOnlyDelete" xml:space="preserve"><value>Hanya transaksi berstatus Draft yang dapat dihapus.</value></data>
+  <data name="DraftFileCleanupFailed" xml:space="preserve"><value>Draft terhapus, tetapi satu atau beberapa file struk tidak dapat dibersihkan dari server.</value></data>
+  <data name="DraftDeleted" xml:space="preserve"><value>Draft {0} berhasil dihapus.</value></data>
+  <data name="UsernameRequired" xml:space="preserve"><value>Username wajib diisi.</value></data>
+  <data name="FirstAdminSetup" xml:space="preserve"><value>Penyiapan admin pertama</value></data>
+  <data name="SetupDescription" xml:space="preserve"><value>Buat akun administrator pertama untuk instalasi ini.</value></data>
+  <data name="SetupCodeHint" xml:space="preserve"><value>Ambil kode satu kali dari perintah --print-bootstrap-code di server.</value></data>
+  <data name="BootstrapCode" xml:space="preserve"><value>Kode bootstrap</value></data>
+  <data name="BootstrapCodeHint" xml:space="preserve"><value>Kode ini hanya berlaku selama 24 jam dan terhapus setelah setup selesai.</value></data>
+  <data name="BootstrapCodeInvalid" xml:space="preserve"><value>Kode bootstrap salah atau sudah kedaluwarsa.</value></data>
+  <data name="CreateAdmin" xml:space="preserve"><value>Buat administrator</value></data>
+  <data name="EmailOptional" xml:space="preserve"><value>Email (opsional)</value></data>
+  <data name="SetupComplete" xml:space="preserve"><value>Administrator berhasil dibuat. Silakan login.</value></data>
+  <data name="InstallApp" xml:space="preserve"><value>Pasang aplikasi</value></data>
+  <data name="InstallAppHint" xml:space="preserve"><value>Pasang SplitBill agar mudah dibuka dari layar utama.</value></data>
+  <data name="RefreshApp" xml:space="preserve"><value>Refresh sekarang</value></data>
+  <data name="UpdateAppHint" xml:space="preserve"><value>Versi SplitBill baru tersedia.</value></data>
+  <data name="SystemTools" xml:space="preserve"><value>Tools sistem</value></data>
+  <data name="SystemToolsDescription" xml:space="preserve"><value>Backup dan pemulihan data instalasi dengan konfirmasi admin.</value></data>
+  <data name="CreateBackup" xml:space="preserve"><value>Buat backup</value></data>
+  <data name="BackupDescription" xml:space="preserve"><value>Unduh snapshot SQLite, foto struk, bukti bayar, dan key ring untuk pemulihan instalasi yang sama.</value></data>
+  <data name="ConfirmAdminPassword" xml:space="preserve"><value>Konfirmasi password admin</value></data>
+  <data name="BackupPasswordHint" xml:space="preserve"><value>Backup tidak dibuat sebelum password admin terverifikasi.</value></data>
+  <data name="DownloadBackup" xml:space="preserve"><value>Unduh backup</value></data>
+  <data name="StageRestore" xml:space="preserve"><value>Validasi paket restore</value></data>
+  <data name="RestoreDescription" xml:space="preserve"><value>Upload ZIP untuk divalidasi dan disiapkan. Eksekusi dilakukan lewat script handoff IIS.</value></data>
+  <data name="BackupFile" xml:space="preserve"><value>File backup ZIP</value></data>
+  <data name="RestoreFileHint" xml:space="preserve"><value>Ukuran maksimal 512 MB. Checksum manifest wajib cocok.</value></data>
+  <data name="ValidateAndStage" xml:space="preserve"><value>Validasi dan stage</value></data>
+  <data name="RestoreWarningTitle" xml:space="preserve"><value>Restore mengganti data lokal</value></data>
+  <data name="RestoreWarning" xml:space="preserve"><value>Jalankan script dari server dengan backup App_Data terlebih dahulu. Mode migration menghapus secret machine-bound dan memaksa input ulang.</value></data>
+  <data name="RestoreStaged" xml:space="preserve"><value>Backup {0} valid dan berisi {1} file. Lanjutkan dengan restore-splitbill.ps1 di server.</value></data>
+  <data name="RestoreInvalid" xml:space="preserve"><value>Backup tidak valid: {0}</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>Password wajib diisi.</value></data>
+  <data name="CurrentPasswordRequired" xml:space="preserve"><value>Password saat ini wajib diisi.</value></data>
+  <data name="NewPasswordRequired" xml:space="preserve"><value>Password baru wajib diisi.</value></data>
+  <data name="PasswordMinLength" xml:space="preserve"><value>Password baru minimal {2} karakter.</value></data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve"><value>Konfirmasi password wajib diisi.</value></data>
+  <data name="PasswordMismatch" xml:space="preserve"><value>Konfirmasi password tidak sama.</value></data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve"><value>Password saat ini salah.</value></data>
+  <data name="PasswordRequiresDigit" xml:space="preserve"><value>Password harus mengandung angka.</value></data>
+  <data name="PasswordRequiresLower" xml:space="preserve"><value>Password harus mengandung huruf kecil.</value></data>
+  <data name="PasswordTooShort" xml:space="preserve"><value>Password baru minimal 6 karakter.</value></data>
+  <data name="PaymentProof" xml:space="preserve"><value>Bukti pembayaran</value></data>
+  <data name="PaymentProofHint" xml:space="preserve"><value>Unggah JPG, PNG, atau WebP maksimal 10 MB.</value></data>
+  <data name="PaymentAttempts" xml:space="preserve"><value>Riwayat pengajuan pembayaran</value></data>
+  <data name="PaymentAttemptsHint" xml:space="preserve"><value>Setiap pengajuan dan hasil konfirmasi tersimpan di sini.</value></data>
+  <data name="ViewProof" xml:space="preserve"><value>Lihat bukti</value></data>
+  <data name="MissingProof" xml:space="preserve"><value>Bukti tidak ada</value></data>
+  <data name="RejectReason" xml:space="preserve"><value>Alasan penolakan</value></data>
+  <data name="RejectReasonPlaceholder" xml:space="preserve"><value>Tulis alasan penolakan</value></data>
+  <data name="InvalidPaymentProof" xml:space="preserve"><value>Bukti pembayaran wajib berupa gambar JPG, PNG, atau WebP.</value></data>
+  <data name="PaymentProofTooLarge" xml:space="preserve"><value>Ukuran bukti pembayaran maksimal 10 MB.</value></data>
+  <data name="PaymentProofFormatInvalid" xml:space="preserve"><value>Format bukti pembayaran harus berupa gambar raster yang didukung.</value></data>
+  <data name="PaymentProofContentInvalid" xml:space="preserve"><value>Isi file bukan gambar yang valid.</value></data>
+  <data name="Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="EditLocked" xml:space="preserve"><value>Transaksi tidak dapat diedit setelah aktivitas pembayaran dimulai.</value></data>
+  <data name="DeleteUnpaid" xml:space="preserve"><value>Hapus Unpaid</value></data>
+  <data name="DeleteUnpaidConfirm" xml:space="preserve"><value>Hapus transaksi Unpaid ini beserta peserta, riwayat pembayaran, bukti, dan foto struk? Tindakan ini tidak dapat dibatalkan.</value></data>
+  <data name="AdminOnlyUnpaidDelete" xml:space="preserve"><value>Hanya Admin yang dapat menghapus transaksi Unpaid.</value></data>
+  <data name="AllocationGroup" xml:space="preserve"><value>Kelompok</value></data>
+  <data name="OwnedQuantity" xml:space="preserve"><value>Dimiliki peserta ini</value></data>
+  <data name="SharedEqually" xml:space="preserve"><value>Patungan rata</value></data>
+  <data name="RemoveGroup" xml:space="preserve"><value>Hapus kelompok</value></data>
+  <data name="AddGroup" xml:space="preserve"><value>Tambah kelompok</value></data>
+  <data name="AssignedQuantity" xml:space="preserve"><value>Terbagi {0} dari {1}</value></data>
+  <data name="RemainingQuantity" xml:space="preserve"><value>Sisa {0}</value></data>
+  <data name="SharedByPeople" xml:space="preserve"><value>Patungan rata · {0} orang</value></data>
+  <data name="ChooseGroupParticipant" xml:space="preserve"><value>Pilih peserta</value></data>
+  <data name="AssignmentIncomplete" xml:space="preserve"><value>Kurangi kelompok lain atau lengkapi peserta</value></data>
+  <data name="AssignmentGroupHint" xml:space="preserve"><value>Atur jumlah dan peserta untuk setiap kelompok item.</value></data>
+  <data name="Row" xml:space="preserve"><value>Baris</value></data>
+  <data name="PushNotificationsTitle" xml:space="preserve"><value>Notifikasi browser</value></data>
+  <data name="PushNotificationsDescription" xml:space="preserve"><value>Dapatkan notifikasi saat ada member mengirim klaim pembayaran.</value></data>
+  <data name="PushEnabledDevices" xml:space="preserve"><value>Perangkat aktif</value></data>
+  <data name="PushEnable" xml:space="preserve"><value>Aktifkan notifikasi</value></data>
+  <data name="PushDisable" xml:space="preserve"><value>Matikan notifikasi</value></data>
+  <data name="PushChecking" xml:space="preserve"><value>Memeriksa dukungan browser...</value></data>
+  <data name="PushEnablePrompt" xml:space="preserve"><value>Aktifkan notifikasi browser untuk perangkat ini.</value></data>
+  <data name="PushEnabled" xml:space="preserve"><value>Notifikasi browser aktif.</value></data>
+  <data name="PushDisabled" xml:space="preserve"><value>Notifikasi browser dimatikan.</value></data>
+  <data name="PushUnsupported" xml:space="preserve"><value>Browser ini belum mendukung push notification.</value></data>
+  <data name="PushInsecure" xml:space="preserve"><value>Push notification membutuhkan HTTPS atau localhost.</value></data>
+  <data name="PushDenied" xml:space="preserve"><value>Izin notifikasi ditolak di browser.</value></data>
+  <data name="PushRequesting" xml:space="preserve"><value>Meminta izin browser...</value></data>
+  <data name="PushError" xml:space="preserve"><value>Push notification gagal. Coba lagi.</value></data>
+  <data name="PushTestButton" xml:space="preserve"><value>Kirim notifikasi uji</value></data>
+  <data name="PushTestSent" xml:space="preserve"><value>Notifikasi uji dikirim.</value></data>
+  <data name="PushTest" xml:space="preserve"><value>Notifikasi uji</value></data>
+  <data name="ReceiptDateRequired" xml:space="preserve"><value>Tanggal struk belum terbaca. Isi tanggal secara manual untuk melanjutkan.</value></data>
+  <data name="YourBillBreakdown" xml:space="preserve"><value>Rincian tagihan kamu</value></data>
+  <data name="MenuAndReceiptCharges" xml:space="preserve"><value>Menu dan penyesuaian struk</value></data>
+  <data name="FullReceiptAmount" xml:space="preserve"><value>Total struk</value></data>
+  <data name="YourShare" xml:space="preserve"><value>Bagian kamu</value></data>
+  <data name="YourMenuSubtotal" xml:space="preserve"><value>Subtotal menu kamu</value></data>
+  <data name="DiscountsAndOtherCharges" xml:space="preserve"><value>Diskon dan biaya lainnya</value></data>
+  <data name="YourAdjustmentTotal" xml:space="preserve"><value>Total penyesuaian kamu</value></data>
+  <data name="YourBillTotal" xml:space="preserve"><value>Total tagihan kamu</value></data>
+  <data name="OtherAdjustment" xml:space="preserve"><value>Penyesuaian lainnya</value></data>
+  <data name="RoundingAdjustment" xml:space="preserve"><value>Penyesuaian pembulatan</value></data>
+  <data name="AdjustmentAllocationHint" xml:space="preserve"><value>Nominal disusun dari item struk dan penyesuaian yang dialokasikan ke bagian kamu.</value></data>
+  <data name="MoreMenuItems" xml:space="preserve"><value>menu lainnya</value></data>
+  <data name="ReceiptPhotos" xml:space="preserve"><value>Foto struk</value></data>
+  <data name="OpenReceiptPhoto" xml:space="preserve"><value>Buka foto struk</value></data>
+  <data name="ReceiptPhotoCounter" xml:space="preserve"><value>Foto {0} dari {1}</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Perbesar</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Perkecil</value></data>
+  <data name="ResetZoom" xml:space="preserve"><value>Reset zoom</value></data>
+  <data name="PreviousPhoto" xml:space="preserve"><value>Foto sebelumnya</value></data>
+  <data name="NextPhoto" xml:space="preserve"><value>Foto berikutnya</value></data>
+  <data name="CloseReceiptViewer" xml:space="preserve"><value>Tutup foto struk</value></data>
+  <data name="Photos" xml:space="preserve"><value>foto</value></data>
+  <data name="ViewOrderDetails" xml:space="preserve"><value>Lihat pesanan</value></data>
+  <data name="OrderItemCount" xml:space="preserve"><value>{0} item pesanan</value></data>
+  <data name="ParticipantShare" xml:space="preserve"><value>Bagian peserta</value></data>
+  <data name="QuantityShare" xml:space="preserve"><value>Bagian qty {0}</value></data>
+  <data name="MenuSubtotal" xml:space="preserve"><value>Subtotal menu</value></data>
+  <data name="AdjustmentTotal" xml:space="preserve"><value>Total penyesuaian</value></data>
+  <data name="ParticipantBillTotal" xml:space="preserve"><value>Total tagihan peserta</value></data>
+  <data name="SharePointIntegration" xml:space="preserve"><value>Integrasi SharePoint</value></data>
+  <data name="SharePointSettingsDescription" xml:space="preserve"><value>Hubungkan SplitBill ke site SharePoint yang dipilih.</value></data>
+  <data name="MicrosoftEntra" xml:space="preserve"><value>Microsoft Entra</value></data>
+  <data name="SharePointCredentialsHint" xml:space="preserve"><value>Gunakan kredensial aplikasi Entra untuk membaca site dan list.</value></data>
+  <data name="Enabled" xml:space="preserve"><value>Aktif</value></data>
+  <data name="TenantId" xml:space="preserve"><value>Tenant ID</value></data>
+  <data name="ClientId" xml:space="preserve"><value>Client ID</value></data>
+  <data name="ClientSecret" xml:space="preserve"><value>Client Secret</value></data>
+  <data name="StoredSecretPlaceholder" xml:space="preserve"><value>Secret tersimpan — isi hanya jika ingin mengganti</value></data>
+  <data name="EnterClientSecret" xml:space="preserve"><value>Masukkan client secret</value></data>
+  <data name="StoredSecretHint" xml:space="preserve"><value>Secret tersimpan terenkripsi. Kosongkan untuk menggunakannya.</value></data>
+  <data name="SecretRequiredForTest" xml:space="preserve"><value>Client secret diperlukan untuk test koneksi.</value></data>
+  <data name="SharePointSiteUrl" xml:space="preserve"><value>SharePoint Site URL</value></data>
+  <data name="SharePointSiteUrlHint" xml:space="preserve"><value>Contoh: https://perusahaan.sharepoint.com/sites/Office</value></data>
+  <data name="TestConnectionBeforeSave" xml:space="preserve"><value>Test koneksi untuk memuat daftar list.</value></data>
+  <data name="TestConnection" xml:space="preserve"><value>Test koneksi</value></data>
+  <data name="SharePointDestination" xml:space="preserve"><value>Tujuan SharePoint</value></data>
+  <data name="SharePointListHint" xml:space="preserve"><value>List akan muncul otomatis setelah site berhasil terhubung.</value></data>
+  <data name="NotConnected" xml:space="preserve"><value>Belum terhubung</value></data>
+  <data name="SharePointList" xml:space="preserve"><value>SharePoint List</value></data>
+  <data name="TestConnectionToLoadLists" xml:space="preserve"><value>Test koneksi untuk memuat list</value></data>
+  <data name="ListNotLoaded" xml:space="preserve"><value>List belum dimuat.</value></data>
+  <data name="EncryptedClientSecret" xml:space="preserve"><value>Client secret terenkripsi</value></data>
+  <data name="StableSiteAndListIds" xml:space="preserve"><value>Site ID dan List ID yang stabil</value></data>
+  <data name="LastConnectionTest" xml:space="preserve"><value>Hasil test koneksi terakhir</value></data>
+  <data name="SharePointConfigurationSaved" xml:space="preserve"><value>Konfigurasi SharePoint berhasil disimpan.</value></data>
+  <data name="SharePointInvalidInput" xml:space="preserve"><value>Periksa Tenant ID, Client ID, secret, dan URL SharePoint.</value></data>
+  <data name="SharePointClientSecretRequired" xml:space="preserve"><value>Client secret diperlukan untuk koneksi ini.</value></data>
+  <data name="SharePointTestRequired" xml:space="preserve"><value>Jalankan Test Connection lagi sebelum menyimpan pilihan list.</value></data>
+  <data name="SharePointAuthenticationFailed" xml:space="preserve"><value>Autentikasi Microsoft Entra gagal.</value></data>
+  <data name="SharePointInvalidClientSecret" xml:space="preserve"><value>Client secret ditolak Microsoft Entra (AADSTS7000215). Pastikan memakai Secret Value dari App Registration yang sama, bukan Secret ID.</value></data>
+  <data name="SharePointExpiredClientSecret" xml:space="preserve"><value>Client secret sudah kedaluwarsa (AADSTS7000222). Buat secret baru lalu salin Secret Value-nya.</value></data>
+  <data name="SharePointApplicationNotFound" xml:space="preserve"><value>Application (Client) ID tidak ditemukan di tenant ini (AADSTS700016). Periksa Tenant ID dan Application ID.</value></data>
+  <data name="SharePointApplicationDisabled" xml:space="preserve"><value>App Registration dinonaktifkan di Microsoft Entra (AADSTS7000112).</value></data>
+  <data name="SharePointTenantInvalid" xml:space="preserve"><value>Tenant ID tidak dikenali Microsoft Entra (AADSTS900023).</value></data>
+  <data name="SharePointAuthenticationFailedWithCode" xml:space="preserve"><value>Autentikasi Microsoft Entra gagal ({0}). Periksa Sign-in logs untuk detailnya.</value></data>
+  <data name="SharePointGraphTokenRejected" xml:space="preserve"><value>Login Microsoft Entra berhasil, tetapi Microsoft Graph menolak access token (GRAPH_HTTP_401). Periksa Microsoft Graph Application permissions dan admin consent.</value></data>
+  <data name="SharePointGraphRequestFailedWithCode" xml:space="preserve"><value>Microsoft Graph mengembalikan kegagalan ({0}). Periksa kode tersebut atau tunggu beberapa menit jika permission baru saja diubah.</value></data>
+  <data name="SharePointGraphRequestFailedWithDetail" xml:space="preserve"><value>Microsoft Graph mengembalikan kegagalan ({0}): {1}</value></data>
+  <data name="SharePointPermissionDenied" xml:space="preserve"><value>Aplikasi belum memiliki akses ke site SharePoint ini.</value></data>
+  <data name="SharePointSiteNotFound" xml:space="preserve"><value>Site SharePoint tidak ditemukan.</value></data>
+  <data name="SharePointNoLists" xml:space="preserve"><value>Tidak ada list SharePoint yang dapat dipilih.</value></data>
+  <data name="SharePointRateLimited" xml:space="preserve"><value>Microsoft Graph sedang membatasi request. Coba lagi nanti.</value></data>
+  <data name="SharePointNetworkFailure" xml:space="preserve"><value>Microsoft 365 tidak dapat dihubungi. Coba lagi.</value></data>
+  <data name="SharePointInvalidResponse" xml:space="preserve"><value>Respons Microsoft Graph tidak valid.</value></data>
+  <data name="TestingConnection" xml:space="preserve"><value>Menguji koneksi…</value></data>
+  <data name="ConnectionReady" xml:space="preserve"><value>Koneksi berhasil. Pilih list.</value></data>
+  <data name="ConnectionFailed" xml:space="preserve"><value>Koneksi gagal.</value></data>
+  <data name="ChooseSharePointList" xml:space="preserve"><value>Pilih SharePoint List.</value></data>
+  <data name="ListsAvailable" xml:space="preserve"><value>list tersedia.</value></data>
+  <data name="ManageUsers" xml:space="preserve"><value>Kelola user</value></data>
+  <data name="AdminUsersDescription" xml:space="preserve"><value>Kelola akun, email, role, dan akses masuk SplitBill.</value></data>
+  <data name="AddUser" xml:space="preserve"><value>Tambah user</value></data>
+  <data name="SearchUsers" xml:space="preserve"><value>Cari user</value></data>
+  <data name="SearchUsersPlaceholder" xml:space="preserve"><value>Nama, username, atau email</value></data>
+  <data name="AllRoles" xml:space="preserve"><value>Semua role</value></data>
+  <data name="AllUserStatuses" xml:space="preserve"><value>Semua status</value></data>
+  <data name="Active" xml:space="preserve"><value>Aktif</value></data>
+  <data name="Disabled" xml:space="preserve"><value>Dinonaktifkan</value></data>
+  <data name="User" xml:space="preserve"><value>User</value></data>
+  <data name="Email" xml:space="preserve"><value>Email</value></data>
+  <data name="DisplayName" xml:space="preserve"><value>Nama tampilan</value></data>
+  <data name="UserRole" xml:space="preserve"><value>Role</value></data>
+  <data name="UserStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Actions" xml:space="preserve"><value>Aksi</value></data>
+  <data name="UserList" xml:space="preserve"><value>Daftar user</value></data>
+  <data name="AdminUserCount" xml:space="preserve"><value>{0} user</value></data>
+  <data name="NoUsersFound" xml:space="preserve"><value>User tidak ditemukan</value></data>
+  <data name="MissingEmail" xml:space="preserve"><value>Email belum diisi</value></data>
+  <data name="CreateUserHint" xml:space="preserve"><value>Buat akun internal dan pilih role aksesnya.</value></data>
+  <data name="EditUser" xml:space="preserve"><value>Edit user</value></data>
+  <data name="CreateUser" xml:space="preserve"><value>Buat user</value></data>
+  <data name="SaveUser" xml:space="preserve"><value>Simpan perubahan</value></data>
+  <data name="TemporaryPassword" xml:space="preserve"><value>Password sementara</value></data>
+  <data name="TemporaryPasswordHint" xml:space="preserve"><value>Berikan password sementara melalui kanal internal yang aman. Password tidak dikirim otomatis.</value></data>
+  <data name="ResetPasswordHint" xml:space="preserve"><value>Set password baru untuk user ini dan keluarkan sesi login lamanya.</value></data>
+  <data name="UsernameImmutable" xml:space="preserve"><value>Username tidak dapat diubah agar histori transaksi tetap konsisten.</value></data>
+  <data name="ResetPassword" xml:space="preserve"><value>Reset password</value></data>
+  <data name="DisableUser" xml:space="preserve"><value>Nonaktifkan</value></data>
+  <data name="EnableUser" xml:space="preserve"><value>Aktifkan</value></data>
+  <data name="DisableUserConfirm" xml:space="preserve"><value>Nonaktifkan user ini? Sesi login aktifnya akan dicabut.</value></data>
+  <data name="EnableUserConfirm" xml:space="preserve"><value>Aktifkan kembali user ini?</value></data>
+  <data name="ResetPasswordConfirm" xml:space="preserve"><value>Reset password user ini?</value></data>
+  <data name="AdminUserCreated" xml:space="preserve"><value>User berhasil dibuat.</value></data>
+  <data name="AdminUserUpdated" xml:space="preserve"><value>Data user berhasil diperbarui.</value></data>
+  <data name="AdminUserPasswordReset" xml:space="preserve"><value>Password user berhasil direset.</value></data>
+  <data name="AdminUserDisabled" xml:space="preserve"><value>User berhasil dinonaktifkan.</value></data>
+  <data name="AdminUserEnabled" xml:space="preserve"><value>User berhasil diaktifkan.</value></data>
+  <data name="AdminDuplicateUsername" xml:space="preserve"><value>Username tersebut sudah digunakan.</value></data>
+  <data name="AdminDuplicateEmail" xml:space="preserve"><value>Email tersebut sudah digunakan.</value></data>
+  <data name="AdminInvalidRole" xml:space="preserve"><value>Role user tidak valid.</value></data>
+  <data name="AdminUserNotFound" xml:space="preserve"><value>User tidak ditemukan.</value></data>
+  <data name="AdminSelfDemotion" xml:space="preserve"><value>Admin tidak dapat menurunkan role akunnya sendiri.</value></data>
+  <data name="AdminSelfDisable" xml:space="preserve"><value>Admin tidak dapat menonaktifkan akunnya sendiri.</value></data>
+  <data name="AdminLastAdmin" xml:space="preserve"><value>Admin terakhir yang aktif tidak dapat dinonaktifkan atau diturunkan rolenya.</value></data>
+  <data name="AdminInvalidUserInput" xml:space="preserve"><value>Periksa data user yang dimasukkan.</value></data>
+  <data name="AdminUserOperationFailed" xml:space="preserve"><value>Perubahan user gagal. Coba lagi.</value></data>
+  <data name="SharePointCurrencyAmount" xml:space="preserve"><value>Rp {0:N0}</value></data>
+  <data name="SharePointBillAssignedTitle" xml:space="preserve"><value>Tagihan baru dari {0}</value></data>
+  <data name="SharePointBillAssignedBody" xml:space="preserve"><value>Halo {0},
+
+Tagihan baru sudah dibuat untukmu.
+
+Merchant: {1}
+Nominal: {2}
+Dibuat oleh: {3}
+
+Buka menu My bills di SplitBill untuk melihat rinciannya.</value></data>
+  <data name="SharePointPaymentRequestedTitle" xml:space="preserve"><value>Permintaan konfirmasi pembayaran dari {0}</value></data>
+  <data name="SharePointPaymentRequestedBody" xml:space="preserve"><value>Halo {0},
+
+{1} sudah mengirim bukti pembayaran.
+
+Merchant: {2}
+Transaksi: {3}
+Nominal: {4}
+
+Buka menu Approvals di SplitBill untuk memeriksa dan mengonfirmasinya.</value></data>
+  <data name="SharePointPaymentRejectedTitle" xml:space="preserve"><value>Pembayaran ditolak oleh {0}</value></data>
+  <data name="SharePointPaymentRejectedBody" xml:space="preserve"><value>Halo {0},
+
+Permintaan pembayaranmu ditolak.
+
+Merchant: {1}
+Transaksi: {2}
+Nominal: {3}
+Ditolak oleh: {4}
+Alasan: {5}
+
+Buka menu My bills di SplitBill untuk melihat rinciannya.</value></data>
+  <data name="SharePointNoRejectionReason" xml:space="preserve"><value>Tidak ada alasan yang diberikan.</value></data>
+  <data name="SharePointOpenBillDetails" xml:space="preserve"><value>Lihat detail tagihan</value></data>
+  <data name="SharePointOpenApprovals" xml:space="preserve"><value>Buka approval pembayaran</value></data>
+  <data name="SharePointFoodPickupTitle" xml:space="preserve"><value>🎉 Kamu terpilih jadi pengambil makanan</value></data>
+  <data name="SharePointFoodPickupBody" xml:space="preserve"><value>🎉 Selamat, {0}!
+
+Kamu terpilih menjadi pengambil makanan kali ini.
+
+Merchant: {1}
+Transaksi: {2}
+Jumlah peserta: {3} orang
+Peluang saat diundi: {4}
+
+Semangat, pahlawan perut lapar! 🛵😆</value></data>
+  <data name="SharePointFoodPickupRoundRobinBody" xml:space="preserve"><value>🎉 Selamat, {0}!
+
+Kamu mendapat giliran mengambil makanan kali ini.
+
+Merchant: {1}
+Transaksi: {2}
+Jumlah peserta: {3} orang
+Metode: Round robin berdasarkan urutan history
+
+Semangat, pahlawan perut lapar! 🛵😆</value></data>
+  <data name="PersonalOverview" xml:space="preserve"><value>Ringkasan pribadi</value></data>
+  <data name="MemberDashboardDescription" xml:space="preserve"><value>Pantau pengeluaran dan status tagihanmu dari bulan ke bulan.</value></data>
+  <data name="OpenMyBills" xml:space="preserve"><value>Buka tagihan saya</value></data>
+  <data name="ThisMonthBills" xml:space="preserve"><value>Tagihan bulan ini</value></data>
+  <data name="PreviousMonthBills" xml:space="preserve"><value>Tagihan bulan lalu</value></data>
+  <data name="TotalPaidByYou" xml:space="preserve"><value>Total sudah kamu bayar</value></data>
+  <data name="YourOutstanding" xml:space="preserve"><value>Outstanding kamu</value></data>
+  <data name="YourMonthlySpending" xml:space="preserve"><value>Pengeluaran bulananmu</value></data>
+  <data name="YourMonthlySpendingHint" xml:space="preserve"><value>Total bagian tagihanmu selama enam bulan terakhir.</value></data>
+  <data name="PaidShort" xml:space="preserve"><value>Dibayar</value></data>
+  <data name="OutstandingShort" xml:space="preserve"><value>Sisa</value></data>
+  <data name="RecentPersonalBills" xml:space="preserve"><value>Tagihan terbarumu</value></data>
+  <data name="RecentPersonalBillsHint" xml:space="preserve"><value>Buka rincian dan status pembayaran terbaru.</value></data>
+  <data name="MonthlyBillValue" xml:space="preserve"><value>Nilai tagihan bulanan</value></data>
+  <data name="MonthlyBillValueHint" xml:space="preserve"><value>Total transaksi non-draft selama enam bulan terakhir.</value></data>
+  <data name="OldestOutstandingBill" xml:space="preserve"><value>Tagihan tertua</value></data>
+  <data name="OldestOutstandingBillHint" xml:space="preserve"><value>Transaksi outstanding yang paling lama.</value></data>
+  <data name="NoOutstandingBills" xml:space="preserve"><value>Tidak ada tagihan outstanding.</value></data>
+  <data name="DaysOutstanding" xml:space="preserve"><value>{0} hari outstanding</value></data>
+  <data name="HighestOutstandingPeople" xml:space="preserve"><value>Outstanding terbesar</value></data>
+  <data name="HighestOutstandingPeopleHint" xml:space="preserve"><value>Lima orang dengan sisa tagihan terbesar.</value></data>
+  <data name="BillCount" xml:space="preserve"><value>{0} tagihan</value></data>
+  <data name="TopMerchants" xml:space="preserve"><value>Merchant terpopuler</value></data>
+  <data name="TopMerchantsHint" xml:space="preserve"><value>Peringkat berdasarkan jumlah transaksi.</value></data>
+  <data name="TransactionCount" xml:space="preserve"><value>{0} transaksi</value></data>
+  <data name="AverageSettlementTime" xml:space="preserve"><value>Rata-rata waktu pelunasan</value></data>
+  <data name="AverageSettlementTimeHint" xml:space="preserve"><value>Dari transaksi dibuat sampai seluruh peserta lunas.</value></data>
+  <data name="Days" xml:space="preserve"><value>hari</value></data>
+  <data name="BasedOnSettledTransactions" xml:space="preserve"><value>Berdasarkan {0} transaksi yang selesai.</value></data>
+  <data name="NoSettlementData" xml:space="preserve"><value>Belum ada data pelunasan lengkap.</value></data>
+  <data name="FoodPickupRotation" xml:space="preserve"><value>Giliran ambil makanan</value></data>
+  <data name="FoodPickupSettingsDescription" xml:space="preserve"><value>Pilih akun yang boleh terpilih mengambil pesanan dan pantau rotasinya.</value></data>
+  <data name="FoodPickupControl" xml:space="preserve"><value>Pengaturan rotasi</value></data>
+  <data name="FoodPickupControlHint" xml:space="preserve"><value>Pilih metode, lalu sistem menentukan pengambil dari peserta terdaftar saat transaksi disimpan.</value></data>
+  <data name="FoodPickupStrategy" xml:space="preserve"><value>Metode pemilihan</value></data>
+  <data name="FoodPickupStrategyWeightedRandom" xml:space="preserve"><value>Acak berbobot</value></data>
+  <data name="FoodPickupStrategyWeightedRandomHint" xml:space="preserve"><value>Diundi dengan peluang lebih kecil untuk anggota yang lebih sering mengambil.</value></data>
+  <data name="FoodPickupStrategyRoundRobin" xml:space="preserve"><value>Round robin</value></data>
+  <data name="FoodPickupStrategyRoundRobinHint" xml:space="preserve"><value>Berurutan dari anggota yang belum pernah atau paling lama belum mengambil.</value></data>
+  <data name="FoodPickupInvalidStrategy" xml:space="preserve"><value>Metode pemilihan tidak valid.</value></data>
+  <data name="FoodPickupRoundRobinPreview" xml:space="preserve"><value>Urutan round robin</value></data>
+  <data name="FoodPickupNextInRotation" xml:space="preserve"><value>Berikutnya</value></data>
+  <data name="FoodPickupSelectedByRoundRobin" xml:space="preserve"><value>Dipilih berdasarkan urutan history</value></data>
+  <data name="FoodPickupInvalidAccounts" xml:space="preserve"><value>Ada akun yang tidak valid atau sedang dinonaktifkan.</value></data>
+  <data name="FoodPickupSettingsSaved" xml:space="preserve"><value>Pengaturan giliran mengambil makanan berhasil disimpan.</value></data>
+  <data name="FoodPickupTimes" xml:space="preserve"><value>kali ambil</value></data>
+  <data name="FoodPickupParticipations" xml:space="preserve"><value>ikut transaksi</value></data>
+  <data name="FoodPickupNever" xml:space="preserve"><value>Belum pernah</value></data>
+  <data name="FoodPickupNoMerchant" xml:space="preserve"><value>Belum ada merchant</value></data>
+  <data name="FoodPickupAddUsersHint" xml:space="preserve"><value>Tambahkan akun melalui Kelola user terlebih dahulu.</value></data>
+  <data name="FoodPickupHistory" xml:space="preserve"><value>Riwayat pengambilan</value></data>
+  <data name="FoodPickupHistoryHint" xml:space="preserve"><value>Catatan undian saat ini dan riwayat perubahan pemenang.</value></data>
+  <data name="FoodPickupNoHistory" xml:space="preserve"><value>Belum ada riwayat</value></data>
+  <data name="FoodPickupNoHistoryHint" xml:space="preserve"><value>Riwayat muncul setelah rotasi aktif dan split berhasil disimpan.</value></data>
+  <data name="FoodPickupWinner" xml:space="preserve"><value>Pengambil</value></data>
+  <data name="FoodPickupDrawType" xml:space="preserve"><value>Jenis undian</value></data>
+  <data name="FoodPickupReason" xml:space="preserve"><value>Alasan</value></data>
+  <data name="FoodPickupChangedFrom" xml:space="preserve"><value>Dari {0}</value></data>
+  <data name="FoodPickupDrawInitial" xml:space="preserve"><value>Undian awal</value></data>
+  <data name="FoodPickupDrawAutomaticRedraw" xml:space="preserve"><value>Undian ulang otomatis</value></data>
+  <data name="FoodPickupDrawAdminReroll" xml:space="preserve"><value>Undian ulang Admin</value></data>
+  <data name="FoodPickupPreview" xml:space="preserve"><value>Pratinjau peluang pengambil</value></data>
+  <data name="FoodPickupPreviewHint" xml:space="preserve"><value>Ini hanya pratinjau. Pemenang final dipilih aman oleh server saat disimpan.</value></data>
+  <data name="FoodPickupCandidateCount" xml:space="preserve"><value>{0} kandidat</value></data>
+  <data name="FoodPickupPriorPickups" xml:space="preserve"><value>{0} kali sebelumnya</value></data>
+  <data name="FoodPickupWinnerHint" xml:space="preserve"><value>Orang ini terpilih untuk mengambil pesanan pada transaksi ini.</value></data>
+  <data name="FoodPickupDrawProbability" xml:space="preserve"><value>Peluang saat undian</value></data>
+  <data name="FoodPickupRerollReasonPlaceholder" xml:space="preserve"><value>Alasan undian ulang (wajib)</value></data>
+  <data name="FoodPickupRerollConfirm" xml:space="preserve"><value>Undi ulang pickup person? Pemenang saat ini akan dikeluarkan dari pilihan.</value></data>
+  <data name="FoodPickupReroll" xml:space="preserve"><value>Undi ulang</value></data>
+  <data name="FoodPickupRerolled" xml:space="preserve"><value>Pickup person berhasil diundi ulang.</value></data>
+  <data name="FoodPickupRerollReasonRequired" xml:space="preserve"><value>Isi alasan undian ulang terlebih dahulu.</value></data>
+  <data name="FoodPickupRerollUnavailable" xml:space="preserve"><value>Undian ulang tidak tersedia untuk transaksi ini.</value></data>
+  <data name="FoodPickupNoWinner" xml:space="preserve"><value>Belum ada pickup person</value></data>
+  <data name="FoodPickupNoWinnerHint" xml:space="preserve"><value>Aktifkan rotasi dan simpan split dengan peserta terdaftar untuk memilih pengambil.</value></data>
+  <data name="FoodPickupBadge" xml:space="preserve"><value>pengambil</value></data>
+  <data name="FoodPickupSelectedMessage" xml:space="preserve"><value>Selamat! Kamu terpilih untuk mengambil makanan. Detail pesanan ada di bawah.</value></data>
+  <data name="FoodPickupOtherMessage" xml:space="preserve"><value>Pickup person untuk transaksi ini adalah anggota yang ditampilkan di atas.</value></data>
+  <data name="FoodPickupReportHint" xml:space="preserve"><value>Statistik pengambilan mengikuti transaksi yang sedang terlihat dan filter di atas.</value></data>
+  <data name="FoodPickupNoReportData" xml:space="preserve"><value>Belum ada statistik pickup</value></data>
+  <data name="FoodPickupNoReportDataHint" xml:space="preserve"><value>Peserta terdaftar akan muncul setelah ada transaksi yang sesuai filter.</value></data>
+  <data name="PickupRatio" xml:space="preserve"><value>Rasio pickup</value></data>
+  <data name="FoodPickupLastPickup" xml:space="preserve"><value>Pickup terakhir</value></data>
+  <data name="FoodPickupEligibility" xml:space="preserve"><value>Status eligible</value></data>
+</root>

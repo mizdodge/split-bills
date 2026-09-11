@@ -1,0 +1,47 @@
+@model AdminUserIndexViewModel
+@{ ViewData["Title"] = L["ManageUsers"]; }
+<div class="page-heading compact">
+    <div><span class="eyebrow">@L["Admin"]</span><h1>@L["ManageUsers"]</h1><p>@L["AdminUsersDescription"]</p></div>
+    <a class="btn btn-primary" asp-action="Create">＋ @L["AddUser"]</a>
+</div>
+
+<form method="get" class="filter-card admin-user-filter">
+    <div><label for="user-search">@L["SearchUsers"]</label><input id="user-search" name="search" value="@Model.Search" class="form-control" placeholder="@L["SearchUsersPlaceholder"]" /></div>
+    <div><label for="user-role">@L["UserRole"]</label><select id="user-role" name="role" class="form-select"><option value="">@L["AllRoles"]</option><option value="Admin" selected="@(Model.Role == "Admin" ? "selected" : null)">Admin</option><option value="Moderator" selected="@(Model.Role == "Moderator" ? "selected" : null)">Moderator</option><option value="Member" selected="@(Model.Role == "Member" ? "selected" : null)">Member</option></select></div>
+    <div><label for="user-status">@L["UserStatus"]</label><select id="user-status" name="status" class="form-select"><option value="">@L["AllUserStatuses"]</option><option value="active" selected="@(Model.Status == "active" ? "selected" : null)">@L["Active"]</option><option value="disabled" selected="@(Model.Status == "disabled" ? "selected" : null)">@L["Disabled"]</option></select></div>
+    <button class="btn btn-light" type="submit">@L["Apply"]</button>
+    <a class="btn btn-light" asp-action="Index">@L["Reset"]</a>
+</form>
+
+<section class="content-card admin-user-list-card">
+    <div class="section-head"><div><h2>@L["UserList"]</h2><p>@L["AdminUserCount", Model.Users.Count]</p></div></div>
+    @if (Model.Users.Count == 0)
+    {
+        <div class="empty-inline"><span>♙</span><strong>@L["NoUsersFound"]</strong><p>@L["TryAnotherFilter"]</p></div>
+    }
+    else
+    {
+        <div class="admin-users-table-wrap">
+            <table class="app-table admin-users-table"><thead><tr><th>@L["User"]</th><th>@L["Email"]</th><th>@L["UserRole"]</th><th>@L["UserStatus"]</th><th>@L["Actions"]</th></tr></thead>
+            <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td><div class="admin-user-identity"><span class="avatar">@user.DisplayName[..1].ToUpperInvariant()</span><span><strong>@user.DisplayName</strong><small>@@@user.Username</small></span></div></td>
+                    <td>@(string.IsNullOrWhiteSpace(user.Email) ? Html.Raw($"<span class='missing-email'>{L["MissingEmail"]}</span>") : user.Email)</td>
+                    <td><span class="role-pill @user.Role.ToLowerInvariant()">@L[user.Role]</span></td>
+                    <td><span class="status @(user.IsDisabled ? "unpaid" : "paid")">@(user.IsDisabled ? L["Disabled"] : L["Active"])</span></td>
+                    <td><div class="admin-user-actions"><a class="btn btn-light btn-sm" asp-action="Edit" asp-route-id="@user.Id">@L["Edit"]</a><form method="post" asp-action="@(user.IsDisabled ? "Enable" : "Disable")" asp-route-id="@user.Id" data-confirm='@(user.IsDisabled ? L["EnableUserConfirm"] : L["DisableUserConfirm"])'>@Html.AntiForgeryToken()<button class="btn btn-light btn-sm" type="submit">@(user.IsDisabled ? L["EnableUser"] : L["DisableUser"])</button></form></div></td>
+                </tr>
+            }
+            </tbody></table>
+        </div>
+        <div class="admin-users-mobile-list">
+        @foreach (var user in Model.Users)
+        {
+            <article class="admin-user-card"><div class="admin-user-card-head"><span class="avatar">@user.DisplayName[..1].ToUpperInvariant()</span><div><strong>@user.DisplayName</strong><small>@@@user.Username</small></div><span class="status @(user.IsDisabled ? "unpaid" : "paid")">@(user.IsDisabled ? L["Disabled"] : L["Active"])</span></div><p>@(string.IsNullOrWhiteSpace(user.Email) ? L["MissingEmail"] : user.Email)</p><div class="admin-user-card-meta"><span class="role-pill @user.Role.ToLowerInvariant()">@L[user.Role]</span><a class="btn btn-light btn-sm" asp-action="Edit" asp-route-id="@user.Id">@L["Edit"]</a><form method="post" asp-action="@(user.IsDisabled ? "Enable" : "Disable")" asp-route-id="@user.Id" data-confirm='@(user.IsDisabled ? L["EnableUserConfirm"] : L["DisableUserConfirm"])'>@Html.AntiForgeryToken()<button class="btn btn-light btn-sm" type="submit">@(user.IsDisabled ? L["EnableUser"] : L["DisableUser"])</button></form></div></article>
+        }
+        </div>
+    }
+</section>
+@section Scripts { <script src="~/js/admin-users.js" asp-append-version="true"></script> }
