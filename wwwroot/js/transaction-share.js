@@ -9,6 +9,14 @@
   const COLORS = { emerald: "#003A40", lime: "#CDFF70", stone: "#444547", white: "#FFFFFF", cool: "#F2F0FA", muted: "#66727a", danger: "#c23636" };
 
   const normalize = value => value == null ? "" : String(value);
+  // ShareData is serialized with the ASP.NET Web (camelCase) defaults. Keep
+  // the renderer defensive for older cached payloads and null display fields;
+  // this is display normalization only and contains no financial calculation.
+  const valueOf = (object, camelName, pascalName = camelName) => normalize(object?.[camelName] ?? object?.[pascalName]);
+  const listOf = (object, camelName, pascalName = camelName) => {
+    const value = object?.[camelName] ?? object?.[pascalName];
+    return Array.isArray(value) ? value : [];
+  };
   const wrap = (ctx, value, maxWidth) => {
     const words = normalize(value).split(/\s+/).filter(Boolean);
     if (words.length === 0) return [""];
@@ -28,7 +36,7 @@
 
   function layout(data, ctx) {
     const commands = [];
-    const labels = data.labels || {};
+    const labels = data.labels || data.Labels || {};
     const collectedLabel = labels.collected || "collected";
     const outstandingLabel = labels.outstanding || "outstanding";
     let cursor = PAD;
@@ -44,85 +52,95 @@
 
     addBox(0, 106, COLORS.emerald);
     commands.push({ type: "brand", y: cursor });
-    addText(data.merchantName, PAD + 116, 18, CONTENT - 116, 30, 800, COLORS.white, 36);
-    addText(`${data.transactionDateText} · ${data.transactionNumber}`, PAD + 116, 58, CONTENT - 116, 18, 400, "#d8f1ee", 25);
-    commands.push({ type: "language", value: data.language === "en-US" ? "EN" : "ID", y: cursor });
+    addText(valueOf(data, "merchantName", "MerchantName"), PAD + 116, 18, CONTENT - 116, 30, 800, COLORS.white, 36);
+    addText(`${valueOf(data, "transactionDateText", "TransactionDateText")} · ${valueOf(data, "transactionNumber", "TransactionNumber")}`, PAD + 116, 58, CONTENT - 116, 18, 400, "#d8f1ee", 25);
+    commands.push({ type: "language", value: valueOf(data, "language", "Language") === "en-US" ? "EN" : "ID", y: cursor });
     advance(130);
 
-    addText(data.participantCountText, PAD, 0, CONTENT, 20, 700, COLORS.emerald, 28);
-    addText(`${data.paymentSummary.paidCountText} · ${data.paymentSummary.awaitingCountText} · ${data.paymentSummary.unpaidCountText}`, PAD, 34, CONTENT, 18, 400, COLORS.muted, 25);
-    addText(`${data.paymentSummary.collectedAmountText} ${collectedLabel} · ${data.paymentSummary.outstandingAmountText} ${outstandingLabel}`, PAD, 67, CONTENT, 18, 700, COLORS.stone, 25);
+    addText(valueOf(data, "participantCountText", "ParticipantCountText"), PAD, 0, CONTENT, 20, 700, COLORS.emerald, 28);
+    const paymentSummary = data.paymentSummary || data.PaymentSummary || {};
+    addText(`${valueOf(paymentSummary, "paidCountText", "PaidCountText")} · ${valueOf(paymentSummary, "awaitingCountText", "AwaitingCountText")} · ${valueOf(paymentSummary, "unpaidCountText", "UnpaidCountText")}`, PAD, 34, CONTENT, 18, 400, COLORS.muted, 25);
+    addText(`${valueOf(paymentSummary, "collectedAmountText", "CollectedAmountText")} ${collectedLabel} · ${valueOf(paymentSummary, "outstandingAmountText", "OutstandingAmountText")} ${outstandingLabel}`, PAD, 67, CONTENT, 18, 700, COLORS.stone, 25);
     advance(112);
 
-    if (data.pickupPersonName) {
+    const pickupPersonName = valueOf(data, "pickupPersonName", "PickupPersonName");
+    if (pickupPersonName) {
       addBox(0, 62, COLORS.lime, null, 14);
-      addText(`🛵  ${data.pickupPersonName}`, PAD + 20, 16, CONTENT - 40, 22, 800, COLORS.emerald, 28);
+      addText(`🛵  ${pickupPersonName}`, PAD + 20, 16, CONTENT - 40, 22, 800, COLORS.emerald, 28);
       advance(78);
     }
 
     let paintedParticipants = 0;
-    for (const participant of (data.participants || [])) {
+    for (const participant of listOf(data, "participants", "Participants")) {
       const itemLines = [];
       ctx.font = font(18, 400);
-      for (const item of (participant.items || [])) {
-        const label = `${item.name} ${item.shareDescription}${item.sharedWith ? ` · ${item.sharedWith}` : ""}`;
-        itemLines.push({ label, lines: wrap(ctx, label, CONTENT - 210), amount: item.amountText });
+      for (const item of listOf(participant, "items", "Items")) {
+        const name = valueOf(item, "name", "Name");
+        const shareDescription = valueOf(item, "shareDescription", "ShareDescription");
+        const sharedWith = valueOf(item, "sharedWithText", "SharedWithText");
+        const label = [name, shareDescription].filter(Boolean).join(" ") + (sharedWith ? ` · ${sharedWith}` : "");
+        itemLines.push({ label, lines: wrap(ctx, label, CONTENT - 210), amount: valueOf(item, "amountText", "AmountText") });
       }
-      const adjustmentLines = (participant.adjustments || []).map(adjustment => {
-        const label = adjustment.percentageText ? `${adjustment.label} · ${adjustment.percentageText}` : adjustment.label;
+      const adjustmentLines = listOf(participant, "adjustments", "Adjustments").map(adjustment => {
+        const labelText = valueOf(adjustment, "label", "Label");
+        const percentageText = valueOf(adjustment, "percentageText", "PercentageText");
+        const label = percentageText ? `${labelText} · ${percentageText}` : labelText;
         ctx.font = font(17, 400);
-        return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${adjustment.isSubtract ? "−" : "+"} ${adjustment.amountText}` };
+        return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${(adjustment.isSubtract ?? adjustment.IsSubtract) ? "−" : "+"} ${valueOf(adjustment, "amountText", "AmountText")}` };
       });
       let height = 72 + itemLines.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 27 + 12, 0);
       height += 42 + adjustmentLines.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 26 + 10, 0);
       height += 84;
       addBox(0, height, COLORS.white, "#d9dde0", 18);
-      commands.push({ type: "participantHeader", name: participant.displayName, status: participant.paymentStatusText, y: cursor + 22 });
+      commands.push({ type: "participantHeader", name: valueOf(participant, "displayName", "DisplayName"), status: valueOf(participant, "paymentStatusText", "PaymentStatusText"), y: cursor + 22 });
       let inner = 70;
       for (const row of itemLines) {
         commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + inner, lineHeight: 27, color: COLORS.stone, size: 18 });
         inner += Math.max(1, row.lines.length) * 27 + 12;
       }
       addRule(inner + 2);
-      commands.push({ type: "labelAmount", label: labels.menuSubtotal || "Menu subtotal", amount: participant.menuSubtotalText, y: cursor + inner + 18, weight: 700 });
+      commands.push({ type: "labelAmount", label: labels.menuSubtotal || labels.MenuSubtotal || "Menu subtotal", amount: valueOf(participant, "menuSubtotalText", "MenuSubtotalText"), y: cursor + inner + 18, weight: 700 });
       inner += 54;
       for (const row of adjustmentLines) {
         commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + inner, lineHeight: 26, color: row.amount.startsWith("−") ? COLORS.danger : COLORS.emerald, size: 17 });
         inner += Math.max(1, row.lines.length) * 26 + 10;
       }
-      commands.push({ type: "labelAmount", label: labels.total || "Total", amount: participant.finalAmountText, y: cursor + height - 43, weight: 800, size: 22 });
+      commands.push({ type: "labelAmount", label: labels.total || labels.Total || "Total", amount: valueOf(participant, "finalAmountText", "FinalAmountText"), y: cursor + height - 43, weight: 800, size: 22 });
       advance(height + 18);
       paintedParticipants++;
     }
 
-    const summary = data.receiptSummary;
-    const receiptRows = (summary.adjustments || []).map(adjustment => {
-      const label = adjustment.percentageText ? `${adjustment.label} · ${adjustment.percentageText}` : adjustment.label;
+    const summary = data.receiptSummary || data.ReceiptSummary || {};
+    const receiptRows = listOf(summary, "adjustments", "Adjustments").map(adjustment => {
+      const labelText = valueOf(adjustment, "label", "Label");
+      const percentageText = valueOf(adjustment, "percentageText", "PercentageText");
+      const label = percentageText ? `${labelText} · ${percentageText}` : labelText;
       ctx.font = font(18, 400);
-      return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${adjustment.isSubtract ? "−" : "+"} ${adjustment.amountText}` };
+      return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${(adjustment.isSubtract ?? adjustment.IsSubtract) ? "−" : "+"} ${valueOf(adjustment, "amountText", "AmountText")}` };
     });
     const receiptRowsHeight = receiptRows.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 27 + 11, 0);
     const summaryHeight = 168 + receiptRowsHeight;
     addBox(0, summaryHeight, COLORS.cool, null, 18);
-    commands.push({ type: "summaryTitle", label: labels.receiptSummary || "Receipt summary", y: cursor + 24 });
-    commands.push({ type: "labelAmount", label: labels.subtotal || "Subtotal", amount: summary.subtotalText, y: cursor + 63, weight: 700 });
+    commands.push({ type: "summaryTitle", label: labels.receiptSummary || labels.ReceiptSummary || "Receipt summary", y: cursor + 24 });
+    commands.push({ type: "labelAmount", label: labels.subtotal || labels.Subtotal || "Subtotal", amount: valueOf(summary, "subtotalText", "SubtotalText"), y: cursor + 63, weight: 700 });
     let summaryInner = 96;
     for (const row of receiptRows) {
       commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + summaryInner, lineHeight: 27, color: row.amount.startsWith("−") ? COLORS.danger : COLORS.emerald, size: 18 });
       summaryInner += Math.max(1, row.lines.length) * 27 + 11;
     }
-    commands.push({ type: "labelAmount", label: labels.grandTotal || "Grand total", amount: summary.grandTotalText, y: cursor + summaryHeight - 44, weight: 800, size: 24, color: COLORS.emerald });
+    commands.push({ type: "labelAmount", label: labels.grandTotal || labels.GrandTotal || "Grand total", amount: valueOf(summary, "grandTotalText", "GrandTotalText"), y: cursor + summaryHeight - 44, weight: 800, size: 24, color: COLORS.emerald });
     const finalTotalY = cursor + summaryHeight - 44;
     advance(summaryHeight + 28);
     addRule(0, COLORS.emerald);
-    addText(labels.generatedBy || "Generated by SplitBill", PAD, 18, CONTENT, 16, 400, COLORS.muted, 22);
+    addText(labels.generatedBy || labels.GeneratedBy || "Generated by SplitBill", PAD, 18, CONTENT, 16, 400, COLORS.muted, 22);
     advance(48);
 
     return { commands, width: WIDTH, height: cursor, paintedParticipants, finalTotalY, finalTotalBlock: true };
   }
 
   function paint(canvas, data) {
-    if (!canvas || !data || !Array.isArray(data.participants)) throw new Error("Share data is incomplete.");
+    const participants = data?.participants ?? data?.Participants;
+    if (!canvas || !data || !Array.isArray(participants)) throw new Error("Share data is incomplete.");
     const measureCanvas = document.createElement("canvas");
     const measureContext = measureCanvas.getContext("2d");
     if (!measureContext) throw new Error("Canvas is unavailable.");
@@ -168,7 +186,7 @@
         context.fillStyle = COLORS.emerald; context.font = font(22, 800); context.fillText(command.label, PAD + 24, command.y + 24);
       }
     }
-    if (measured.paintedParticipants !== data.participants.length || !measured.finalTotalBlock || measured.finalTotalY > canvas.height) {
+    if (measured.paintedParticipants !== participants.length || !measured.finalTotalBlock || measured.finalTotalY > canvas.height) {
       throw new Error("Share image paint verification failed.");
     }
     return { width: canvas.width, height: canvas.height, paintedParticipantCount: measured.paintedParticipants, finalCursor: measured.height, finalTotalPainted: true, canvas };

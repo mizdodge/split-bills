@@ -15,4 +15,16 @@ public sealed class ShareRendererAssetTests
         Assert.DoesNotContain("html2canvas", source, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("https://", source, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void LongShareRendererUsesSerializedDisplayPropertyNamesAndNullSafeFallbacks()
+    {
+        var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../wwwroot/js/transaction-share.js"));
+        var source = File.ReadAllText(path);
+
+        Assert.Contains("valueOf(item, \"sharedWithText\", \"SharedWithText\")", source);
+        Assert.Contains("const listOf =", source);
+        Assert.DoesNotContain("item.sharedWith ?", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("item.sharedWith}`", source, StringComparison.Ordinal);
+    }
 }

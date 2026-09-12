@@ -47,7 +47,7 @@ const data = {
     participantKey: `p${index + 1}`,
     displayName: person[0],
     paymentStatusText: person[1],
-    items: person[2].map(item => ({ name: item[0], shareDescription: item[1], amountText: item[2], sharedWith: item[3] })),
+    items: person[2].map(item => ({ name: item[0], shareDescription: item[1], amountText: item[2], sharedWithText: item[3] })),
     menuSubtotalText: person[3],
     adjustments: adjustments(index % 2 ? "Rp 2.000" : "Rp 3.000"),
     finalAmountText: person[4]
