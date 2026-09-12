@@ -80,7 +80,7 @@ SplitBill is a self-hosted ASP.NET Core 8 application that turns one or more rec
 | 📊 | **Reports and Excel** | Role-scoped date/status filters, all payment states, per-person order detail, and four Excel sheets: Summary, Payment Details, Pivot by Person, and Pickup Rotation. |
 | 🛵 | **Food pickup rotation** | Admin-managed eligibility, secure weighted random or deterministic Round Robin, participant-only candidates, stable winners, reasoned rerolls, and auditable history. |
 | 💬 | **SharePoint + Teams** | Durable outbox events for bill assignment, payment approval, rejection, and pickup winner; Power Automate sends localized Teams messages with deep links. |
-| 🖼️ | **One long share image** | Uploader shares all, selected, or one participant in a single readable 1000px JPEG; Members can share only their own bill, with HTTP download fallback. |
+| 🖼️ | **One long share image** | Uploader or Admin shares all, selected, or one participant in a single readable 1000px JPEG; Members can share only their own bill, with HTTP download fallback. |
 | 👥 | **Role and user management** | Admin has global access and user management, Moderator manages owned transactions, and Member sees only linked bills and shared report context. |
 | 📈 | **Two dashboard experiences** | Admin/Moderator operational analytics and a private Member spending dashboard with monthly history, paid totals, and outstanding totals. |
 | 📲 | **Installable PWA** | Responsive ID/EN interface, install prompt, static offline shell, and optional HTTPS browser push without caching authenticated pages or private images. |

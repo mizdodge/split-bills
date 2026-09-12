@@ -628,19 +628,16 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     [HttpGet]
     public async Task<IActionResult> ShareData(long id, CancellationToken cancellationToken)
     {
-        var currentUserId = userManager.GetUserId(User);
-        var owner = await db.Transactions.AsNoTracking()
+        var available = await ScopedTransactions().AsNoTracking()
             .Where(x => x.Id == id)
-            .Select(x => new { x.UploadedByUserId, x.Status, ParticipantCount = x.Participants.Count })
+            .Select(x => new { x.Status, ParticipantCount = x.Participants.Count })
             .SingleOrDefaultAsync(cancellationToken);
-        if (owner is null) return NotFound();
-        if (!string.Equals(owner.UploadedByUserId, currentUserId, StringComparison.Ordinal))
-            return User.IsInRole(DatabaseSeeder.AdminRole) ? Forbid() : NotFound();
-        if (owner.Status == TransactionStatus.Draft || owner.ParticipantCount == 0)
+        if (available is null) return NotFound();
+        if (available.Status == TransactionStatus.Draft || available.ParticipantCount == 0)
             return BadRequest(new { message = Text("ShareUnavailable", "Simpan split dengan minimal satu peserta terlebih dahulu.") });
 
-        var transaction = await db.Transactions.AsSplitQuery()
-            .Where(x => x.Id == id && x.UploadedByUserId == currentUserId)
+        var transaction = await ScopedTransactions().AsSplitQuery()
+            .Where(x => x.Id == id)
             .Include(x => x.Items)
             .Include(x => x.Charges)
             .Include(x => x.Participants).ThenInclude(x => x.ItemAllocations).ThenInclude(x => x.Item)
