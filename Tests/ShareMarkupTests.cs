@@ -30,6 +30,7 @@ public sealed class ShareMarkupTests
         Assert.DoesNotContain("guest-access-block", details);
         Assert.DoesNotContain("share-export-card", details);
         Assert.Contains("canShareJpg", details);
+        Assert.Contains("TransactionStatus.Unpaid or TransactionStatus.Partial or TransactionStatus.Paid", details);
     }
 
     [Fact]

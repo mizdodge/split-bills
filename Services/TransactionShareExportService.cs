@@ -201,8 +201,11 @@ public sealed class TransactionShareExportService(IStringLocalizer<SharedResourc
     private static string ShareDescription(decimal quantity)
         => $"× {quantity.ToString("0.##", CultureInfo.CurrentUICulture)}";
 
-    private static string Percentage(decimal fraction)
-        => fraction.ToString("0.##%", CultureInfo.CurrentUICulture);
+    // ReceiptReviewNormalizer stores effective rates as percentage points
+    // (for example 31.25), while the .NET percent format expects a fraction
+    // (0.3125). Keep the export aligned with Transaction Details.
+    private static string Percentage(decimal percentagePoints)
+        => $"{percentagePoints.ToString("0.##", CultureInfo.CurrentUICulture)}%";
 
     private static string FileName(BillTransaction transaction)
     {
