@@ -33,6 +33,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<CurrencyConfiguration> CurrencyConfigurations => Set<CurrencyConfiguration>();
     public DbSet<CurrencyExchangeRate> CurrencyExchangeRates => Set<CurrencyExchangeRate>();
     public DbSet<GuestAccessLink> GuestAccessLinks => Set<GuestAccessLink>();
+    public DbSet<GuestTransactionAccessLink> GuestTransactionAccessLinks => Set<GuestTransactionAccessLink>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -64,6 +65,13 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             .HasOne(x => x.Participant)
             .WithMany(x => x.GuestAccessLinks)
             .HasForeignKey(x => x.ParticipantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<GuestTransactionAccessLink>()
+            .HasIndex(x => x.TokenHash).IsUnique();
+        builder.Entity<GuestTransactionAccessLink>()
+            .HasOne(x => x.Transaction)
+            .WithMany(x => x.GuestTransactionAccessLinks)
+            .HasForeignKey(x => x.TransactionId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<SharePointNotificationOutbox>()

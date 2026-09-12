@@ -174,6 +174,25 @@
   <data name="ShareDialogTitle" xml:space="preserve">
     <value>Share split details</value>
   </data>
+  <data name="ShareUnifiedHint" xml:space="preserve"><value>Share a guest link or create a summary image.</value></data>
+  <data name="ShareLinkTab" xml:space="preserve"><value>Guest links</value></data>
+  <data name="ShareJpgTab" xml:space="preserve"><value>JPG image</value></data>
+  <data name="ShareTransactionLink" xml:space="preserve"><value>Transaction link</value></data>
+  <data name="ShareTransactionLinkHint" xml:space="preserve"><value>One read-only link to view the whole transaction without signing in.</value></data>
+  <data name="ShareLinkActive" xml:space="preserve"><value>Active</value></data>
+  <data name="ShareLinkNotCreated" xml:space="preserve"><value>Not created</value></data>
+  <data name="ShareLinkRevoked" xml:space="preserve"><value>Revoked</value></data>
+  <data name="ShareLinkCopied" xml:space="preserve"><value>Link copied.</value></data>
+  <data name="ShareLinkUnavailable" xml:space="preserve"><value>The guest link could not be loaded.</value></data>
+  <data name="ShareLinkRegenerated" xml:space="preserve"><value>A new link is active; the old link was revoked.</value></data>
+  <data name="ShareLinkRevokedFeedback" xml:space="preserve"><value>Guest access was revoked.</value></data>
+  <data name="ShareRegenerateConfirm" xml:space="preserve"><value>Generate a new link? The previous link will stop working immediately.</value></data>
+  <data name="ShareRevokeConfirm" xml:space="preserve"><value>Revoke this guest link?</value></data>
+  <data name="ShareGuestParticipants" xml:space="preserve"><value>Per-participant links</value></data>
+  <data name="ShareGuestParticipantsHint" xml:space="preserve"><value>Only guest participants are listed here.</value></data>
+  <data name="ShareNoGuestParticipants" xml:space="preserve"><value>This transaction has no guest participants.</value></data>
+  <data name="ShareJpgHint" xml:space="preserve"><value>Choose what to include in the image.</value></data>
+  <data name="ShareLinkTokenHint" xml:space="preserve"><value>↻ Generate a new token to revoke the old link.</value></data>
   <data name="ShareAllParticipants" xml:space="preserve">
     <value>All participants</value>
   </data>

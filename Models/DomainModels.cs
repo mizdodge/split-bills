@@ -254,9 +254,26 @@ public sealed class BillTransaction
     public List<TransactionReceiptImage> ReceiptImages { get; set; } = [];
     public List<TransactionCharge> Charges { get; set; } = [];
     public List<TransactionParticipant> Participants { get; set; } = [];
+    public List<GuestTransactionAccessLink> GuestTransactionAccessLinks { get; set; } = [];
     public FoodPickupAssignment? PickupAssignment { get; set; }
     public List<FoodPickupDrawHistory> PickupDrawHistories { get; set; } = [];
     public List<ReceiptProcessingLog> ProcessingLogs { get; set; } = [];
+}
+
+/// <summary>Independent read-only whole-transaction guest link.</summary>
+public sealed class GuestTransactionAccessLink
+{
+    public long Id { get; set; }
+    public long TransactionId { get; set; }
+    public BillTransaction? Transaction { get; set; }
+    [MaxLength(64)] public string TokenHash { get; set; } = string.Empty;
+    [MaxLength(4000)] public string ProtectedToken { get; set; } = string.Empty;
+    public GuestAccessLinkStatus Status { get; set; } = GuestAccessLinkStatus.Active;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? RevokedAt { get; set; }
+    public DateTimeOffset? LastAccessedAt { get; set; }
+    public string? CreatedByUserId { get; set; }
+    public int AccessCount { get; set; }
 }
 
 public sealed class GuestAccessLink

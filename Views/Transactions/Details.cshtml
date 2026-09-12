@@ -1,9 +1,9 @@
 @model TransactionDetailsViewModel
 @using System.Security.Claims
 @{ ViewData["Title"] = L["Details"]; var tx = Model.Transaction; }
-@{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); var isUploader = string.Equals(tx.UploadedByUserId, User.FindFirstValue(ClaimTypes.NameIdentifier), StringComparison.Ordinal); }
+@{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); var isUploader = string.Equals(tx.UploadedByUserId, User.FindFirstValue(ClaimTypes.NameIdentifier), StringComparison.Ordinal); var canShareLinks = tx.Status != TransactionStatus.Draft && tx.Participants.Count > 0 && (isUploader || User.IsInRole(DatabaseSeeder.AdminRole)); var canShareJpg = canShareLinks && isUploader; }
 @{ var currencyLabel = tx.CurrencyCode == "IDR" ? "Rp" : tx.CurrencyCode; var pickupName = !string.IsNullOrWhiteSpace(Model.PickupAssignment?.SelectedUser?.DisplayName) ? Model.PickupAssignment.SelectedUser!.DisplayName : tx.Participants.FirstOrDefault(p => p.Id == Model.PickupAssignment?.SelectedParticipantId)?.Name; }
-<div class="page-heading compact"><div><a class="back-link" asp-action="Index">@L["AllTransactions"]</a><h1>@tx.MerchantName</h1><p>@tx.TransactionNumber · @(tx.TransactionDate?.ToString("dd MMMM yyyy") ?? tx.UploadDate.ToLocalTime().ToString("dd MMMM yyyy"))</p></div><span class="status large @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span></div>
+<div class="page-heading compact"><div><a class="back-link" asp-action="Index">@L["AllTransactions"]</a><h1>@tx.MerchantName</h1><p>@tx.TransactionNumber · @(tx.TransactionDate?.ToString("dd MMMM yyyy") ?? tx.UploadDate.ToLocalTime().ToString("dd MMMM yyyy"))</p></div><div class="page-heading-actions"><span class="status large @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span>@if (canShareLinks) { <button type="button" class="btn btn-light transaction-share-trigger" data-share-open aria-label='@L["ShareTransaction"]' title='@L["ShareTransaction"]'><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4"></circle><circle cx="6" cy="12" r="2.4"></circle><circle cx="18" cy="19" r="2.4"></circle><path d="m8.2 10.8 7.5-4.5M8.2 13.2l7.5 4.5"></path></svg></button> }</div></div>
 <div class="detail-grid">
     <section class="content-card bill-summary">
         <div class="bill-summary-main">
@@ -132,11 +132,6 @@
                         </div>
                     </details>
                 }
-                @if (person.AccountLink is null && (isUploader || User.IsInRole(DatabaseSeeder.AdminRole)))
-                {
-                    var guestActive = person.GuestAccessLinks.Any(x => x.Status == GuestAccessLinkStatus.Active);
-                    <div class="guest-access-block" data-guest-access data-copied-text="@L["GuestLinkCopied"]" data-manual-text="@L["GuestLinkManualCopy"]" data-error-text="@L["GuestLinkCopyUnavailable"]"><span class="eyebrow">@L["GuestAccess"] · @(guestActive ? "Active" : "Not created")</span><div class="guest-access-actions"><button type="button" class="btn btn-soft btn-sm" data-guest-copy data-guest-endpoint="@Url.Action("CopyGuestLink", new { transactionId = tx.Id, participantId = person.Id })">@L["CopyGuestLink"]</button>@Html.AntiForgeryToken()<form asp-action="RegenerateGuestLink" method="post" class="m-0"><input type="hidden" name="transactionId" value="@tx.Id" /><input type="hidden" name="participantId" value="@person.Id" /><button class="btn btn-light btn-sm" type="submit">@L["RegenerateGuestLink"]</button></form><form asp-action="RevokeGuestLink" method="post" class="m-0"><input type="hidden" name="transactionId" value="@tx.Id" /><input type="hidden" name="participantId" value="@person.Id" /><button class="btn btn-outline-danger btn-sm" type="submit">@L["RevokeGuestLink"]</button></form></div><div class="guest-copy-feedback" data-guest-copy-feedback role="status" aria-live="polite"></div></div>
-                }
             </article>
         }
         @if (tx.Participants.Count == 0) { <div class="empty-inline"><span>👥</span><strong>@L["NotSplitYet"]</strong><p>@L["SetParticipantsFirst"]</p></div> }
@@ -150,75 +145,40 @@
         <div class="compact-items">@foreach(var item in tx.Items.OrderBy(x => x.LineNumber)){<div><span>@item.Name <small>@item.Quantity × @currencyLabel @item.UnitPrice.ToString("N0")</small></span><strong>@currencyLabel @item.TotalPrice.ToString("N0")</strong></div>}</div>
         <div class="compact-totals"><div><span>@L["Subtotal"]</span><strong>@currencyLabel @tx.Subtotal.ToString("N0")</strong></div>@foreach(var charge in Model.Charges){var rate=ReceiptReviewNormalizer.CalculateEffectivePercentage(charge.Amount ?? 0,tx.Subtotal);<div><span>@charge.Label @if(rate.HasValue){<small>@L["EffectiveRate", rate.Value.ToString("0.##")].Value</small>}</span><strong>@(charge.Operation == ChargeOperation.Subtract ? "-" : "+") @currencyLabel @charge.Amount.GetValueOrDefault().ToString("N0")</strong></div>}<div><span>@L["Total"]</span><strong>@currencyLabel @tx.GrandTotal.ToString("N0")</strong></div></div>
     </section>
-    @if (isUploader && tx.Status != TransactionStatus.Draft && tx.Participants.Count > 0)
+    @if (canShareLinks)
     {
-        <section class="content-card share-export-card" data-share-export data-share-endpoint="@Url.Action("ShareData", "Transactions", new { id = tx.Id })">
-            <div class="section-head"><div><h2>@L["ShareTransaction"]</h2><p>@L["ShareTransactionHint"]</p></div><span class="share-count" data-share-count>—</span></div>
-            <div class="share-action-row"><button type="button" class="btn btn-primary" data-share-open>@L["ShareTransaction"]</button><button type="button" class="btn btn-soft" data-share-download>@L["DownloadJpg"]</button><span class="share-status" data-share-status role="status" aria-live="polite"></span></div>
+        var transactionLink = tx.GuestTransactionAccessLinks.FirstOrDefault(x => x.Status == GuestAccessLinkStatus.Active);
+        <section class="share-unified" data-share-export data-share-endpoint="@(canShareJpg ? Url.Action("ShareData", "Transactions", new { id = tx.Id }) : null)" data-transaction-link-copy-endpoint="@Url.Action("CopyTransactionGuestLink", "Transactions", new { id = tx.Id })" data-transaction-link-regenerate-endpoint="@Url.Action("RegenerateTransactionGuestLink", "Transactions", new { id = tx.Id })" data-transaction-link-revoke-endpoint="@Url.Action("RevokeTransactionGuestLink", "Transactions", new { id = tx.Id })" data-copied-text='@L["ShareLinkCopied"]' data-manual-text='@L["GuestLinkManualCopy"]' data-error-text='@L["ShareLinkUnavailable"]' data-regenerated-text='@L["ShareLinkRegenerated"]' data-revoked-text='@L["ShareLinkRevokedFeedback"]' data-regenerate-confirm='@L["ShareRegenerateConfirm"]' data-revoke-confirm='@L["ShareRevokeConfirm"]'>
+            @Html.AntiForgeryToken()
             <dialog class="share-dialog" data-share-dialog aria-labelledby="share-dialog-title" hidden>
-                <div class="share-dialog-panel"><div class="share-dialog-head"><h2 id="share-dialog-title">@L["ShareDialogTitle"]</h2><button type="button" class="share-dialog-close" data-share-close aria-label='@L["ShareClose"]'>×</button></div>
-                    <fieldset class="share-mode-options"><legend>@L["ShareMode"]</legend><label><input type="radio" name="share-mode" value="all" checked /> @L["ShareAllParticipants"]</label><label><input type="radio" name="share-mode" value="selected" /> @L["ShareSelectedParticipants"]</label><label><input type="radio" name="share-mode" value="individual" /> @L["ShareIndividualParticipant"]</label></fieldset>
-                    <div class="share-participant-select" data-share-participants hidden><p class="field-hint">@L["ShareSelectParticipant"]</p></div>
-                    <div class="share-dialog-actions"><button type="button" class="btn btn-primary" data-share-generate>@L["ShareGenerate"]</button><button type="button" class="btn btn-soft" data-share-native>@L["ShareTransaction"]</button></div><p class="share-status" data-share-status role="status" aria-live="polite"></p>
+                <div class="share-dialog-panel unified-share-dialog-panel">
+                    <div class="share-dialog-head"><div><h2 id="share-dialog-title">@L["ShareDialogTitle"]</h2><p class="share-dialog-subtitle">@L["ShareUnifiedHint"]</p></div><button type="button" class="share-dialog-close" data-share-close aria-label='@L["ShareClose"]'>×</button></div>
+                    <div class="unified-share-tabs" role="tablist" aria-label='@L["ShareTransaction"]'><button type="button" class="unified-share-tab active" data-share-tab="links" role="tab" aria-selected="true" aria-controls="share-links-panel">🔗 @L["ShareLinkTab"]</button>@if (canShareJpg) { <button type="button" class="unified-share-tab" data-share-tab="jpg" role="tab" aria-selected="false" aria-controls="share-jpg-panel">▧ @L["ShareJpgTab"]</button> }</div>
+                    <section id="share-links-panel" class="unified-share-panel" data-share-panel="links" role="tabpanel">
+                        <div class="share-link-section-head"><div><h3>@L["ShareTransactionLink"]</h3><p>@L["ShareTransactionLinkHint"]</p></div><span class="share-link-state @(transactionLink is null ? "is-muted" : "")" data-transaction-link-state>@(transactionLink is null ? L["ShareLinkNotCreated"] : L["ShareLinkActive"])</span></div>
+                        <div class="share-link-section" data-transaction-link><div class="share-link-row"><input class="form-control" data-link-url readonly aria-label='@L["ShareTransactionLink"]' /><button type="button" class="btn btn-light share-icon-action" data-link-copy aria-label='@L["CopyGuestLink"]' title='@L["CopyGuestLink"]'><span aria-hidden="true">▣</span></button><button type="button" class="btn btn-light share-icon-action" data-link-regenerate aria-label='@L["RegenerateGuestLink"]' title='@L["RegenerateGuestLink"]'><span aria-hidden="true">↻</span></button></div><input class="form-control share-link-manual" data-link-manual hidden readonly aria-label='@L["GuestLinkManualCopy"]' /><div class="share-link-feedback" data-link-feedback role="status" aria-live="polite"></div></div>
+                        <p class="share-link-hint">@L["ShareLinkTokenHint"]</p>
+                        <div class="share-link-section-head guest-links-heading"><div><h3>@L["ShareGuestParticipants"]</h3><p>@L["ShareGuestParticipantsHint"]</p></div></div>
+                        <div class="guest-link-list" data-guest-link-list>
+                            @foreach (var guest in tx.Participants.Where(x => x.AccountLink is null).OrderBy(x => x.Name))
+                            {
+                                var guestLink = guest.GuestAccessLinks.FirstOrDefault(x => x.Status == GuestAccessLinkStatus.Active);
+                                <article class="guest-link-row" data-guest-link data-copy-endpoint="@Url.Action("CopyGuestLink", new { transactionId = tx.Id, participantId = guest.Id })" data-regenerate-endpoint="@Url.Action("RegenerateGuestLinkInline", new { transactionId = tx.Id, participantId = guest.Id })" data-revoke-endpoint="@Url.Action("RevokeGuestLinkInline", new { transactionId = tx.Id, participantId = guest.Id })"><div class="guest-link-copy"><span class="avatar">@guest.Name[0].ToString().ToUpperInvariant()</span><div><strong>@guest.Name</strong><small data-guest-link-state>@(guestLink is null ? L["ShareLinkNotCreated"] : L["ShareLinkActive"])</small></div></div><div class="guest-link-actions"><button type="button" class="btn btn-soft btn-sm" data-link-copy>@L["CopyGuestLink"]</button><button type="button" class="btn btn-light btn-sm" data-link-regenerate>@L["RegenerateGuestLink"]</button><button type="button" class="btn btn-outline-danger btn-sm" data-link-revoke>@L["RevokeGuestLink"]</button></div><input class="form-control share-link-manual" data-link-manual hidden readonly aria-label='@L["GuestLinkManualCopy"]' /><div class="guest-link-feedback" data-link-feedback role="status" aria-live="polite"></div></article>
+                            }
+                        </div>
+                        @if (!tx.Participants.Any(x => x.AccountLink is null)) { <p class="empty-inline compact-empty">@L["ShareNoGuestParticipants"]</p> }
+                        <div class="share-link-footer"><button type="button" class="btn btn-outline-danger btn-sm" data-transaction-link-revoke>@L["RevokeGuestLink"]</button><button type="button" class="btn btn-primary btn-sm" data-share-close>@L["ShareClose"]</button></div>
+                    </section>
+                    @if (canShareJpg)
+                    {
+                        <section id="share-jpg-panel" class="unified-share-panel" data-share-panel="jpg" role="tabpanel" hidden>
+                            <p class="share-dialog-subtitle">@L["ShareJpgHint"]</p><fieldset class="share-mode-options"><legend>@L["ShareMode"]</legend><label><input type="radio" name="share-mode" value="all" checked /> @L["ShareAllParticipants"]</label><label><input type="radio" name="share-mode" value="selected" /> @L["ShareSelectedParticipants"]</label><label><input type="radio" name="share-mode" value="individual" /> @L["ShareIndividualParticipant"]</label></fieldset>
+                            <div class="share-participant-select" data-share-participants hidden><p class="field-hint">@L["ShareSelectParticipant"]</p></div><div class="share-dialog-actions"><button type="button" class="btn btn-primary" data-share-generate>@L["ShareGenerate"]</button><button type="button" class="btn btn-soft" data-share-native>@L["ShareTransaction"]</button></div><p class="share-status" data-share-status role="status" aria-live="polite"></p>
+                        </section>
+                    }
                 </div>
             </dialog>
-            <canvas class="share-render-canvas" aria-hidden="true"></canvas>
+            @if (canShareJpg) { <canvas class="share-render-canvas" aria-hidden="true"></canvas> }
         </section>
     }
 </div>
-@section Scripts { <script>
-document.querySelectorAll('[data-guest-copy]').forEach(button => button.addEventListener('click', async () => {
-    const block = button.closest('[data-guest-access]');
-    const feedback = block.querySelector('[data-guest-copy-feedback]');
-    button.disabled = true;
-    feedback.replaceChildren();
-    try {
-        const body = new FormData();
-        const token = block.querySelector('input[name="__RequestVerificationToken"]');
-        if (token) body.append('__RequestVerificationToken', token.value);
-        const response = await fetch(button.dataset.guestEndpoint, { method: 'POST', body, credentials: 'same-origin' });
-        if (!response.ok) throw new Error(`Guest link request returned ${response.status}`);
-        const data = await response.json();
-        if (typeof data.url !== 'string' || !data.url) throw new Error('Guest link response is missing its URL');
-
-        let copied = false;
-        if (window.isSecureContext && navigator.clipboard?.writeText) {
-            try { await navigator.clipboard.writeText(data.url); copied = true; } catch (_) { /* Try the legacy copy path below. */ }
-        }
-        if (!copied) {
-            const temporary = document.createElement('textarea');
-            temporary.value = data.url;
-            temporary.readOnly = true;
-            temporary.setAttribute('aria-hidden', 'true');
-            temporary.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0';
-            document.body.appendChild(temporary);
-            temporary.focus();
-            temporary.select();
-            try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
-            temporary.remove();
-        }
-
-        if (copied) {
-            feedback.textContent = block.dataset.copiedText;
-        } else {
-            const hint = document.createElement('span');
-            hint.textContent = block.dataset.manualText;
-            const field = document.createElement('input');
-            field.type = 'text';
-            field.readOnly = true;
-            field.className = 'form-control guest-copy-manual';
-            field.value = data.url;
-            field.setAttribute('aria-label', block.dataset.manualText);
-            field.addEventListener('focus', () => field.select());
-            feedback.append(hint, field);
-            field.focus();
-            field.select();
-        }
-    } catch (error) {
-        console.warn('Guest link copy request failed:', error.message);
-        feedback.textContent = block.dataset.errorText;
-    } finally {
-        button.disabled = false;
-    }
-}));
-</script> }

@@ -7,6 +7,7 @@ All notable public changes to SplitBill are documented here.
 - Added an optional per-transaction pickup switch with surprise-only winner reveal and preserved pickup history.
 - Added privacy-scoped Transaction and Member share projections and a two-pass long JPEG Canvas renderer with a 25-participant clipping fixture.
 - Added All/Selected/Individual uploader sharing, Member own-bill sharing, Web Share API detection, and automatic download fallback.
+- Unified guest-link management under the Transaction Details header Share modal, with independent transaction-wide and participant-scoped tokens, copy fallback, regeneration, and revocation.
 
 ## 1.0.0 - 2026-09-11
 

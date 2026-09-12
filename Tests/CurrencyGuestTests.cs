@@ -176,6 +176,73 @@ public sealed class CurrencyGuestTests
         Assert.Null(await service.ResolveAsync(token!));
     }
 
+    [Fact]
+    public async Task GuestTransactionAccessService_RecopiesRotatesAndRevokesIndependently()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:;Foreign Keys=True");
+        await connection.OpenAsync();
+        await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
+        await db.Database.EnsureCreatedAsync();
+        await DatabaseSchemaUpdater.EnsureAsync(db);
+        db.Users.Add(new ApplicationUser { Id = "u", UserName = "u" });
+        await db.SaveChangesAsync();
+        var tx = new BillTransaction
+        {
+            TransactionNumber = "TRX-TX-GUEST", MerchantName = "Cafe", UploadedByUserId = "u",
+            Status = TransactionStatus.Unpaid, GrandTotal = 20, Subtotal = 20,
+            Participants = [new TransactionParticipant { Name = "Guest", Amount = 20 }]
+        };
+        db.Transactions.Add(tx);
+        await db.SaveChangesAsync();
+        var provider = DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "splitbill-tx-guest-" + Guid.NewGuid().ToString("N"))));
+        var service = new GuestTransactionAccessService(db, new GuestAccessTokenService(provider));
+
+        var first = await service.GetCopyTokenAsync(tx.Id, "u");
+        var second = await service.GetCopyTokenAsync(tx.Id, "u");
+        Assert.NotNull(first);
+        Assert.Equal(first, second);
+        var resolved = await service.ResolveAsync(first!);
+        Assert.NotNull(resolved);
+        Assert.Equal(tx.Id, resolved!.Transaction.Id);
+        Assert.Equal(1, resolved.Link.AccessCount);
+
+        var rotated = await service.RegenerateAsync(tx.Id, "u");
+        Assert.NotNull(rotated);
+        Assert.NotEqual(first, rotated);
+        Assert.Null(await service.ResolveAsync(first!));
+        Assert.NotNull(await service.ResolveAsync(rotated!));
+        Assert.True(await service.RevokeAsync(tx.Id));
+        Assert.Null(await service.ResolveAsync(rotated!));
+        Assert.False(await service.RevokeAsync(tx.Id));
+        Assert.Empty(await db.GuestAccessLinks.ToListAsync());
+    }
+
+    [Fact]
+    public async Task GuestTransactionAccessService_DoesNotCreateForDraftAndCascadesWithTransaction()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:;Foreign Keys=True");
+        await connection.OpenAsync();
+        await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
+        await db.Database.EnsureCreatedAsync();
+        await DatabaseSchemaUpdater.EnsureAsync(db);
+        db.Users.Add(new ApplicationUser { Id = "u", UserName = "u" });
+        await db.SaveChangesAsync();
+        var draft = new BillTransaction { TransactionNumber = "TRX-TX-DRAFT", MerchantName = "Draft", UploadedByUserId = "u", Status = TransactionStatus.Draft, Participants = [new TransactionParticipant { Name = "Guest", Amount = 1 }] };
+        db.Transactions.Add(draft);
+        await db.SaveChangesAsync();
+        var provider = DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "splitbill-tx-draft-" + Guid.NewGuid().ToString("N"))));
+        var service = new GuestTransactionAccessService(db, new GuestAccessTokenService(provider));
+        Assert.Null(await service.GetCopyTokenAsync(draft.Id, "u"));
+
+        draft.Status = TransactionStatus.Unpaid;
+        await db.SaveChangesAsync();
+        var token = await service.GetCopyTokenAsync(draft.Id, "u");
+        Assert.NotNull(token);
+        db.Transactions.Remove(draft);
+        await db.SaveChangesAsync();
+        Assert.Empty(await db.GuestTransactionAccessLinks.ToListAsync());
+    }
+
     private sealed class StubHttpClientFactory(HttpClient client) : IHttpClientFactory
     {
         public HttpClient CreateClient(string name) => client;

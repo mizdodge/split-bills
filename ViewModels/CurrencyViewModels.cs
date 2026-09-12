@@ -28,6 +28,8 @@ public sealed class GuestBillViewModel
 {
     public string Token { get; set; } = string.Empty;
     public bool WholeTransaction { get; set; }
+    public bool IsTransactionToken { get; set; }
+    public bool HasPersonalView { get; set; }
     public string MerchantName { get; set; } = string.Empty;
     public string TransactionNumber { get; set; } = string.Empty;
     public DateOnly? TransactionDate { get; set; }

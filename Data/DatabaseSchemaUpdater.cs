@@ -85,6 +85,24 @@ public static class DatabaseSchemaUpdater
                 );
                 CREATE UNIQUE INDEX IF NOT EXISTS "IX_GuestAccessLinks_TokenHash" ON "GuestAccessLinks" ("TokenHash");
                 CREATE INDEX IF NOT EXISTS "IX_GuestAccessLinks_ParticipantId_Status" ON "GuestAccessLinks" ("ParticipantId", "Status");
+                CREATE TABLE IF NOT EXISTS "GuestTransactionAccessLinks" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_GuestTransactionAccessLinks" PRIMARY KEY AUTOINCREMENT,
+                    "TransactionId" INTEGER NOT NULL,
+                    "TokenHash" TEXT NOT NULL,
+                    "ProtectedToken" TEXT NOT NULL,
+                    "Status" INTEGER NOT NULL DEFAULT 0,
+                    "CreatedAt" TEXT NOT NULL,
+                    "RevokedAt" TEXT NULL,
+                    "LastAccessedAt" TEXT NULL,
+                    "CreatedByUserId" TEXT NULL,
+                    "AccessCount" INTEGER NOT NULL DEFAULT 0,
+                    CONSTRAINT "FK_GuestTransactionAccessLinks_Transactions_TransactionId"
+                        FOREIGN KEY ("TransactionId") REFERENCES "Transactions" ("Id") ON DELETE CASCADE
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "IX_GuestTransactionAccessLinks_TokenHash"
+                    ON "GuestTransactionAccessLinks" ("TokenHash");
+                CREATE UNIQUE INDEX IF NOT EXISTS "IX_GuestTransactionAccessLinks_ActiveTransaction"
+                    ON "GuestTransactionAccessLinks" ("TransactionId") WHERE "Status" = 0;
                 """, cancellationToken);
 
             if (!await HasColumnAsync(db, "CurrencyConfigurations", "DashboardCurrencyCodes", cancellationToken))

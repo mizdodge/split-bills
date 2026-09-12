@@ -23,7 +23,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     ITransactionShareExportService? shareExportService = null,
     ICurrencyCatalog? currencyCatalog = null,
     ICurrencyRateService? currencyRateService = null,
-    IGuestAccessService? guestAccessService = null) : Controller
+    IGuestAccessService? guestAccessService = null,
+    IGuestTransactionAccessService? guestTransactionAccessService = null) : Controller
 {
     private static readonly JsonSerializerOptions ParticipantJsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -610,7 +611,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             .Include(x => x.Participants).ThenInclude(x => x.AccountLink)
             .Include(x => x.Participants).ThenInclude(x => x.ItemAllocations)
             .Include(x => x.Participants).ThenInclude(x => x.GuestAccessLinks)
-            .Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals).SingleOrDefaultAsync(x => x.Id == id);
+            .Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals)
+            .Include(x => x.GuestTransactionAccessLinks).SingleOrDefaultAsync(x => x.Id == id);
         if (transaction is null) return NotFound();
         var participantBreakdowns = calculator.BuildParticipantBreakdowns(transaction)
             .ToDictionary(x => x.ParticipantId);
@@ -821,6 +823,58 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         if (token is null) return NotFound();
         Response.Headers["Cache-Control"] = "no-store";
         return Json(new { url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/g/my-bill/{Uri.EscapeDataString(token)}" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CopyTransactionGuestLink(long id, CancellationToken cancellationToken)
+    {
+        var transaction = await ManageableTransaction(id)
+            .Where(x => x.Status != TransactionStatus.Draft && x.Participants.Any())
+            .Select(x => new { x.Id })
+            .SingleOrDefaultAsync(cancellationToken);
+        if (transaction is null || guestTransactionAccessService is null) return NotFound();
+        var token = await guestTransactionAccessService.GetCopyTokenAsync(id, userManager.GetUserId(User)!, cancellationToken);
+        if (token is null) return NotFound();
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/g/transaction/{Uri.EscapeDataString(token)}", status = "Active" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegenerateTransactionGuestLink(long id, CancellationToken cancellationToken)
+    {
+        if (!await ManageableTransaction(id).AnyAsync(cancellationToken) || guestTransactionAccessService is null) return NotFound();
+        var token = await guestTransactionAccessService.RegenerateAsync(id, userManager.GetUserId(User)!, cancellationToken);
+        if (token is null) return NotFound();
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/g/transaction/{Uri.EscapeDataString(token)}", status = "Active" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RevokeTransactionGuestLink(long id, CancellationToken cancellationToken)
+    {
+        if (!await ManageableTransaction(id).AnyAsync(cancellationToken) || guestTransactionAccessService is null) return NotFound();
+        await guestTransactionAccessService.RevokeAsync(id, cancellationToken);
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { status = "Revoked" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegenerateGuestLinkInline(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        if (!await ManageableTransaction(transactionId).AnyAsync(cancellationToken) || guestAccessService is null) return NotFound();
+        var token = await guestAccessService.RegenerateAsync(transactionId, participantId, userManager.GetUserId(User)!, cancellationToken);
+        if (token is null) return NotFound();
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/g/my-bill/{Uri.EscapeDataString(token)}", status = "Active" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RevokeGuestLinkInline(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        if (!await ManageableTransaction(transactionId).AnyAsync(cancellationToken) || guestAccessService is null) return NotFound();
+        await guestAccessService.RevokeAsync(transactionId, participantId, cancellationToken);
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { status = "Revoked" });
     }
 
     [HttpPost, ValidateAntiForgeryToken]

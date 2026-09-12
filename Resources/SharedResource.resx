@@ -174,6 +174,25 @@
   <data name="ShareDialogTitle" xml:space="preserve">
     <value>Bagikan rincian split</value>
   </data>
+  <data name="ShareUnifiedHint" xml:space="preserve"><value>Bagikan link tamu atau buat gambar ringkasan.</value></data>
+  <data name="ShareLinkTab" xml:space="preserve"><value>Link tamu</value></data>
+  <data name="ShareJpgTab" xml:space="preserve"><value>Gambar JPG</value></data>
+  <data name="ShareTransactionLink" xml:space="preserve"><value>Link transaksi</value></data>
+  <data name="ShareTransactionLinkHint" xml:space="preserve"><value>Satu link read-only untuk melihat seluruh transaksi tanpa login.</value></data>
+  <data name="ShareLinkActive" xml:space="preserve"><value>Aktif</value></data>
+  <data name="ShareLinkNotCreated" xml:space="preserve"><value>Belum dibuat</value></data>
+  <data name="ShareLinkRevoked" xml:space="preserve"><value>Dicabut</value></data>
+  <data name="ShareLinkCopied" xml:space="preserve"><value>Link berhasil disalin.</value></data>
+  <data name="ShareLinkUnavailable" xml:space="preserve"><value>Link tamu tidak dapat dimuat.</value></data>
+  <data name="ShareLinkRegenerated" xml:space="preserve"><value>Link baru aktif; link lama sudah dicabut.</value></data>
+  <data name="ShareLinkRevokedFeedback" xml:space="preserve"><value>Akses guest berhasil dicabut.</value></data>
+  <data name="ShareRegenerateConfirm" xml:space="preserve"><value>Buat link baru? Link sebelumnya akan langsung tidak berlaku.</value></data>
+  <data name="ShareRevokeConfirm" xml:space="preserve"><value>Cabut akses guest link ini?</value></data>
+  <data name="ShareGuestParticipants" xml:space="preserve"><value>Link per peserta</value></data>
+  <data name="ShareGuestParticipantsHint" xml:space="preserve"><value>Hanya peserta guest yang tampil di sini.</value></data>
+  <data name="ShareNoGuestParticipants" xml:space="preserve"><value>Tidak ada peserta guest di transaksi ini.</value></data>
+  <data name="ShareJpgHint" xml:space="preserve"><value>Pilih isi gambar yang ingin dibagikan.</value></data>
+  <data name="ShareLinkTokenHint" xml:space="preserve"><value>↻ Buat ulang token untuk mencabut link lama.</value></data>
   <data name="ShareAllParticipants" xml:space="preserve">
     <value>Semua peserta</value>
   </data>

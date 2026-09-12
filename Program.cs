@@ -153,6 +153,7 @@ builder.Services.AddSingleton<ICurrencyTrendService, CurrencyTrendService>();
 builder.Services.AddHostedService<CurrencyRateRefreshService>();
 builder.Services.AddSingleton<IGuestAccessTokenService, GuestAccessTokenService>();
 builder.Services.AddScoped<IGuestAccessService, GuestAccessService>();
+builder.Services.AddScoped<IGuestTransactionAccessService, GuestTransactionAccessService>();
 
 var app = builder.Build();
 
