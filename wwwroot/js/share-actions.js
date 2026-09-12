@@ -70,9 +70,28 @@
       }));
       holder.addEventListener("change", updateMode); updateMode();
     };
-    const close = () => { if (dialog) { dialog.hidden = true; document.body.classList.remove("share-dialog-open"); openButton?.focus(); } };
+    const close = () => {
+      if (!dialog) return;
+      if (dialog.open && typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+      dialog.hidden = true;
+      document.body.classList.remove("share-dialog-open");
+      openButton?.focus();
+    };
     const activateJpg = async () => { if (jpgLoaded) return; setStatus(text("shareRendering", "Loading share options…")); try { const data = await fetchPayload(); renderCards(data); jpgLoaded = true; setStatus(""); } catch { setStatus(text("shareError", "The image could not be created. Try again."), true); } };
-    const open = () => { if (!dialog || busy) return; dialog.hidden = false; document.body.classList.add("share-dialog-open"); dialog.querySelector("[data-share-close]")?.focus(); };
+    const open = () => {
+      if (!dialog || busy) return;
+      dialog.hidden = false;
+      try {
+        if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
+        else dialog.setAttribute("open", "");
+      } catch (_) {
+        // Older/private browsers may not implement the modal dialog API.
+        dialog.setAttribute("open", "");
+      }
+      document.body.classList.add("share-dialog-open");
+      dialog.querySelector("[data-share-close]")?.focus();
+    };
     const setLinkFeedback = (holder, message, value = null) => { const feedback = holder.querySelector("[data-link-feedback]"); if (feedback) { feedback.replaceChildren(); feedback.textContent = message || ""; } const manual = holder.querySelector("[data-link-manual]"); if (manual) { manual.hidden = value === null; if (value !== null) showManual(manual, value); } };
     const copyLink = async (holder, endpointForCopy, onUrl = null) => {
       const button = holder.querySelector("[data-link-copy]"); if (button) button.disabled = true;
@@ -109,7 +128,7 @@
       });
     });
     const setTab = async tab => { root.querySelectorAll("[data-share-tab]").forEach(button => { const active = button.dataset.shareTab === tab; button.classList.toggle("active", active); button.setAttribute("aria-selected", active ? "true" : "false"); }); root.querySelectorAll("[data-share-panel]").forEach(panel => { panel.hidden = panel.dataset.sharePanel !== tab; }); setStatus(""); if (tab === "jpg") await activateJpg(); };
-    openButton?.addEventListener("click", open); root.querySelectorAll("[data-share-close]").forEach(button => button.addEventListener("click", close)); root.querySelectorAll("[data-share-tab]").forEach(button => button.addEventListener("click", () => setTab(button.dataset.shareTab))); root.querySelectorAll("input[name='share-mode']").forEach(input => input.addEventListener("change", updateMode));
+    openButton?.addEventListener("click", open); root.querySelectorAll("[data-share-close]").forEach(button => button.addEventListener("click", close)); dialog?.addEventListener("close", () => { dialog.hidden = true; document.body.classList.remove("share-dialog-open"); }); root.querySelectorAll("[data-share-tab]").forEach(button => button.addEventListener("click", () => setTab(button.dataset.shareTab))); root.querySelectorAll("input[name='share-mode']").forEach(input => input.addEventListener("change", updateMode));
     root.querySelector("[data-share-download]")?.addEventListener("click", () => generate(false)); root.querySelector("[data-share-native]")?.addEventListener("click", () => generate(true)); root.querySelector("[data-share-generate]")?.addEventListener("click", () => generate(false)); dialog?.addEventListener("click", event => { if (event.target === dialog) close(); }); dialog?.addEventListener("keydown", event => { if (event.key === "Escape") close(); });
     wireTransactionLink(); wireGuestLinks();
     async function generate(nativeShare) {

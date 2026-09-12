@@ -42,6 +42,8 @@ public sealed class ShareMarkupTests
         Assert.Contains("data-link-revoke", script);
         Assert.Contains("copyValue", script);
         Assert.Contains("legacy", script, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("showModal", script);
+        Assert.Contains("dialog.close", script);
     }
 
     [Fact]
