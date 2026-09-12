@@ -8,6 +8,10 @@ using Splitbill.Models;
 using Splitbill.Services;
 using System.Net;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var printBootstrapCode = args.Any(arg => string.Equals(arg, "--print-bootstrap-code", StringComparison.OrdinalIgnoreCase));
 var resetMachineSecrets = args.Any(arg => string.Equals(arg, "--reset-machine-secrets", StringComparison.OrdinalIgnoreCase));
@@ -67,6 +71,25 @@ builder.Services.AddControllersWithViews(options =>
     options.ValueProviderFactories.Insert(0, new InvariantFormValueProviderFactory()))
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status404NotFound;
+    options.AddPolicy("GuestAccess", httpContext =>
+    {
+        var token = httpContext.Request.RouteValues.TryGetValue("token", out var rawToken)
+            ? rawToken?.ToString() ?? string.Empty
+            : string.Empty;
+        var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)))[..16];
+        var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter($"guest:{ip}:{tokenHash}", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 30,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        });
+    });
+});
 builder.Services.AddHttpContextAccessor();
 var dataProtection = builder.Services.AddDataProtection()
     .SetApplicationName("SplitBill")
@@ -80,6 +103,12 @@ builder.Services.AddHttpClient("SharePointGraph", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
     client.DefaultRequestHeaders.UserAgent.ParseAdd("SplitBill/1.0");
+});
+builder.Services.AddHttpClient("CurrencyRateProvider", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(20);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("SplitBill/1.0");
+    client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 });
 builder.Services.AddHttpClient(nameof(LibNetWebPushTransport), client => client.Timeout = TimeSpan.FromSeconds(30));
 builder.Services.AddScoped<IAiReceiptService, AiReceiptService>();
@@ -113,6 +142,17 @@ builder.Services.AddScoped<IExcelReportService, ExcelReportService>();
 builder.Services.AddSingleton<ISplitBillCalculator, SplitBillCalculator>();
 builder.Services.AddScoped<ITransactionShareExportService, TransactionShareExportService>();
 builder.Services.AddSingleton<IDashboardAnalyticsService, DashboardAnalyticsService>();
+builder.Services.AddSingleton<ICurrencyCatalog, CurrencyCatalog>();
+builder.Services.AddScoped<ICurrencyRateProvider, FrankfurterRateProvider>();
+builder.Services.AddScoped<ICurrencyConfigurationService, CurrencyConfigurationService>();
+builder.Services.AddScoped<ICurrencyRateService, CurrencyRateService>();
+builder.Services.AddSingleton<IDashboardCurrencySelectionService, DashboardCurrencySelectionService>();
+builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
+builder.Services.AddSingleton<ICurrencyFormatter, CurrencyFormatter>();
+builder.Services.AddSingleton<ICurrencyTrendService, CurrencyTrendService>();
+builder.Services.AddHostedService<CurrencyRateRefreshService>();
+builder.Services.AddSingleton<IGuestAccessTokenService, GuestAccessTokenService>();
+builder.Services.AddScoped<IGuestAccessService, GuestAccessService>();
 
 var app = builder.Build();
 
@@ -135,6 +175,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") }
 });
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

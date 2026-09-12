@@ -43,6 +43,7 @@
             {
                 <div class="nav-label">@L["Admin"]</div>
                 <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span> @L["AISettings"]</a>
+                <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span> @L["CurrencySettings"]</a>
                 <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span> @L["SharePointIntegration"]</a>
                 <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span> @L["ManageUsers"]</a>
                 <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span> @L["FoodPickupRotation"]</a>
@@ -94,6 +95,7 @@
         @if (User.IsInRole(DatabaseSeeder.AdminRole))
         {
             <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span>@L["AISettings"]</a>
+            <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span>@L["CurrencySettings"]</a>
             <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span>@L["SharePointIntegration"]</a>
             <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span>@L["ManageUsers"]</a>
             <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span>@L["FoodPickupRotation"]</a>

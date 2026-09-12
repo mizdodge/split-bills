@@ -24,6 +24,14 @@ public sealed class ReviewTransactionViewModel
     [BindNever, ValidateNever] public decimal? Tax { get; set; }
     [BindNever, ValidateNever] public decimal? ServiceCharge { get; set; }
     public decimal? GrandTotal { get; set; }
+    public string CurrencyCode { get; set; } = "IDR";
+    [BindNever, ValidateNever] public string ReportingCurrencyCode { get; set; } = "IDR";
+    public decimal ExchangeRateToReporting { get; set; } = 1m;
+    public DateOnly? ExchangeRateEffectiveDate { get; set; }
+    public string? ExchangeRateSource { get; set; }
+    public ExchangeRateCaptureMode ExchangeRateCaptureMode { get; set; } = ExchangeRateCaptureMode.Identity;
+    public string? ExchangeRateManualNote { get; set; }
+    [BindNever, ValidateNever] public IReadOnlyList<CurrencyInfo> AvailableCurrencies { get; set; } = [];
     [BindNever, ValidateNever] public decimal AiConfidence { get; set; }
     [BindNever, ValidateNever] public bool AiNeedsReview { get; set; }
     [BindNever, ValidateNever] public List<string> Warnings { get; set; } = [];

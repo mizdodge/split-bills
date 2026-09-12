@@ -30,6 +30,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<WebPushSubscription> WebPushSubscriptions => Set<WebPushSubscription>();
     public DbSet<WebPushDelivery> WebPushDeliveries => Set<WebPushDelivery>();
     public DbSet<InstallationState> InstallationStates => Set<InstallationState>();
+    public DbSet<CurrencyConfiguration> CurrencyConfigurations => Set<CurrencyConfiguration>();
+    public DbSet<CurrencyExchangeRate> CurrencyExchangeRates => Set<CurrencyExchangeRate>();
+    public DbSet<GuestAccessLink> GuestAccessLinks => Set<GuestAccessLink>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -50,6 +53,18 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
         builder.Entity<InstallationState>()
             .HasKey(x => x.Id);
+
+        builder.Entity<CurrencyConfiguration>().HasKey(x => x.Id);
+        builder.Entity<CurrencyExchangeRate>()
+            .HasIndex(x => new { x.BaseCurrencyCode, x.QuoteCurrencyCode, x.EffectiveDate, x.ProviderBaseUrlFingerprint })
+            .IsUnique();
+        builder.Entity<GuestAccessLink>()
+            .HasIndex(x => x.TokenHash).IsUnique();
+        builder.Entity<GuestAccessLink>()
+            .HasOne(x => x.Participant)
+            .WithMany(x => x.GuestAccessLinks)
+            .HasForeignKey(x => x.ParticipantId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<SharePointNotificationOutbox>()
             .HasIndex(x => x.EventId)
@@ -231,5 +246,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             property.SetPrecision(18);
             property.SetScale(2);
         }
+        builder.Entity<CurrencyExchangeRate>().Property(x => x.Rate).HasPrecision(28, 12);
+        builder.Entity<BillTransaction>().Property(x => x.ExchangeRateToReporting).HasPrecision(28, 12);
     }
 }

@@ -37,6 +37,62 @@ public static class DatabaseSchemaUpdater
                 """, cancellationToken);
 
             await ExecuteAsync(db, """
+                CREATE TABLE IF NOT EXISTS "CurrencyConfigurations" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_CurrencyConfigurations" PRIMARY KEY,
+                    "DefaultCurrencyCode" TEXT NOT NULL DEFAULT 'IDR',
+                    "ProviderKind" INTEGER NOT NULL DEFAULT 0,
+                    "BaseUrl" TEXT NOT NULL DEFAULT 'https://api.frankfurter.dev',
+                    "AuthenticationMode" INTEGER NOT NULL DEFAULT 0,
+                    "ProtectedApiKey" TEXT NULL,
+                    "AllowPrivateNetworkEndpoint" INTEGER NOT NULL DEFAULT 0,
+                    "AutoRefreshEnabled" INTEGER NOT NULL DEFAULT 1,
+                    "DashboardCurrencyCodes" TEXT NOT NULL DEFAULT 'USD,SGD,EUR,JPY',
+                    "DashboardPrimaryCurrencyCode" TEXT NOT NULL DEFAULT 'USD',
+                    "LastTestAt" TEXT NULL,
+                    "LastTestSucceeded" INTEGER NULL,
+                    "LastError" TEXT NULL,
+                    "LastRefreshAt" TEXT NULL,
+                    "LastRefreshSucceeded" INTEGER NULL,
+                    "LastRefreshError" TEXT NULL,
+                    "UpdatedAt" TEXT NOT NULL,
+                    "UpdatedByUserId" TEXT NULL
+                );
+                CREATE TABLE IF NOT EXISTS "CurrencyExchangeRates" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_CurrencyExchangeRates" PRIMARY KEY AUTOINCREMENT,
+                    "BaseCurrencyCode" TEXT NOT NULL,
+                    "QuoteCurrencyCode" TEXT NOT NULL,
+                    "Rate" TEXT NOT NULL,
+                    "EffectiveDate" TEXT NOT NULL,
+                    "RetrievedAt" TEXT NOT NULL,
+                    "ProviderKind" INTEGER NOT NULL,
+                    "ProviderBaseUrlFingerprint" TEXT NOT NULL
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "IX_CurrencyExchangeRates_PairDateProvider"
+                    ON "CurrencyExchangeRates" ("BaseCurrencyCode", "QuoteCurrencyCode", "EffectiveDate", "ProviderBaseUrlFingerprint");
+                CREATE TABLE IF NOT EXISTS "GuestAccessLinks" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_GuestAccessLinks" PRIMARY KEY AUTOINCREMENT,
+                    "ParticipantId" INTEGER NOT NULL,
+                    "TokenHash" TEXT NOT NULL,
+                    "ProtectedToken" TEXT NOT NULL,
+                    "Status" INTEGER NOT NULL DEFAULT 0,
+                    "CreatedAt" TEXT NOT NULL,
+                    "RevokedAt" TEXT NULL,
+                    "LastAccessedAt" TEXT NULL,
+                    "CreatedByUserId" TEXT NULL,
+                    "AccessCount" INTEGER NOT NULL DEFAULT 0,
+                    CONSTRAINT "FK_GuestAccessLinks_TransactionParticipants_ParticipantId"
+                        FOREIGN KEY ("ParticipantId") REFERENCES "TransactionParticipants" ("Id") ON DELETE CASCADE
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "IX_GuestAccessLinks_TokenHash" ON "GuestAccessLinks" ("TokenHash");
+                CREATE INDEX IF NOT EXISTS "IX_GuestAccessLinks_ParticipantId_Status" ON "GuestAccessLinks" ("ParticipantId", "Status");
+                """, cancellationToken);
+
+            if (!await HasColumnAsync(db, "CurrencyConfigurations", "DashboardCurrencyCodes", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"CurrencyConfigurations\" ADD COLUMN \"DashboardCurrencyCodes\" TEXT NOT NULL DEFAULT 'USD,SGD,EUR,JPY';", cancellationToken);
+            if (!await HasColumnAsync(db, "CurrencyConfigurations", "DashboardPrimaryCurrencyCode", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"CurrencyConfigurations\" ADD COLUMN \"DashboardPrimaryCurrencyCode\" TEXT NOT NULL DEFAULT 'USD';", cancellationToken);
+
+            await ExecuteAsync(db, """
                 CREATE TABLE IF NOT EXISTS "SharePointConfigurations" (
                     "Id" INTEGER NOT NULL CONSTRAINT "PK_SharePointConfigurations" PRIMARY KEY,
                     "Enabled" INTEGER NOT NULL,
@@ -211,6 +267,25 @@ public static class DatabaseSchemaUpdater
                 await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"NotificationBaseUrl\" TEXT NULL;", cancellationToken);
             if (!await HasColumnAsync(db, "Transactions", "RequiresFoodPickup", cancellationToken))
                 await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"RequiresFoodPickup\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "CurrencyCode", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"CurrencyCode\" TEXT NOT NULL DEFAULT 'IDR';", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ReportingCurrencyCode", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ReportingCurrencyCode\" TEXT NOT NULL DEFAULT 'IDR';", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateToReporting", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateToReporting\" TEXT NOT NULL DEFAULT '1';", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateEffectiveDate", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateEffectiveDate\" TEXT NULL;", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateCapturedAt", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateCapturedAt\" TEXT NULL;", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateSource", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateSource\" TEXT NOT NULL DEFAULT 'LegacyIdentity';", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateCaptureMode", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateCaptureMode\" INTEGER NOT NULL DEFAULT 3;", cancellationToken);
+            if (!await HasColumnAsync(db, "Transactions", "ExchangeRateManualNote", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"Transactions\" ADD COLUMN \"ExchangeRateManualNote\" TEXT NULL;", cancellationToken);
+            await ExecuteAsync(db, "UPDATE \"Transactions\" SET \"CurrencyCode\"='IDR' WHERE \"CurrencyCode\" IS NULL OR \"CurrencyCode\"='';", cancellationToken);
+            await ExecuteAsync(db, "UPDATE \"Transactions\" SET \"ReportingCurrencyCode\"='IDR' WHERE \"ReportingCurrencyCode\" IS NULL OR \"ReportingCurrencyCode\"='';", cancellationToken);
+            await ExecuteAsync(db, "UPDATE \"Transactions\" SET \"ExchangeRateToReporting\"='1' WHERE \"ExchangeRateToReporting\" IS NULL OR \"ExchangeRateToReporting\"='';", cancellationToken);
             // Existing transactions that already have a winner are historical
             // pickup transactions. Preserve that behavior when adding the flag.
             await ExecuteAsync(db, """

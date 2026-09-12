@@ -65,6 +65,7 @@ public sealed class MyBillRowViewModel
     public string MerchantName { get; set; } = string.Empty;
     public DateOnly? TransactionDate { get; set; }
     public decimal Amount { get; set; }
+    public string CurrencyCode { get; set; } = "IDR";
     public ParticipantPaymentStatus PaymentStatus { get; set; }
     public string MenuDetail { get; set; } = string.Empty;
     public List<MyBillItemDetailViewModel> ItemDetails { get; set; } = [];
@@ -80,6 +81,11 @@ public sealed class MyBillDetailsViewModel
     public string MerchantName { get; set; } = string.Empty;
     public DateOnly? TransactionDate { get; set; }
     public decimal Amount { get; set; }
+    public string CurrencyCode { get; set; } = "IDR";
+    public string ReportingCurrencyCode { get; set; } = "IDR";
+    public decimal ExchangeRateToReporting { get; set; } = 1m;
+    public DateOnly? ExchangeRateEffectiveDate { get; set; }
+    public string ExchangeRateSource { get; set; } = "LegacyIdentity";
     public ParticipantPaymentStatus PaymentStatus { get; set; }
     public string MenuDetail { get; set; } = string.Empty;
     public decimal ItemSubtotal { get; set; }

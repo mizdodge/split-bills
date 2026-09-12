@@ -25,11 +25,12 @@ public sealed class AiReceiptService(
     IDataProtectionProvider dataProtectionProvider) : IAiReceiptService
 {
     private const string SystemPrompt = """
-        You extract structured data from Indonesian receipts. Return only data matching the supplied JSON schema.
-        Monetary values must be plain IDR numbers without separators or currency symbols. Never invent unreadable data.
+        You extract structured data from receipts. Return only data matching the supplied JSON schema.
+        Monetary values must be plain numbers without separators or currency symbols, in the currency printed on the receipt.
+        Set currency to the three-letter ISO 4217 code you can read from the receipt; use IDR only when the receipt is clearly Indonesian or the currency is unreadable.
         Put every non-item amount in charges as its own row, preserving the printed label such as PB1, PPN, service charge,
         packaging, delivery fee, voucher, discount, or any other receipt-specific adjustment. Use operation "add" for fees and
-        "subtract" for discounts. The amount is always the exact positive IDR nominal printed on the receipt, never a percentage.
+        "subtract" for discounts. The amount is always the exact positive nominal printed on the receipt, never a percentage.
         Do not include charge or discount rows in items, and never count the same amount twice.
         Ignore percentage labels such as 9.5%, 10%, or 11% when an associated monetary amount is printed. Never calculate an
         amount from a percentage. If only a percentage is visible without its nominal amount, omit that charge, set needsReview

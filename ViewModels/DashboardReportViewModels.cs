@@ -23,6 +23,9 @@ public sealed class DashboardViewModel
     public decimal MemberPaidAmount { get; set; }
     public List<DashboardMemberMonthViewModel> MemberMonthlySpending { get; set; } = [];
     public List<DashboardMemberBillViewModel> RecentMemberBills { get; set; } = [];
+    public List<DashboardRateHistoryViewModel> RateHistory { get; set; } = [];
+    public List<DashboardCurrencyTrendViewModel> CurrencyTrends { get; set; } = [];
+    public DashboardCurrentCurrencySectionViewModel? CurrentCurrencyRates { get; set; }
 }
 
 public sealed record DashboardOutstandingPersonViewModel(string Name, decimal Amount, int BillCount);
@@ -53,6 +56,57 @@ public sealed record DashboardMemberBillViewModel(
     DateOnly Date,
     decimal Amount,
     ParticipantPaymentStatus PaymentStatus);
+
+public sealed record DashboardRateHistoryViewModel(string BaseCurrency, string ReportingCurrency, decimal Rate, DateOnly EffectiveDate, bool IsStale);
+
+public sealed record DashboardCurrencyTrendViewModel(
+    string BaseCurrency,
+    string ReportingCurrency,
+    decimal LatestRate,
+    DateOnly StartDate,
+    DateOnly LatestDate,
+    decimal? ChangeFromPreviousPercent,
+    bool IsStale,
+    int PointCount,
+    string SvgPoints);
+
+public sealed class DashboardCurrentCurrencySectionViewModel
+{
+    public string ReportingCurrency { get; init; } = "IDR";
+    public string PrimaryCurrencyCode { get; init; } = "USD";
+    public List<string> SelectedCurrencyCodes { get; init; } = [];
+    public List<CurrencyInfo> AvailableCurrencies { get; init; } = [];
+    public List<DashboardCurrentCurrencyRateViewModel> Rates { get; init; } = [];
+    public DateTimeOffset? LastUpdatedAt { get; init; }
+}
+
+public sealed record DashboardCurrentCurrencyRateViewModel(
+    string BaseCurrency,
+    string ReportingCurrency,
+    string CurrencyName,
+    string FormattedRate,
+    DateOnly StartDate,
+    DateOnly LatestDate,
+    decimal? ChangeFromPreviousPercent,
+    bool IsStale,
+    int PointCount,
+    string SvgPoints,
+    bool IsPrimary);
+
+public sealed class DashboardCurrencyPreferencesInput
+{
+    public List<string> CurrencyCodes { get; set; } = [];
+    public string PrimaryCurrencyCode { get; set; } = string.Empty;
+}
+
+public sealed class DashboardRateHistoryPageViewModel
+{
+    public string ReportingCurrency { get; init; } = "IDR";
+    public List<DashboardRateHistoryViewModel> Rows { get; init; } = [];
+    public int Page { get; init; }
+    public int PageSize { get; init; }
+    public int TotalCount { get; init; }
+}
 
 public sealed class ReportViewModel
 {

@@ -20,7 +20,10 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     IPaymentProofStorageService? proofStorage = null,
     ISharePointNotificationOutboxService? sharePointNotifications = null,
     IFoodPickupRotationService? pickupRotationService = null,
-    ITransactionShareExportService? shareExportService = null) : Controller
+    ITransactionShareExportService? shareExportService = null,
+    ICurrencyCatalog? currencyCatalog = null,
+    ICurrencyRateService? currencyRateService = null,
+    IGuestAccessService? guestAccessService = null) : Controller
 {
     private static readonly JsonSerializerOptions ParticipantJsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -99,6 +102,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             {
                 var (result, rawResponse) = await aiReceiptService.AnalyzeAsync(inputs, cancellationToken);
                 ApplyAiResult(transaction, result, rawResponse);
+                NormalizeCurrency(transaction);
             }
             finally
             {
@@ -147,7 +151,15 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             TempData["Error"] = Text("EditLocked", "Transaksi tidak dapat diedit setelah aktivitas pembayaran dimulai.");
             return RedirectToAction(nameof(Details), new { id });
         }
-        return View(ToReviewViewModel(transaction));
+        var model = ToReviewViewModel(transaction);
+        model.AvailableCurrencies = currencyCatalog?.GetAll() ?? [new CurrencyInfo("IDR", "Indonesian Rupiah", "Rp", 0)];
+        model.ReportingCurrencyCode = transaction.ReportingCurrencyCode;
+        if (currencyRateService is not null && !string.Equals(transaction.CurrencyCode, transaction.ReportingCurrencyCode, StringComparison.OrdinalIgnoreCase) && transaction.ExchangeRateToReporting <= 0 && transaction.TransactionDate is { } rateDate)
+        {
+            var rate = await currencyRateService.GetRateAsync(transaction.CurrencyCode, transaction.ReportingCurrencyCode, rateDate);
+            if (rate is not null) { model.ExchangeRateToReporting = rate.Rate; model.ExchangeRateEffectiveDate = rate.EffectiveDate; model.ExchangeRateSource = rate.Source; model.ExchangeRateCaptureMode = ExchangeRateCaptureMode.Automatic; }
+        }
+        return View(model);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -181,6 +193,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             model.ReceiptImagePath = transaction.ReceiptImagePath;
             model.AiConfidence = transaction.AiConfidence;
             model.AiNeedsReview = transaction.AiNeedsReview;
+            model.AvailableCurrencies = currencyCatalog?.GetAll() ?? [new CurrencyInfo("IDR", "Indonesian Rupiah", "Rp", 0)];
             return View(model);
         }
 
@@ -188,6 +201,27 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         transaction.TransactionDate = model.TransactionDate.HasValue ? DateOnly.FromDateTime(model.TransactionDate.Value) : null;
         transaction.Subtotal = model.Subtotal!.Value; transaction.Discount = model.Discount!.Value; transaction.Tax = model.Tax!.Value;
         transaction.ServiceCharge = model.ServiceCharge!.Value; transaction.GrandTotal = model.GrandTotal!.Value;
+        var currencyCode = model.CurrencyCode.Trim().ToUpperInvariant();
+        var reportingCode = (await db.CurrencyConfigurations.AsNoTracking().Where(x => x.Id == 1).Select(x => x.DefaultCurrencyCode).SingleOrDefaultAsync()) ?? "IDR";
+        if (currencyCatalog is null || !currencyCatalog.TryGet(currencyCode, out _))
+            ModelState.AddModelError(nameof(model.CurrencyCode), Text("UnsupportedCurrency", "Mata uang tidak didukung."));
+        if (currencyCode != reportingCode && model.ExchangeRateToReporting <= 0)
+            ModelState.AddModelError(nameof(model.ExchangeRateToReporting), Text("ExchangeRateRequired", "Masukkan kurs positif ke mata uang laporan."));
+        if (currencyCode != reportingCode && model.ExchangeRateCaptureMode == ExchangeRateCaptureMode.Manual && string.IsNullOrWhiteSpace(model.ExchangeRateManualNote))
+            ModelState.AddModelError(nameof(model.ExchangeRateManualNote), Text("ExchangeRateNoteRequired", "Tambahkan catatan sumber kurs manual."));
+        if (!ModelState.IsValid)
+        {
+            model.AvailableCurrencies = currencyCatalog?.GetAll() ?? [];
+            return View(model);
+        }
+        transaction.CurrencyCode = currencyCode;
+        transaction.ReportingCurrencyCode = reportingCode;
+        transaction.ExchangeRateToReporting = currencyCode == reportingCode ? 1m : model.ExchangeRateToReporting;
+        transaction.ExchangeRateCaptureMode = currencyCode == reportingCode ? ExchangeRateCaptureMode.Identity : (model.ExchangeRateCaptureMode == ExchangeRateCaptureMode.Manual ? ExchangeRateCaptureMode.Manual : ExchangeRateCaptureMode.Automatic);
+        transaction.ExchangeRateEffectiveDate = currencyCode == reportingCode ? transaction.TransactionDate : model.ExchangeRateEffectiveDate ?? transaction.TransactionDate;
+        transaction.ExchangeRateCapturedAt = DateTimeOffset.UtcNow;
+        transaction.ExchangeRateSource = string.IsNullOrWhiteSpace(model.ExchangeRateSource) ? (transaction.ExchangeRateCaptureMode == ExchangeRateCaptureMode.Manual ? "Manual" : "Review") : model.ExchangeRateSource.Trim();
+        transaction.ExchangeRateManualNote = model.ExchangeRateManualNote?.Trim();
         transaction.AiNeedsReview = false; transaction.UpdatedAt = DateTimeOffset.UtcNow;
         db.TransactionParticipants.RemoveRange(transaction.Participants);
         db.TransactionItems.RemoveRange(transaction.Items);
@@ -353,6 +387,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         if (sharePointNotifications is not null)
             await sharePointNotifications.EnqueueBillAssignmentsAsync(transaction, userManager.GetUserId(User)!, HttpContext.RequestAborted);
         await db.SaveChangesAsync();
+        if (guestAccessService is not null)
+            await guestAccessService.EnsureLinksAsync(transaction, userManager.GetUserId(User)!, HttpContext.RequestAborted);
         if (sharePointNotifications is not null && pickupOperation?.Assignment is not null && pickupOperation.History is not null)
             await sharePointNotifications.EnqueueFoodPickupSelectedAsync(transaction, pickupOperation.Assignment, pickupOperation.History, userManager.GetUserId(User)!, HttpContext.RequestAborted);
         await db.SaveChangesAsync();
@@ -573,6 +609,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             .Include(x => x.Participants).ThenInclude(x => x.PaymentHistories)
             .Include(x => x.Participants).ThenInclude(x => x.AccountLink)
             .Include(x => x.Participants).ThenInclude(x => x.ItemAllocations)
+            .Include(x => x.Participants).ThenInclude(x => x.GuestAccessLinks)
             .Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals).SingleOrDefaultAsync(x => x.Id == id);
         if (transaction is null) return NotFound();
         var participantBreakdowns = calculator.BuildParticipantBreakdowns(transaction)
@@ -739,6 +776,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             transaction.Items = [];
             transaction.Charges = [];
             ApplyAiResult(transaction, result, rawResponse);
+            NormalizeCurrency(transaction);
             log.Status = AiProcessingStatus.Succeeded;
             log.FinishedAt = DateTimeOffset.UtcNow;
             await db.SaveChangesAsync(cancellationToken);
@@ -758,6 +796,51 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             foreach (var input in inputs) await input.Stream.DisposeAsync();
         }
         return RedirectToAction(nameof(Review), new { id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateGuestLink(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        var transaction = await ManageableTransaction(transactionId).Include(x => x.Participants).ThenInclude(x => x.GuestAccessLinks).SingleOrDefaultAsync(cancellationToken);
+        var participant = transaction?.Participants.SingleOrDefault(x => x.Id == participantId && x.AccountLink == null);
+        if (transaction is null || participant is null) return NotFound();
+        if (guestAccessService is null) return BadRequest();
+        await guestAccessService.EnsureLinksAsync(transaction, userManager.GetUserId(User)!, cancellationToken);
+        TempData["Success"] = Text("GuestLinkCreated", "Guest link siap digunakan.");
+        return RedirectToAction(nameof(Details), new { id = transactionId });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CopyGuestLink(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        var transaction = await ManageableTransaction(transactionId).Include(x => x.Participants).SingleOrDefaultAsync(cancellationToken);
+        var participant = transaction?.Participants.SingleOrDefault(x => x.Id == participantId && x.AccountLink == null);
+        if (transaction is null || participant is null || guestAccessService is null) return NotFound();
+        await guestAccessService.EnsureLinksAsync(transaction, userManager.GetUserId(User)!, cancellationToken);
+        var token = await guestAccessService.GetCopyTokenAsync(participantId, cancellationToken);
+        if (token is null) return NotFound();
+        Response.Headers["Cache-Control"] = "no-store";
+        return Json(new { url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/g/my-bill/{Uri.EscapeDataString(token)}" });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegenerateGuestLink(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        var transaction = await ManageableTransaction(transactionId).AnyAsync(cancellationToken);
+        if (!transaction || guestAccessService is null) return NotFound();
+        var token = await guestAccessService.RegenerateAsync(transactionId, participantId, userManager.GetUserId(User)!, cancellationToken);
+        if (token is null) return NotFound();
+        TempData["Success"] = Text("GuestLinkRegenerated", "Guest link berhasil dibuat ulang.");
+        return RedirectToAction(nameof(Details), new { id = transactionId });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RevokeGuestLink(long transactionId, long participantId, CancellationToken cancellationToken)
+    {
+        if (guestAccessService is null || !await ManageableTransaction(transactionId).AnyAsync(cancellationToken)) return NotFound();
+        await guestAccessService.RevokeAsync(transactionId, participantId, cancellationToken);
+        TempData["Success"] = Text("GuestLinkRevoked", "Guest link berhasil dicabut.");
+        return RedirectToAction(nameof(Details), new { id = transactionId });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -857,6 +940,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         transaction.TransactionDate = DateOnly.TryParse(result.TransactionDate, out var date) ? date : null;
         transaction.Subtotal = result.Subtotal; transaction.Discount = result.Discount; transaction.Tax = result.Tax;
         transaction.ServiceCharge = result.ServiceCharge; transaction.GrandTotal = result.GrandTotal;
+        if (!string.IsNullOrWhiteSpace(result.Currency)) transaction.CurrencyCode = result.Currency.Trim().ToUpperInvariant();
         transaction.AiConfidence = result.Confidence; transaction.AiNeedsReview = result.NeedsReview;
         transaction.AiWarningsJson = JsonSerializer.Serialize(result.Warnings); transaction.AiRawResponseJson = rawResponse;
         transaction.UpdatedAt = DateTimeOffset.UtcNow;
@@ -884,6 +968,19 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         transaction.ServiceCharge = transaction.Charges.Where(x => x.Operation == ChargeOperation.Add && !ReceiptReviewNormalizer.IsTaxLabel(x.Label)).Sum(x => x.Amount);
     }
 
+    private void NormalizeCurrency(BillTransaction transaction)
+    {
+        var code = transaction.CurrencyCode?.Trim().ToUpperInvariant();
+        if (currencyCatalog is null || !currencyCatalog.TryGet(code, out _))
+        {
+            transaction.CurrencyCode = "IDR";
+            var warnings = string.IsNullOrWhiteSpace(transaction.AiWarningsJson) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(transaction.AiWarningsJson) ?? [];
+            warnings.Add("Mata uang struk tidak dikenali; pilih mata uang yang sesuai saat review.");
+            transaction.AiWarningsJson = JsonSerializer.Serialize(warnings.Distinct());
+        }
+        else transaction.CurrencyCode = code!;
+    }
+
     private static ReviewTransactionViewModel ToReviewViewModel(BillTransaction transaction) => new()
     {
         Id = transaction.Id, TransactionNumber = transaction.TransactionNumber, ReceiptImagePath = transaction.ReceiptImagePath,
@@ -891,6 +988,13 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         MerchantName = transaction.MerchantName, TransactionDate = transaction.TransactionDate?.ToDateTime(TimeOnly.MinValue),
         Subtotal = transaction.Subtotal, Discount = transaction.Discount, Tax = transaction.Tax,
         ServiceCharge = transaction.ServiceCharge, GrandTotal = transaction.GrandTotal,
+        CurrencyCode = string.IsNullOrWhiteSpace(transaction.CurrencyCode) ? "IDR" : transaction.CurrencyCode,
+        ReportingCurrencyCode = string.IsNullOrWhiteSpace(transaction.ReportingCurrencyCode) ? "IDR" : transaction.ReportingCurrencyCode,
+        ExchangeRateToReporting = transaction.ExchangeRateToReporting <= 0 ? 1m : transaction.ExchangeRateToReporting,
+        ExchangeRateEffectiveDate = transaction.ExchangeRateEffectiveDate,
+        ExchangeRateSource = transaction.ExchangeRateSource,
+        ExchangeRateCaptureMode = transaction.ExchangeRateCaptureMode,
+        ExchangeRateManualNote = transaction.ExchangeRateManualNote,
         AiConfidence = transaction.AiConfidence, AiNeedsReview = transaction.AiNeedsReview,
         Warnings = string.IsNullOrWhiteSpace(transaction.AiWarningsJson) ? [] : JsonSerializer.Deserialize<List<string>>(transaction.AiWarningsJson) ?? [],
         Items = transaction.Items.OrderBy(x => x.LineNumber).Select(x => new ReviewItemViewModel

@@ -147,6 +147,7 @@ public sealed class MyBillsController(ApplicationDbContext db, UserManager<Appli
         MerchantName = participant.Transaction?.MerchantName ?? string.Empty,
         TransactionDate = participant.Transaction?.TransactionDate,
         Amount = participant.Amount,
+        CurrencyCode = participant.Transaction?.CurrencyCode ?? "IDR",
         PaymentStatus = participant.PaymentStatus,
         MenuDetail = ParticipantMenuFormatter.Format(participant, participant.Transaction?.SplitMethod ?? SplitMethod.Equal),
         ItemDetails = ParticipantMenuFormatter.GetDetails(participant, participant.Transaction?.SplitMethod ?? SplitMethod.Equal)
@@ -171,6 +172,11 @@ public sealed class MyBillsController(ApplicationDbContext db, UserManager<Appli
             MerchantName = transaction.MerchantName,
             TransactionDate = transaction.TransactionDate,
             Amount = breakdown.FinalAmount,
+            CurrencyCode = transaction.CurrencyCode,
+            ReportingCurrencyCode = transaction.ReportingCurrencyCode,
+            ExchangeRateToReporting = transaction.ExchangeRateToReporting,
+            ExchangeRateEffectiveDate = transaction.ExchangeRateEffectiveDate,
+            ExchangeRateSource = transaction.ExchangeRateSource,
             PaymentStatus = participant.PaymentStatus,
             PickupPersonName = !string.IsNullOrWhiteSpace(transaction.PickupAssignment?.SelectedUser?.DisplayName)
                 ? transaction.PickupAssignment!.SelectedUser!.DisplayName

@@ -18,6 +18,10 @@ public enum SharePointNotificationEventType { BillAssigned = 0, PaymentApprovalR
 public enum SharePointNotificationStatus { Pending = 0, Processing = 1, Sent = 2, DeadLetter = 3 }
 public enum FoodPickupDrawKind { Initial = 0, AutomaticRedraw = 1, AdminReroll = 2 }
 public enum FoodPickupSelectionStrategy { WeightedRandom = 0, RoundRobin = 1 }
+public enum CurrencyProviderKind { FrankfurterV2 = 0 }
+public enum CurrencyAuthenticationMode { None = 0, Bearer = 1, XApiKey = 2 }
+public enum ExchangeRateCaptureMode { Identity = 0, Automatic = 1, Manual = 2, LegacyIdentity = 3 }
+public enum GuestAccessLinkStatus { Active = 0, Revoked = 1 }
 
 public enum AdminUserAuditAction
 {
@@ -56,6 +60,40 @@ public sealed class AiConfiguration
     [MaxLength(1000)] public string? LastError { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public string? UpdatedByUserId { get; set; }
+}
+
+public sealed class CurrencyConfiguration
+{
+    public int Id { get; set; } = 1;
+    [MaxLength(3)] public string DefaultCurrencyCode { get; set; } = "IDR";
+    public CurrencyProviderKind ProviderKind { get; set; } = CurrencyProviderKind.FrankfurterV2;
+    [MaxLength(500)] public string BaseUrl { get; set; } = "https://api.frankfurter.dev";
+    public CurrencyAuthenticationMode AuthenticationMode { get; set; } = CurrencyAuthenticationMode.None;
+    [MaxLength(4000)] public string? ProtectedApiKey { get; set; }
+    public bool AllowPrivateNetworkEndpoint { get; set; }
+    public bool AutoRefreshEnabled { get; set; } = true;
+    [MaxLength(31)] public string DashboardCurrencyCodes { get; set; } = "USD,SGD,EUR,JPY";
+    [MaxLength(3)] public string DashboardPrimaryCurrencyCode { get; set; } = "USD";
+    public DateTimeOffset? LastTestAt { get; set; }
+    public bool? LastTestSucceeded { get; set; }
+    [MaxLength(1000)] public string? LastError { get; set; }
+    public DateTimeOffset? LastRefreshAt { get; set; }
+    public bool? LastRefreshSucceeded { get; set; }
+    [MaxLength(1000)] public string? LastRefreshError { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public string? UpdatedByUserId { get; set; }
+}
+
+public sealed class CurrencyExchangeRate
+{
+    public long Id { get; set; }
+    [MaxLength(3)] public string BaseCurrencyCode { get; set; } = string.Empty;
+    [MaxLength(3)] public string QuoteCurrencyCode { get; set; } = string.Empty;
+    public decimal Rate { get; set; }
+    public DateOnly EffectiveDate { get; set; }
+    public DateTimeOffset RetrievedAt { get; set; }
+    public CurrencyProviderKind ProviderKind { get; set; }
+    [MaxLength(64)] public string ProviderBaseUrlFingerprint { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -194,6 +232,14 @@ public sealed class BillTransaction
     public SplitMethod SplitMethod { get; set; } = SplitMethod.Equal;
     /// <summary>Whether this transaction asks the configured pickup rotation to choose a collector.</summary>
     public bool RequiresFoodPickup { get; set; }
+    [MaxLength(3)] public string CurrencyCode { get; set; } = "IDR";
+    [MaxLength(3)] public string ReportingCurrencyCode { get; set; } = "IDR";
+    public decimal ExchangeRateToReporting { get; set; } = 1m;
+    public DateOnly? ExchangeRateEffectiveDate { get; set; }
+    public DateTimeOffset? ExchangeRateCapturedAt { get; set; }
+    [MaxLength(120)] public string ExchangeRateSource { get; set; } = "LegacyIdentity";
+    public ExchangeRateCaptureMode ExchangeRateCaptureMode { get; set; } = ExchangeRateCaptureMode.LegacyIdentity;
+    [MaxLength(500)] public string? ExchangeRateManualNote { get; set; }
     public decimal AiConfidence { get; set; }
     public bool AiNeedsReview { get; set; }
     public string? AiWarningsJson { get; set; }
@@ -211,6 +257,21 @@ public sealed class BillTransaction
     public FoodPickupAssignment? PickupAssignment { get; set; }
     public List<FoodPickupDrawHistory> PickupDrawHistories { get; set; } = [];
     public List<ReceiptProcessingLog> ProcessingLogs { get; set; } = [];
+}
+
+public sealed class GuestAccessLink
+{
+    public long Id { get; set; }
+    public long ParticipantId { get; set; }
+    public TransactionParticipant? Participant { get; set; }
+    [MaxLength(64)] public string TokenHash { get; set; } = string.Empty;
+    [MaxLength(4000)] public string ProtectedToken { get; set; } = string.Empty;
+    public GuestAccessLinkStatus Status { get; set; } = GuestAccessLinkStatus.Active;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? RevokedAt { get; set; }
+    public DateTimeOffset? LastAccessedAt { get; set; }
+    public string? CreatedByUserId { get; set; }
+    public int AccessCount { get; set; }
 }
 
 public sealed class TransactionReceiptImage
@@ -262,6 +323,7 @@ public sealed class TransactionParticipant
     public List<ParticipantItemAllocation> ItemAllocations { get; set; } = [];
     public List<PaymentHistory> PaymentHistories { get; set; } = [];
     public List<PaymentApproval> PaymentApprovals { get; set; } = [];
+    public List<GuestAccessLink> GuestAccessLinks { get; set; } = [];
 }
 
 public sealed class ParticipantAccountLink

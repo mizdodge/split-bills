@@ -18,6 +18,17 @@ public static class DatabaseSeeder
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await db.Database.EnsureCreatedAsync();
         await DatabaseSchemaUpdater.EnsureAsync(db);
+        if (!await db.CurrencyConfigurations.AnyAsync(x => x.Id == 1))
+        {
+            db.CurrencyConfigurations.Add(new CurrencyConfiguration
+            {
+                Id = 1, DefaultCurrencyCode = "IDR", BaseUrl = "https://api.frankfurter.dev",
+                ProviderKind = CurrencyProviderKind.FrankfurterV2, AuthenticationMode = CurrencyAuthenticationMode.None,
+                AutoRefreshEnabled = true, DashboardCurrencyCodes = "USD,SGD,EUR,JPY",
+                DashboardPrimaryCurrencyCode = "USD", UpdatedAt = DateTimeOffset.UtcNow
+            });
+            await db.SaveChangesAsync();
+        }
         await db.Database.ExecuteSqlRawAsync("""
             CREATE TABLE IF NOT EXISTS "TransactionCharges" (
                 "Id" INTEGER NOT NULL CONSTRAINT "PK_TransactionCharges" PRIMARY KEY AUTOINCREMENT,

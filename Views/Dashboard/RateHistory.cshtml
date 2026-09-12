@@ -1,0 +1,30 @@
+@model DashboardRateHistoryPageViewModel
+@{ ViewData["Title"] = L["RateHistoryTitle"]; }
+
+<div class="page-heading">
+    <div><span class="eyebrow">@L["Overview"]</span><h1>@L["RateHistoryTitle"]</h1><p>@L["RateHistoryHint", Model.ReportingCurrency]</p></div>
+    @if (User.IsInRole(DatabaseSeeder.AdminRole))
+    {
+        <a class="btn btn-primary" asp-controller="AdminCurrency" asp-action="Index">@L["CurrencySettings"]</a>
+    }
+</div>
+
+<section class="content-card">
+    @if (Model.Rows.Count == 0)
+    {
+        <div class="empty-inline"><span>↔</span><strong>@L["NoRateHistory"]</strong></div>
+    }
+    else
+    {
+        <div class="table-responsive"><table class="app-table"><thead><tr><th>@L["Currency"]</th><th>@L["DefaultCurrency"]</th><th>@L["Rate"]</th><th>@L["RateDate"]</th><th>@L["Freshness"]</th></tr></thead><tbody>
+        @foreach (var row in Model.Rows)
+        {
+            <tr><td><strong>@row.BaseCurrency</strong></td><td>@row.ReportingCurrency</td><td>1 @row.BaseCurrency = @row.Rate.ToString("0.############") @row.ReportingCurrency</td><td>@row.EffectiveDate.ToString("dd MMM yyyy")</td><td><span class="status @(row.IsStale ? "unpaid" : "paid")">@(row.IsStale ? L["Stale"] : L["Healthy"])</span></td></tr>
+        }
+        </tbody></table></div>
+        @if (Model.TotalCount > Model.PageSize)
+        {
+            <div class="pager"><span>@L["PageOf", Model.Page, (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize)]</span><div>@if (Model.Page > 1){<a class="btn btn-soft btn-sm" asp-route-page="@(Model.Page - 1)">@L["Previous"]</a>}@if (Model.Page * Model.PageSize < Model.TotalCount){<a class="btn btn-soft btn-sm" asp-route-page="@(Model.Page + 1)">@L["Next"]</a>}</div></div>
+        }
+    }
+</section>

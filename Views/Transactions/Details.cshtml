@@ -2,14 +2,18 @@
 @using System.Security.Claims
 @{ ViewData["Title"] = L["Details"]; var tx = Model.Transaction; }
 @{ var canEdit = tx.Status == TransactionStatus.Draft || (tx.Status == TransactionStatus.Unpaid && tx.Participants.Count > 0 && tx.Participants.All(p => p.PaymentStatus == ParticipantPaymentStatus.Unpaid && p.PaymentApprovals.Count == 0 && p.PaymentHistories.Count == 0)); var isUploader = string.Equals(tx.UploadedByUserId, User.FindFirstValue(ClaimTypes.NameIdentifier), StringComparison.Ordinal); }
-@{ var pickupName = !string.IsNullOrWhiteSpace(Model.PickupAssignment?.SelectedUser?.DisplayName) ? Model.PickupAssignment.SelectedUser!.DisplayName : tx.Participants.FirstOrDefault(p => p.Id == Model.PickupAssignment?.SelectedParticipantId)?.Name; }
+@{ var currencyLabel = tx.CurrencyCode == "IDR" ? "Rp" : tx.CurrencyCode; var pickupName = !string.IsNullOrWhiteSpace(Model.PickupAssignment?.SelectedUser?.DisplayName) ? Model.PickupAssignment.SelectedUser!.DisplayName : tx.Participants.FirstOrDefault(p => p.Id == Model.PickupAssignment?.SelectedParticipantId)?.Name; }
 <div class="page-heading compact"><div><a class="back-link" asp-action="Index">@L["AllTransactions"]</a><h1>@tx.MerchantName</h1><p>@tx.TransactionNumber · @(tx.TransactionDate?.ToString("dd MMMM yyyy") ?? tx.UploadDate.ToLocalTime().ToString("dd MMMM yyyy"))</p></div><span class="status large @tx.Status.ToString().ToLowerInvariant()">@L[tx.Status.ToString()]</span></div>
 <div class="detail-grid">
     <section class="content-card bill-summary">
         <div class="bill-summary-main">
             <button type="button" class="receipt-thumb receipt-viewer-trigger" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = tx.Id, index = 0 })" aria-label='@L["OpenReceiptPhoto"] 1'><img src="@Url.Action("ReceiptImage", new { id = tx.Id, index = 0 })" alt='@L["ReceiptPhotos"] 1' /></button>
-            <div class="bill-summary-copy"><span>@L["TotalBill"]</span><strong>Rp @tx.GrandTotal.ToString("N0")</strong><small>@tx.Items.Count item · @L["PeopleCount", tx.Participants.Count]</small></div>
+            <div class="bill-summary-copy"><span>@L["TotalBill"]</span><strong>@currencyLabel @tx.GrandTotal.ToString("N0")</strong><small>@tx.Items.Count item · @L["PeopleCount", tx.Participants.Count]</small></div>
         </div>
+        @if (!string.Equals(tx.CurrencyCode, tx.ReportingCurrencyCode, StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="currency-transparency"><span>@L["ReferenceConversion"]</span><strong>1 @tx.CurrencyCode = @tx.ExchangeRateToReporting.ToString("0.######") @tx.ReportingCurrencyCode</strong><small>@L["RateDate"]: @(tx.ExchangeRateEffectiveDate?.ToString("dd MMM yyyy") ?? "-") · @tx.ExchangeRateSource</small></div>
+        }
         @if (Model.PickupAssignment is not null && pickupName is not null)
         {
             <aside class="bill-summary-pickup">
@@ -78,7 +82,7 @@
                         @if (latestApproval?.Status == PaymentApprovalStatus.Rejected && !string.IsNullOrWhiteSpace(latestApproval.Note)) { <small class="text-danger">@L["RejectReason"]: @latestApproval.Note</small> }
                         @if (latestApproval is not null && !string.IsNullOrWhiteSpace(latestApproval.ProofFileName)) { <button type="button" class="btn btn-sm btn-soft mt-1" data-proof-viewer data-viewer-group="proof" data-viewer-url="@Url.Action("Proof", "Payments", new { id = latestApproval.Id })" data-viewer-title='@L["PaymentProof"]' aria-label='@L["ViewProof"]'>@L["ViewProof"]</button> }
                     </div>
-                    <strong class="person-amount">Rp @person.Amount.ToString("N0")</strong>
+                    <strong class="person-amount">@currencyLabel @person.Amount.ToString("N0")</strong>
                     @if (person.PaymentStatus == ParticipantPaymentStatus.Paid)
                     {
                         <span class="paid-check">✓ @L["Paid"]</span>
@@ -105,11 +109,11 @@
                             @foreach (var item in breakdown.Items)
                             {
                                 <div class="participant-breakdown-row">
-                                    <span><strong>@item.Name</strong><small>@L["QuantityShare", item.QuantityShare.ToString("0.##")] · @L["FullReceiptAmount"] Rp @item.ReceiptAmount.ToString("N0")</small></span>
-                                    <strong>Rp @item.ParticipantAmount.ToString("N0")</strong>
+                                    <span><strong>@item.Name</strong><small>@L["QuantityShare", item.QuantityShare.ToString("0.##")] · @L["FullReceiptAmount"] @currencyLabel @item.ReceiptAmount.ToString("N0")</small></span>
+                                    <strong>@currencyLabel @item.ParticipantAmount.ToString("N0")</strong>
                                 </div>
                             }
-                            <div class="participant-breakdown-row participant-subtotal"><span>@L["MenuSubtotal"]</span><strong>Rp @breakdown.ItemSubtotal.ToString("N0")</strong></div>
+                            <div class="participant-breakdown-row participant-subtotal"><span>@L["MenuSubtotal"]</span><strong>@currencyLabel @breakdown.ItemSubtotal.ToString("N0")</strong></div>
                             @if (breakdown.Adjustments.Count > 0)
                             {
                                 <div class="participant-breakdown-label">@L["DiscountsAndOtherCharges"]</div>
@@ -118,15 +122,20 @@
                                     var adjustmentLabel = adjustment.Label ?? (adjustment.Kind == ParticipantAdjustmentKind.UnitemizedAdjustment ? L["OtherAdjustment"].Value : L["RoundingAdjustment"].Value);
                                     var adjustmentSign = adjustment.Operation == ChargeOperation.Subtract ? "-" : "+";
                                     <div class="participant-breakdown-row participant-adjustment @(adjustment.Operation == ChargeOperation.Subtract ? "subtract" : "add")">
-                                        <span><strong>@adjustmentLabel</strong><small>@if (adjustment.ReceiptPercentage.HasValue) { @L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")] }@if (adjustment.ReceiptAmount > 0) { <text> · @L["FullReceiptAmount"] @adjustmentSign Rp @adjustment.ReceiptAmount.ToString("N0")</text> }</small></span>
-                                        <strong>@adjustmentSign Rp @adjustment.ParticipantAmount.ToString("N0")</strong>
+                                        <span><strong>@adjustmentLabel</strong><small>@if (adjustment.ReceiptPercentage.HasValue) { @L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")] }@if (adjustment.ReceiptAmount > 0) { <text> · @L["FullReceiptAmount"] @adjustmentSign @currencyLabel @adjustment.ReceiptAmount.ToString("N0")</text> }</small></span>
+                                        <strong>@adjustmentSign @currencyLabel @adjustment.ParticipantAmount.ToString("N0")</strong>
                                     </div>
                                 }
                             }
-                            <div class="participant-breakdown-row participant-subtotal"><span>@L["AdjustmentTotal"]</span><strong>Rp @breakdown.AdjustmentTotal.ToString("N0")</strong></div>
-                            <div class="participant-breakdown-row participant-total"><span>@L["ParticipantBillTotal"]</span><strong>Rp @breakdown.FinalAmount.ToString("N0")</strong></div>
+                            <div class="participant-breakdown-row participant-subtotal"><span>@L["AdjustmentTotal"]</span><strong>@currencyLabel @breakdown.AdjustmentTotal.ToString("N0")</strong></div>
+                            <div class="participant-breakdown-row participant-total"><span>@L["ParticipantBillTotal"]</span><strong>@currencyLabel @breakdown.FinalAmount.ToString("N0")</strong></div>
                         </div>
                     </details>
+                }
+                @if (person.AccountLink is null && (isUploader || User.IsInRole(DatabaseSeeder.AdminRole)))
+                {
+                    var guestActive = person.GuestAccessLinks.Any(x => x.Status == GuestAccessLinkStatus.Active);
+                    <div class="guest-access-block" data-guest-access data-copied-text="@L["GuestLinkCopied"]" data-manual-text="@L["GuestLinkManualCopy"]" data-error-text="@L["GuestLinkCopyUnavailable"]"><span class="eyebrow">@L["GuestAccess"] · @(guestActive ? "Active" : "Not created")</span><div class="guest-access-actions"><button type="button" class="btn btn-soft btn-sm" data-guest-copy data-guest-endpoint="@Url.Action("CopyGuestLink", new { transactionId = tx.Id, participantId = person.Id })">@L["CopyGuestLink"]</button>@Html.AntiForgeryToken()<form asp-action="RegenerateGuestLink" method="post" class="m-0"><input type="hidden" name="transactionId" value="@tx.Id" /><input type="hidden" name="participantId" value="@person.Id" /><button class="btn btn-light btn-sm" type="submit">@L["RegenerateGuestLink"]</button></form><form asp-action="RevokeGuestLink" method="post" class="m-0"><input type="hidden" name="transactionId" value="@tx.Id" /><input type="hidden" name="participantId" value="@person.Id" /><button class="btn btn-outline-danger btn-sm" type="submit">@L["RevokeGuestLink"]</button></form></div><div class="guest-copy-feedback" data-guest-copy-feedback role="status" aria-live="polite"></div></div>
                 }
             </article>
         }
@@ -138,8 +147,8 @@
         <section class="content-card"><div class="section-head"><div><h2>@L["AllReceiptPhotos"]</h2><p>@L["PhotosStoredProcessed", Model.ReceiptImageCount]</p></div></div><div class="detail-receipt-gallery">@for(var imageIndex = 0; imageIndex < Model.ReceiptImageCount; imageIndex++){<button type="button" class="detail-receipt-button" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = tx.Id, index = imageIndex })" aria-label='@L["OpenReceiptPhoto"] @(imageIndex + 1)'><img src="@Url.Action("ReceiptImage", new { id = tx.Id, index = imageIndex })" alt='@L["PhotoNumber", imageIndex + 1]' loading="lazy" /><span>@L["PhotoNumber", imageIndex + 1]</span></button>}</div></section>
     }
     <section class="content-card"><div class="section-head"><div><h2>@L["ReceiptDetails"]</h2><p>@L["ConfirmedByModerator"]</p></div></div>
-        <div class="compact-items">@foreach(var item in tx.Items.OrderBy(x => x.LineNumber)){<div><span>@item.Name <small>@item.Quantity × Rp @item.UnitPrice.ToString("N0")</small></span><strong>Rp @item.TotalPrice.ToString("N0")</strong></div>}</div>
-        <div class="compact-totals"><div><span>@L["Subtotal"]</span><strong>Rp @tx.Subtotal.ToString("N0")</strong></div>@foreach(var charge in Model.Charges){var rate=ReceiptReviewNormalizer.CalculateEffectivePercentage(charge.Amount ?? 0,tx.Subtotal);<div><span>@charge.Label @if(rate.HasValue){<small>@L["EffectiveRate", rate.Value.ToString("0.##")].Value</small>}</span><strong>@(charge.Operation == ChargeOperation.Subtract ? "-" : "+") Rp @charge.Amount.GetValueOrDefault().ToString("N0")</strong></div>}<div><span>@L["Total"]</span><strong>Rp @tx.GrandTotal.ToString("N0")</strong></div></div>
+        <div class="compact-items">@foreach(var item in tx.Items.OrderBy(x => x.LineNumber)){<div><span>@item.Name <small>@item.Quantity × @currencyLabel @item.UnitPrice.ToString("N0")</small></span><strong>@currencyLabel @item.TotalPrice.ToString("N0")</strong></div>}</div>
+        <div class="compact-totals"><div><span>@L["Subtotal"]</span><strong>@currencyLabel @tx.Subtotal.ToString("N0")</strong></div>@foreach(var charge in Model.Charges){var rate=ReceiptReviewNormalizer.CalculateEffectivePercentage(charge.Amount ?? 0,tx.Subtotal);<div><span>@charge.Label @if(rate.HasValue){<small>@L["EffectiveRate", rate.Value.ToString("0.##")].Value</small>}</span><strong>@(charge.Operation == ChargeOperation.Subtract ? "-" : "+") @currencyLabel @charge.Amount.GetValueOrDefault().ToString("N0")</strong></div>}<div><span>@L["Total"]</span><strong>@currencyLabel @tx.GrandTotal.ToString("N0")</strong></div></div>
     </section>
     @if (isUploader && tx.Status != TransactionStatus.Draft && tx.Participants.Count > 0)
     {
@@ -157,3 +166,59 @@
         </section>
     }
 </div>
+@section Scripts { <script>
+document.querySelectorAll('[data-guest-copy]').forEach(button => button.addEventListener('click', async () => {
+    const block = button.closest('[data-guest-access]');
+    const feedback = block.querySelector('[data-guest-copy-feedback]');
+    button.disabled = true;
+    feedback.replaceChildren();
+    try {
+        const body = new FormData();
+        const token = block.querySelector('input[name="__RequestVerificationToken"]');
+        if (token) body.append('__RequestVerificationToken', token.value);
+        const response = await fetch(button.dataset.guestEndpoint, { method: 'POST', body, credentials: 'same-origin' });
+        if (!response.ok) throw new Error(`Guest link request returned ${response.status}`);
+        const data = await response.json();
+        if (typeof data.url !== 'string' || !data.url) throw new Error('Guest link response is missing its URL');
+
+        let copied = false;
+        if (window.isSecureContext && navigator.clipboard?.writeText) {
+            try { await navigator.clipboard.writeText(data.url); copied = true; } catch (_) { /* Try the legacy copy path below. */ }
+        }
+        if (!copied) {
+            const temporary = document.createElement('textarea');
+            temporary.value = data.url;
+            temporary.readOnly = true;
+            temporary.setAttribute('aria-hidden', 'true');
+            temporary.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0';
+            document.body.appendChild(temporary);
+            temporary.focus();
+            temporary.select();
+            try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+            temporary.remove();
+        }
+
+        if (copied) {
+            feedback.textContent = block.dataset.copiedText;
+        } else {
+            const hint = document.createElement('span');
+            hint.textContent = block.dataset.manualText;
+            const field = document.createElement('input');
+            field.type = 'text';
+            field.readOnly = true;
+            field.className = 'form-control guest-copy-manual';
+            field.value = data.url;
+            field.setAttribute('aria-label', block.dataset.manualText);
+            field.addEventListener('focus', () => field.select());
+            feedback.append(hint, field);
+            field.focus();
+            field.select();
+        }
+    } catch (error) {
+        console.warn('Guest link copy request failed:', error.message);
+        feedback.textContent = block.dataset.errorText;
+    } finally {
+        button.disabled = false;
+    }
+}));
+</script> }

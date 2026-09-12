@@ -48,6 +48,7 @@
             }
         </section>
     </div>
+
 }
 else
 {
@@ -137,6 +138,28 @@ else
         </section>
     </div>
 
+    @if (Model.CurrencyTrends.Count > 0)
+    {
+        <section class="content-card mt-4 currency-trend-section">
+            <div class="section-head">
+                <div><h2>@L["CurrencyTrend"]</h2><p>@L["CurrencyTrendHint"]</p></div>
+                <div class="section-actions"><a class="btn btn-soft btn-sm" asp-controller="Dashboard" asp-action="RateHistory">@L["ViewRateHistory"]</a>@if (User.IsInRole(DatabaseSeeder.AdminRole)){<a class="btn btn-soft btn-sm" asp-controller="AdminCurrency" asp-action="Index">@L["CurrencySettings"]</a>}</div>
+            </div>
+            <div class="currency-trend-grid">
+                @foreach (var trend in Model.CurrencyTrends)
+                {
+                    var directionClass = trend.ChangeFromPreviousPercent > 0 ? "up" : trend.ChangeFromPreviousPercent < 0 ? "down" : "flat";
+                    <article class="currency-trend-card">
+                        <div class="currency-trend-head"><span><strong>@trend.BaseCurrency</strong><small>→ @trend.ReportingCurrency</small></span><span class="status @(trend.IsStale ? "unpaid" : "paid")">@(trend.IsStale ? L["Stale"] : L["Healthy"])</span></div>
+                        <div class="currency-trend-value"><strong>@trend.LatestRate.ToString("N4")</strong>@if (trend.ChangeFromPreviousPercent.HasValue){<span class="currency-trend-change @directionClass">@(trend.ChangeFromPreviousPercent > 0 ? "▲" : trend.ChangeFromPreviousPercent < 0 ? "▼" : "•") @Math.Abs(trend.ChangeFromPreviousPercent.Value).ToString("N2")%</span>}</div>
+                        <svg class="currency-sparkline @directionClass" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="@L["CurrencyTrendAria", trend.BaseCurrency, trend.ReportingCurrency]"><polyline points="@trend.SvgPoints" /></svg>
+                        <div class="currency-trend-foot"><span>@trend.StartDate.ToString("dd MMM")</span><small>@L["RatePoints", trend.PointCount]</small><span>@trend.LatestDate.ToString("dd MMM")</span></div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
     <section class="content-card mt-4">
         <div class="section-head"><div><h2>@L["RecentTransactions"]</h2><p>@L["LatestBillActivity"]</p></div><a asp-controller="Transactions" asp-action="Index">@L["ViewAll"]</a></div>
         @if (Model.RecentTransactions.Count == 0)
@@ -151,4 +174,123 @@ else
             </tbody></table></div>
         }
     </section>
+
+    @if (Model.CurrentCurrencyRates is { } currentRates)
+    {
+        var primaryRate = currentRates.Rates.FirstOrDefault(x => x.IsPrimary);
+        <section class="content-card mt-4 current-rate-section" id="current-currency-rates">
+            <div class="section-head current-rate-heading">
+                <div><h2>@L["CurrentCurrencyRate"]</h2><p>@L["CurrentCurrencyRateHint", currentRates.ReportingCurrency]</p></div>
+                <div class="current-rate-actions">
+                    @if (currentRates.LastUpdatedAt.HasValue)
+                    {
+                        <small>@L["CurrencyRatesUpdatedAt", currentRates.LastUpdatedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")]</small>
+                    }
+                    @if (User.IsInRole(DatabaseSeeder.AdminRole))
+                    {
+                        <button class="btn btn-light btn-sm" id="currency-filter-toggle" type="button" aria-expanded="false" aria-controls="currency-rate-editor">@L["FilterCurrencies"]</button>
+                    }
+                </div>
+            </div>
+
+            <div id="currency-rate-display">
+                @if (primaryRate is null)
+                {
+                    <div class="empty-inline compact-empty"><strong>@L["NoCurrentCurrencyRates"]</strong></div>
+                }
+                else
+                {
+                    var primaryDirection = primaryRate.ChangeFromPreviousPercent > 0 ? "up" : primaryRate.ChangeFromPreviousPercent < 0 ? "down" : "flat";
+                    <article class="current-rate-primary">
+                        <div class="current-rate-primary-copy">
+                            <div class="current-rate-pair"><span class="current-rate-code">@primaryRate.BaseCurrency[..1]</span><span><strong>@primaryRate.BaseCurrency → @primaryRate.ReportingCurrency</strong><small>@primaryRate.CurrencyName</small></span><span class="current-rate-main-label">@L["MainRate"]</span></div>
+                            <div class="current-rate-value"><small>@L["OneCurrencyEquals", primaryRate.BaseCurrency]</small><strong>@primaryRate.FormattedRate</strong>@if (primaryRate.ChangeFromPreviousPercent.HasValue){<span class="currency-trend-change @primaryDirection">@(primaryRate.ChangeFromPreviousPercent > 0 ? "▲" : primaryRate.ChangeFromPreviousPercent < 0 ? "▼" : "•") @L["PreviousRateChange", Math.Abs(primaryRate.ChangeFromPreviousPercent.Value).ToString("N2")]</span>}</div>
+                        </div>
+                        <div class="current-rate-primary-chart"><svg class="currency-sparkline @primaryDirection" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="@L["CurrencyTrendAria", primaryRate.BaseCurrency, primaryRate.ReportingCurrency]"><polyline points="@primaryRate.SvgPoints" /></svg><div class="currency-trend-foot"><span>@primaryRate.StartDate.ToString("dd MMM")</span><small>@L["RatePoints", primaryRate.PointCount]</small><span>@primaryRate.LatestDate.ToString("dd MMM")</span></div></div>
+                    </article>
+
+                    <div class="current-rate-secondary-grid">
+                        @foreach (var rate in currentRates.Rates.Where(x => !x.IsPrimary))
+                        {
+                            var direction = rate.ChangeFromPreviousPercent > 0 ? "up" : rate.ChangeFromPreviousPercent < 0 ? "down" : "flat";
+                            <article class="currency-trend-card">
+                                <div class="currency-trend-head"><span><strong>@rate.BaseCurrency</strong><small>→ @rate.ReportingCurrency</small></span><span class="status @(rate.IsStale ? "unpaid" : "paid")">@(rate.IsStale ? L["Stale"] : L["Healthy"])</span></div>
+                                <div class="currency-trend-value"><strong>@rate.FormattedRate</strong>@if (rate.ChangeFromPreviousPercent.HasValue){<span class="currency-trend-change @direction">@(rate.ChangeFromPreviousPercent > 0 ? "▲" : rate.ChangeFromPreviousPercent < 0 ? "▼" : "•") @Math.Abs(rate.ChangeFromPreviousPercent.Value).ToString("N2")%</span>}</div>
+                                <svg class="currency-sparkline @direction" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="@L["CurrencyTrendAria", rate.BaseCurrency, rate.ReportingCurrency]"><polyline points="@rate.SvgPoints" /></svg>
+                                <div class="currency-trend-foot"><span>@rate.StartDate.ToString("dd MMM")</span><small>@L["RatePoints", rate.PointCount]</small><span>@rate.LatestDate.ToString("dd MMM")</span></div>
+                            </article>
+                        }
+                    </div>
+                }
+            </div>
+
+            @if (User.IsInRole(DatabaseSeeder.AdminRole))
+            {
+                <form asp-action="SaveCurrencyDashboard" method="post" id="currency-rate-editor" class="currency-rate-editor" hidden>
+                    <div class="currency-editor-head"><div><h3>@L["ChooseDashboardCurrencies"]</h3><p>@L["ChooseDashboardCurrenciesHint"]</p></div><strong id="currency-selection-count">@L["SelectedCurrencyCount", currentRates.SelectedCurrencyCodes.Count]</strong></div>
+                    <div class="currency-editor-grid">
+                        @foreach (var currency in currentRates.AvailableCurrencies)
+                        {
+                            var selected = currentRates.SelectedCurrencyCodes.Contains(currency.Code, StringComparer.OrdinalIgnoreCase);
+                            var primary = string.Equals(currentRates.PrimaryCurrencyCode, currency.Code, StringComparison.OrdinalIgnoreCase);
+                            <div class="currency-editor-option @(selected ? "selected" : string.Empty)">
+                                <label class="currency-show-choice"><input type="checkbox" name="CurrencyCodes" value="@currency.Code" checked="@(selected ? "checked" : null)" /><span><strong>@currency.Code → @currentRates.ReportingCurrency</strong><small>@currency.Name</small></span></label>
+                                <label class="currency-main-choice"><input type="radio" name="PrimaryCurrencyCode" value="@currency.Code" checked="@(primary ? "checked" : null)" disabled="@(!selected ? "disabled" : null)" /> @L["MainRate"]</label>
+                            </div>
+                        }
+                    </div>
+                    <p class="currency-editor-message" id="currency-selection-message" aria-live="polite">@L["MaximumFourCurrencies"]</p>
+                    <div class="form-actions"><button class="btn btn-light" id="currency-filter-cancel" type="button">@L["Cancel"]</button><button class="btn btn-primary" type="submit">@L["ApplyCurrencies"]</button></div>
+                </form>
+            }
+        </section>
+    }
+}
+
+@if (!Model.IsMemberDashboard && User.IsInRole(DatabaseSeeder.AdminRole))
+{
+    <script>
+        (() => {
+            const toggle = document.getElementById('currency-filter-toggle');
+            const cancel = document.getElementById('currency-filter-cancel');
+            const display = document.getElementById('currency-rate-display');
+            const editor = document.getElementById('currency-rate-editor');
+            if (!toggle || !cancel || !display || !editor) return;
+            const checks = [...editor.querySelectorAll('input[name="CurrencyCodes"]')];
+            const count = document.getElementById('currency-selection-count');
+            const message = document.getElementById('currency-selection-message');
+            const countTemplate = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(L["SelectedCurrencyCount", "__COUNT__"].Value))';
+            const maximumMessage = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(L["MaximumFourCurrencies"].Value))';
+            const filterLabel = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(L["FilterCurrencies"].Value))';
+            const closeLabel = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(L["CloseFilter"].Value))';
+            const setEditing = editing => {
+                display.hidden = editing;
+                editor.hidden = !editing;
+                toggle.textContent = editing ? closeLabel : filterLabel;
+                toggle.setAttribute('aria-expanded', editing.toString());
+            };
+            const refresh = () => {
+                const selectedCount = checks.filter(input => input.checked).length;
+                count.textContent = countTemplate.replace('__COUNT__', selectedCount.toString());
+                checks.forEach(input => {
+                    const option = input.closest('.currency-editor-option');
+                    const radio = option.querySelector('input[name="PrimaryCurrencyCode"]');
+                    option.classList.toggle('selected', input.checked);
+                    radio.disabled = !input.checked;
+                    if (!input.checked && radio.checked) radio.checked = false;
+                });
+                message.textContent = maximumMessage;
+            };
+            checks.forEach(input => input.addEventListener('change', () => {
+                if (checks.filter(item => item.checked).length > 4) {
+                    input.checked = false;
+                    message.textContent = maximumMessage;
+                }
+                refresh();
+            }));
+            toggle.addEventListener('click', () => setEditing(editor.hidden));
+            cancel.addEventListener('click', () => setEditing(false));
+            refresh();
+        })();
+    </script>
 }

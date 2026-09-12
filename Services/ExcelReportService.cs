@@ -60,7 +60,7 @@ public sealed class ExcelReportService : IExcelReportService
     private static int BuildDetails(IXLWorksheet sheet, IReadOnlyList<ReportParticipantProjection> rows, Labels labels)
     {
         sheet.ShowGridLines = false;
-        var headers = new[] { labels.Date, labels.TransactionNumber, labels.Merchant, labels.Uploader, labels.Participant, labels.Username, labels.SplitMethod, labels.Menu, labels.AmountDue, labels.PaidAmount, labels.AwaitingAmount, labels.UnpaidAmount, labels.Status, labels.ClaimDate, labels.ResolutionDate, labels.ResolvedBy, labels.LastAction, labels.PickupPerson };
+        var headers = new[] { labels.Date, labels.TransactionNumber, labels.Merchant, labels.Uploader, labels.Participant, labels.Username, labels.SplitMethod, labels.Menu, labels.AmountDue, labels.PaidAmount, labels.AwaitingAmount, labels.UnpaidAmount, labels.Status, labels.ClaimDate, labels.ResolutionDate, labels.ResolvedBy, labels.LastAction, labels.PickupPerson, labels.Currency, labels.ReportingCurrency, labels.ReportingAmount };
         sheet.Cell(5, 1).InsertData(new[] { headers });
         if (rows.Count > 0)
         {
@@ -69,7 +69,8 @@ public sealed class ExcelReportService : IExcelReportService
                 x.EffectiveDate.ToDateTime(TimeOnly.MinValue), x.TransactionNumber, x.MerchantName, x.UploaderName ?? string.Empty,
                 x.ParticipantName, x.Username ?? string.Empty, x.MenuDetail.Contains("bagi rata", StringComparison.OrdinalIgnoreCase) ? labels.Equal : labels.ByItem,
                 x.MenuDetail, x.AmountDue, x.PaidAmount, x.AwaitingAmount, x.UnpaidAmount, StatusLabel(x.PaymentStatus, labels),
-                x.ClaimDate?.ToLocalTime().DateTime, x.ResolutionDate?.ToLocalTime().DateTime, x.ResolvedBy ?? string.Empty, ActionLabel(x.LastAction, labels), x.PickupPersonName ?? string.Empty
+                x.ClaimDate?.ToLocalTime().DateTime, x.ResolutionDate?.ToLocalTime().DateTime, x.ResolvedBy ?? string.Empty, ActionLabel(x.LastAction, labels), x.PickupPersonName ?? string.Empty,
+                x.CurrencyCode, x.ReportingCurrencyCode, ReportValue(x.ReportingAmountDue, x.AmountDue)
             }).ToList();
             sheet.Cell(6, 1).InsertData(data);
         }
@@ -79,7 +80,8 @@ public sealed class ExcelReportService : IExcelReportService
         sheet.SheetView.FreezeRows(5);
         sheet.Column(1).Style.DateFormat.Format = "yyyy-mm-dd";
         sheet.Columns(14, 15).Style.DateFormat.Format = "yyyy-mm-dd hh:mm";
-        sheet.Columns(9, 12).Style.NumberFormat.Format = "\"Rp \"#,##0.00";
+        sheet.Columns(9, 12).Style.NumberFormat.Format = "#,##0.00";
+        sheet.Column(21).Style.NumberFormat.Format = "#,##0.00";
         sheet.Columns().AdjustToContents();
         sheet.Column(8).Width = 48;
         sheet.Column(8).Style.Alignment.WrapText = true;
@@ -148,10 +150,10 @@ public sealed class ExcelReportService : IExcelReportService
             .Select(group => new PersonSummary(
                 group.Select(x => x.ParticipantName).OrderBy(x => x, StringComparer.Ordinal).First(),
                 group.Count(),
-                group.Sum(x => x.AmountDue),
-                group.Sum(x => x.PaidAmount),
-                group.Sum(x => x.AwaitingAmount),
-                group.Sum(x => x.UnpaidAmount)))
+                group.Sum(x => ReportValue(x.ReportingAmountDue, x.AmountDue)),
+                group.Sum(x => ReportValue(x.ReportingPaidAmount, x.PaidAmount)),
+                group.Sum(x => ReportValue(x.ReportingAwaitingAmount, x.AwaitingAmount)),
+                group.Sum(x => ReportValue(x.ReportingUnpaidAmount, x.UnpaidAmount))))
             .ToList();
         for (var index = 0; index < people.Count; index++)
         {
@@ -223,8 +225,10 @@ public sealed class ExcelReportService : IExcelReportService
         _ => labels.Legacy
     };
 
-    private sealed record Labels(string Summary, string Details, string Pivot, string PickupRotation, string Generated, string Metric, string Value, string Transactions, string TotalBilled, string Paid, string Awaiting, string Unpaid, string Outstanding, string Date, string TransactionNumber, string Merchant, string Uploader, string Participant, string Username, string SplitMethod, string Menu, string AmountDue, string PaidAmount, string AwaitingAmount, string UnpaidAmount, string Status, string ClaimDate, string ResolutionDate, string ResolvedBy, string LastAction, string PickupPerson, string TransactionCount, string PaidPercentage, string Total, string Equal, string ByItem, string MemberSubmitted, string ModeratorConfirmed, string ModeratorRejected, string ModeratorMarkedPaid, string ModeratorReopened, string Legacy, string ParticipatedTransactions, string PickupCount, string PickupRatio, string LastPickupDate, string LastMerchant);
+    private static decimal ReportValue(decimal reporting, decimal original) => reporting == 0m && original != 0m ? original : reporting;
 
-    private static readonly Labels IndonesianLabels = new("Ringkasan", "Detail Pembayaran", "Pivot per Orang", "Rotasi Pickup", "Dibuat", "Metrik", "Nilai", "Jumlah transaksi", "Total tagihan", "Sudah dibayar", "Menunggu konfirmasi", "Belum dibayar", "Outstanding", "Tanggal", "Nomor transaksi", "Merchant", "Uploader", "Nama", "Username", "Metode split", "Detail menu", "Tagihan", "Sudah dibayar", "Menunggu konfirmasi", "Belum dibayar", "Status", "Diajukan", "Diselesaikan", "Dikonfirmasi oleh", "Aksi terakhir", "Pengambil", "Jumlah transaksi", "% lunas", "Total", "Bagi rata", "Berdasarkan item", "Diajukan user", "Dikonfirmasi moderator", "Ditolak moderator", "Ditandai moderator", "Dibuka kembali", "Perubahan lama", "Transaksi diikuti", "Jumlah pickup", "Rasio pickup", "Tanggal pickup terakhir", "Merchant terakhir");
-    private static readonly Labels EnglishLabels = new("Summary", "Payment Details", "Pivot by Person", "Pickup Rotation", "Generated", "Metric", "Value", "Transactions", "Total billed", "Paid", "Awaiting confirmation", "Unpaid", "Outstanding", "Date", "Transaction number", "Merchant", "Uploader", "Participant", "Username", "Split method", "Menu detail", "Amount due", "Paid amount", "Awaiting amount", "Unpaid amount", "Status", "Claim date", "Resolution date", "Resolved by", "Last action", "Pickup person", "Transaction count", "Paid percentage", "Total", "Equal split", "By item", "Submitted by member", "Confirmed by moderator", "Rejected by moderator", "Marked paid by moderator", "Reopened by moderator", "Legacy change", "Participated transactions", "Pickup count", "Pickup ratio", "Last pickup date", "Last merchant");
+    private sealed record Labels(string Summary, string Details, string Pivot, string PickupRotation, string Generated, string Metric, string Value, string Transactions, string TotalBilled, string Paid, string Awaiting, string Unpaid, string Outstanding, string Date, string TransactionNumber, string Merchant, string Uploader, string Participant, string Username, string SplitMethod, string Menu, string Currency, string AmountDue, string ReportingCurrency, string ReportingAmount, string PaidAmount, string AwaitingAmount, string UnpaidAmount, string Status, string ClaimDate, string ResolutionDate, string ResolvedBy, string LastAction, string PickupPerson, string TransactionCount, string PaidPercentage, string Total, string Equal, string ByItem, string MemberSubmitted, string ModeratorConfirmed, string ModeratorRejected, string ModeratorMarkedPaid, string ModeratorReopened, string Legacy, string ParticipatedTransactions, string PickupCount, string PickupRatio, string LastPickupDate, string LastMerchant);
+
+    private static readonly Labels IndonesianLabels = new("Ringkasan", "Detail Pembayaran", "Pivot per Orang", "Rotasi Pickup", "Dibuat", "Metrik", "Nilai", "Jumlah transaksi", "Total tagihan", "Sudah dibayar", "Menunggu konfirmasi", "Belum dibayar", "Outstanding", "Tanggal", "Nomor transaksi", "Merchant", "Uploader", "Nama", "Username", "Metode split", "Detail menu", "Mata uang", "Tagihan", "Mata uang laporan", "Nilai laporan", "Sudah dibayar", "Menunggu konfirmasi", "Belum dibayar", "Status", "Diajukan", "Diselesaikan", "Dikonfirmasi oleh", "Aksi terakhir", "Pengambil", "Jumlah transaksi", "% lunas", "Total", "Bagi rata", "Berdasarkan item", "Diajukan user", "Dikonfirmasi moderator", "Ditolak moderator", "Ditandai moderator", "Dibuka kembali", "Perubahan lama", "Transaksi diikuti", "Jumlah pickup", "Rasio pickup", "Tanggal pickup terakhir", "Merchant terakhir");
+    private static readonly Labels EnglishLabels = new("Summary", "Payment Details", "Pivot by Person", "Pickup Rotation", "Generated", "Metric", "Value", "Transactions", "Total billed", "Paid", "Awaiting confirmation", "Unpaid", "Outstanding", "Date", "Transaction number", "Merchant", "Uploader", "Participant", "Username", "Split method", "Menu detail", "Currency", "Amount due", "Reporting currency", "Reporting amount", "Paid amount", "Awaiting amount", "Unpaid amount", "Status", "Claim date", "Resolution date", "Resolved by", "Last action", "Pickup person", "Transaction count", "Paid percentage", "Total", "Equal split", "By item", "Submitted by member", "Confirmed by moderator", "Rejected by moderator", "Marked paid by moderator", "Reopened by moderator", "Legacy change", "Participated transactions", "Pickup count", "Pickup ratio", "Last pickup date", "Last merchant");
 }

@@ -11,7 +11,7 @@ AI extraction · Quantity-based splitting · Payment approval · Pickup rotation
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-171_passing-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-180_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -172,4 +172,9 @@ SplitBill is available under the [MIT License](LICENSE).
 
 ## Status
 
-The current release gate passes **167 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.
+The current release gate passes **180 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.
+## Currency and guest access
+
+SplitBill keeps payment obligations in the receipt's original currency while storing an auditable rate snapshot to the IDR reporting currency. Admins can configure the built-in Frankfurter v2 provider or a compatible private endpoint from **Currency settings**, and choose up to four transaction-independent current rates for the shared Admin/Moderator dashboard with one highlighted primary pair. Each chart uses up to seven latest **stored rate dates**; these may span more than seven calendar days. See [Currency and guest-link setup](documentation/guides/CURRENCY_AND_GUEST_SETUP.md).
+
+Guests do not need an account or email. After a split is saved, the uploader can copy one participant-specific guest link. It opens a read-only personal bill with an in-page switch to the complete transaction view, including receipt details, adjustments, payment status, pickup result, and saved currency reference.

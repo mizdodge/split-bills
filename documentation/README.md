@@ -19,3 +19,13 @@ The [`screenshots`](screenshots/) directory contains sanitized, illustrative UI 
 The application-screen source is [`readme-gallery.html`](screenshots/source/readme-gallery.html). Open it with `?view=dashboard`, `?view=upload`, `?view=split`, `?view=transaction`, `?view=mybill`, or `?view=report` to render a specific 1600×900 preview. The long-share source is [`share-export-preview.html`](screenshots/source/share-export-preview.html); it loads the real renderer from `wwwroot/js/transaction-share.js` and paints sanitized precomputed display values. The Dashboard, Upload Receipt, and Set Split previews mirror the current Razor hierarchy, labels, dynamic states, navigation, and responsive application styles; all sample values are sanitized.
 
 Release-level changes are summarized in the public [`CHANGELOG.md`](../CHANGELOG.md). Internal implementation plans and environment-specific operational logs are intentionally kept outside the public repository.
+# SplitBill documentation
+
+Public setup and operational guides:
+
+- [Currency and guest-link setup](guides/CURRENCY_AND_GUEST_SETUP.md)
+- The currency guide explains why dashboard charts show up to seven **stored rate dates**, which may cover more than seven calendar days, and how the Admin chooses the current-rate cards.
+- [SharePoint setup](guides/SHAREPOINT_SETUP.md)
+- [IIS setup and deployment](guides/SERVER_SETUP.md)
+
+Internal implementation plans stay outside release packages.

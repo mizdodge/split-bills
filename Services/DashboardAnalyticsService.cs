@@ -42,7 +42,7 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
                 StringComparer.OrdinalIgnoreCase)
             .Select(group => new DashboardOutstandingPersonViewModel(
                 group.Select(x => x.Participant.Name.Trim()).FirstOrDefault(x => x.Length > 0) ?? "-",
-                group.Sum(x => x.Participant.Amount),
+                group.Sum(x => ToReporting(x.Transaction, x.Participant.Amount)),
                 group.Select(x => x.Transaction.Id).Distinct().Count()))
             .OrderByDescending(x => x.Amount)
             .ThenBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)
@@ -55,7 +55,7 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
             {
                 Transaction = x,
                 Date = EffectiveDate(x),
-                Amount = x.Participants.Where(p => p.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(p => p.Amount)
+                Amount = x.Participants.Where(p => p.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(p => ToReporting(x, p.Amount))
             })
             .Where(x => x.Amount > 0)
             .OrderBy(x => x.Date)
@@ -79,7 +79,7 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
                 var date = EffectiveDate(x);
                 return new DateOnly(date.Year, date.Month, 1);
             })
-            .ToDictionary(x => x.Key, x => x.Sum(transaction => transaction.GrandTotal));
+            .ToDictionary(x => x.Key, x => x.Sum(transaction => ToReporting(transaction, transaction.GrandTotal)));
         var maximumMonthlyAmount = months.Select(month => totalsByMonth.GetValueOrDefault(month)).DefaultIfEmpty().Max();
         var monthly = months.Select(month =>
         {
@@ -93,7 +93,7 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
             .Select(group => new DashboardMerchantViewModel(
                 group.Key.Length == 0 ? "-" : group.Key,
                 group.Count(),
-                group.Sum(x => x.GrandTotal)))
+                group.Sum(x => ToReporting(x, x.GrandTotal))))
             .OrderByDescending(x => x.TransactionCount)
             .ThenByDescending(x => x.TotalAmount)
             .ThenBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)
@@ -129,9 +129,9 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
             .GroupBy(x => MonthOf(x.Transaction!))
             .ToDictionary(group => group.Key, group => new
             {
-                Total = group.Sum(x => x.Amount),
-                Paid = group.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Paid).Sum(x => x.Amount),
-                Outstanding = group.Where(x => x.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(x => x.Amount)
+                Total = group.Sum(x => ToReporting(x.Transaction!, x.Amount)),
+                Paid = group.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Paid).Sum(x => ToReporting(x.Transaction!, x.Amount)),
+                Outstanding = group.Where(x => x.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(x => ToReporting(x.Transaction!, x.Amount))
             });
         var maximum = months.Select(month => monthlyTotals.TryGetValue(month, out var value) ? value.Total : 0m).DefaultIfEmpty().Max();
         var history = months.Select(month =>
@@ -155,15 +155,15 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
                 x.Transaction!.MerchantName,
                 x.Transaction.TransactionNumber,
                 EffectiveDate(x.Transaction),
-                x.Amount,
+                ToReporting(x.Transaction!, x.Amount),
                 x.PaymentStatus))
             .ToList();
 
         return new DashboardMemberAnalyticsResult(
             history.Last().TotalAmount,
             history.Count > 1 ? history[^2].TotalAmount : 0,
-            visible.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Paid).Sum(x => x.Amount),
-            visible.Where(x => x.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(x => x.Amount),
+            visible.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Paid).Sum(x => ToReporting(x.Transaction!, x.Amount)),
+            visible.Where(x => x.PaymentStatus != ParticipantPaymentStatus.Paid).Sum(x => ToReporting(x.Transaction!, x.Amount)),
             history,
             recent);
     }
@@ -176,4 +176,7 @@ public sealed class DashboardAnalyticsService : IDashboardAnalyticsService
         var date = EffectiveDate(transaction);
         return new DateOnly(date.Year, date.Month, 1);
     }
+
+    private static decimal ToReporting(BillTransaction transaction, decimal amount) =>
+        Math.Round(amount * (transaction.ExchangeRateToReporting <= 0 ? 1m : transaction.ExchangeRateToReporting), 2, MidpointRounding.AwayFromZero);
 }

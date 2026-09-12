@@ -12,10 +12,10 @@ public sealed class ReportQueryResult
     public List<ReportTransactionProjection> Transactions { get; init; } = [];
     public IEnumerable<ReportParticipantProjection> Participants => Transactions.SelectMany(x => x.Participants);
     public int TotalTransactions => Transactions.Count;
-    public decimal TotalAmount => Participants.Sum(x => x.AmountDue);
-    public decimal PaidAmount => Participants.Sum(x => x.PaidAmount);
-    public decimal AwaitingAmount => Participants.Sum(x => x.AwaitingAmount);
-    public decimal UnpaidAmount => Participants.Sum(x => x.UnpaidAmount);
+    public decimal TotalAmount => Participants.Sum(x => x.ReportingAmountDue == 0m && x.AmountDue != 0m ? x.AmountDue : x.ReportingAmountDue);
+    public decimal PaidAmount => Participants.Sum(x => x.ReportingPaidAmount == 0m && x.PaidAmount != 0m ? x.PaidAmount : x.ReportingPaidAmount);
+    public decimal AwaitingAmount => Participants.Sum(x => x.ReportingAwaitingAmount == 0m && x.AwaitingAmount != 0m ? x.AwaitingAmount : x.ReportingAwaitingAmount);
+    public decimal UnpaidAmount => Participants.Sum(x => x.ReportingUnpaidAmount == 0m && x.UnpaidAmount != 0m ? x.UnpaidAmount : x.ReportingUnpaidAmount);
     public decimal OutstandingAmount => AwaitingAmount + UnpaidAmount;
 }
 
@@ -33,6 +33,12 @@ public sealed class ReportTransactionProjection
     public decimal Discount { get; init; }
     public decimal Tax { get; init; }
     public decimal ServiceCharge { get; init; }
+    public string CurrencyCode { get; init; } = "IDR";
+    public string ReportingCurrencyCode { get; init; } = "IDR";
+    public decimal ExchangeRateToReporting { get; init; } = 1m;
+    public DateOnly? ExchangeRateEffectiveDate { get; init; }
+    public string ExchangeRateSource { get; init; } = "LegacyIdentity";
+    public decimal ReportingGrandTotal { get; init; }
     public string? PickupPersonName { get; init; }
     public decimal? PickupProbability { get; init; }
     public FoodPickupSelectionStrategy? PickupStrategy { get; init; }
@@ -59,6 +65,12 @@ public sealed class ReportParticipantProjection
     public decimal PaidAmount { get; init; }
     public decimal AwaitingAmount { get; init; }
     public decimal UnpaidAmount { get; init; }
+    public string CurrencyCode { get; init; } = "IDR";
+    public string ReportingCurrencyCode { get; init; } = "IDR";
+    public decimal ReportingAmountDue { get; init; }
+    public decimal ReportingPaidAmount { get; init; }
+    public decimal ReportingAwaitingAmount { get; init; }
+    public decimal ReportingUnpaidAmount { get; init; }
     public ParticipantPaymentStatus PaymentStatus { get; init; }
     public DateTimeOffset? ClaimDate { get; init; }
     public DateTimeOffset? ResolutionDate { get; init; }
@@ -118,6 +130,10 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
             EffectiveDate = tx.TransactionDate ?? DateOnly.FromDateTime(tx.UploadDate.ToLocalTime().DateTime),
             UploaderName = tx.UploadedByUser?.DisplayName, Status = tx.Status, SplitMethod = tx.SplitMethod,
             GrandTotal = tx.GrandTotal, Subtotal = tx.Subtotal, Discount = tx.Discount, Tax = tx.Tax,
+            CurrencyCode = tx.CurrencyCode, ReportingCurrencyCode = tx.ReportingCurrencyCode,
+            ExchangeRateToReporting = tx.ExchangeRateToReporting <= 0 ? 1m : tx.ExchangeRateToReporting,
+            ExchangeRateEffectiveDate = tx.ExchangeRateEffectiveDate, ExchangeRateSource = tx.ExchangeRateSource,
+            ReportingGrandTotal = Convert(tx.GrandTotal, tx.ExchangeRateToReporting),
             ServiceCharge = tx.ServiceCharge, Items = tx.Items.OrderBy(x => x.LineNumber).ToList(),
             Charges = tx.Charges.OrderBy(x => x.SortOrder).ToList(), Participants = participants,
             PickupPersonName = PickupName(tx), PickupProbability = tx.PickupAssignment?.RecordedProbability,
@@ -142,6 +158,10 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
             MenuDetail = ParticipantMenuFormatter.Format(participant, tx.SplitMethod),
             ItemDetails = ParticipantMenuFormatter.GetDetails(participant, tx.SplitMethod), AmountDue = participant.Amount,
             PaidAmount = paid, AwaitingAmount = awaiting, UnpaidAmount = unpaid, PaymentStatus = participant.PaymentStatus,
+            CurrencyCode = tx.CurrencyCode, ReportingCurrencyCode = tx.ReportingCurrencyCode,
+            ReportingAmountDue = Convert(participant.Amount, tx.ExchangeRateToReporting),
+            ReportingPaidAmount = Convert(paid, tx.ExchangeRateToReporting), ReportingAwaitingAmount = Convert(awaiting, tx.ExchangeRateToReporting),
+            ReportingUnpaidAmount = Convert(unpaid, tx.ExchangeRateToReporting),
             ClaimDate = latestApproval?.RequestedAt, ResolutionDate = latestApproval?.ResolvedAt,
             ResolvedBy = latestApproval?.ResolvedByUserId is not null && users.TryGetValue(latestApproval.ResolvedByUserId, out var resolver) ? resolver.DisplayName : null,
             LastAction = latestHistory?.ActionType ?? PaymentActionType.LegacyStatusChange
@@ -159,4 +179,6 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
         if (!string.IsNullOrWhiteSpace(assignment.SelectedUser?.DisplayName)) return assignment.SelectedUser.DisplayName;
         return tx.Participants.FirstOrDefault(x => x.Id == assignment.SelectedParticipantId)?.Name;
     }
+
+    private static decimal Convert(decimal amount, decimal rate) => Math.Round(amount * (rate <= 0 ? 1m : rate), 2, MidpointRounding.AwayFromZero);
 }

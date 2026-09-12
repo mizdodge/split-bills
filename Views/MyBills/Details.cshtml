@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = L["Details"];
     var receiptCount = Model.ReceiptImageUrls.Count;
+    var currencyLabel = Model.CurrencyCode == "IDR" ? "Rp" : Model.CurrencyCode;
 }
 
 <div class="page-heading compact member-detail-heading">
@@ -16,10 +17,14 @@
 </div>
 
 <section class="member-total-strip" data-share-export data-share-endpoint="@Url.Action("ShareData", "MyBills", new { id = Model.ParticipantId })">
-    <div><span>@L["YourBillTotal"]</span><strong>Rp @Model.Amount.ToString("N0")</strong></div>
-    <div class="member-total-equation"><span>@L["YourMenuSubtotal"]</span><strong>Rp @Model.ItemSubtotal.ToString("N0")</strong><span aria-hidden="true">·</span><span>@L["YourAdjustmentTotal"]</span><strong>Rp @Model.AdjustmentTotal.ToString("N0")</strong></div>
+    <div><span>@L["YourBillTotal"]</span><strong>@currencyLabel @Model.Amount.ToString("N0")</strong></div>
+    <div class="member-total-equation"><span>@L["YourMenuSubtotal"]</span><strong>@currencyLabel @Model.ItemSubtotal.ToString("N0")</strong><span aria-hidden="true">·</span><span>@L["YourAdjustmentTotal"]</span><strong>@currencyLabel @Model.AdjustmentTotal.ToString("N0")</strong></div>
     <div class="member-share-actions"><button type="button" class="btn btn-primary" data-share-native>@L["ShareMyBill"]</button><button type="button" class="btn btn-soft" data-share-download>@L["DownloadJpg"]</button><span class="share-status" data-share-status role="status" aria-live="polite"></span></div><canvas class="share-render-canvas" aria-hidden="true"></canvas>
 </section>
+@if (!string.Equals(Model.CurrencyCode, Model.ReportingCurrencyCode, StringComparison.OrdinalIgnoreCase))
+{
+    <section class="content-card currency-transparency"><span>@L["ReferenceConversion"]</span><strong>1 @Model.CurrencyCode = @Model.ExchangeRateToReporting.ToString("0.######") @Model.ReportingCurrencyCode</strong><small>@L["RateDate"]: @(Model.ExchangeRateEffectiveDate?.ToString("dd MMM yyyy") ?? "-") · @Model.ExchangeRateSource</small></section>
+}
 
 @if (Model.PickupPersonName is not null)
 {
@@ -49,13 +54,13 @@
                 <div class="member-breakdown-row member-breakdown-header" role="row"><span role="columnheader">@L["Description"]</span><span role="columnheader">@L["FullReceiptAmount"]</span><span role="columnheader">@L["YourShare"]</span></div>
                 @foreach (var item in Model.Items)
                 {
-                    <div class="member-breakdown-row" role="row"><span role="cell"><strong>@item.Name</strong><small>× @item.Quantity.ToString("0.##")</small></span><span role="cell">Rp @item.ReceiptAmount.ToString("N0")</span><strong role="cell">Rp @item.Amount.ToString("N0")</strong></div>
+                    <div class="member-breakdown-row" role="row"><span role="cell"><strong>@item.Name</strong><small>× @item.Quantity.ToString("0.##")</small></span><span role="cell">@currencyLabel @item.ReceiptAmount.ToString("N0")</span><strong role="cell">@currencyLabel @item.Amount.ToString("N0")</strong></div>
                 }
                 @if (Model.Items.Count == 0)
                 {
                     <div class="member-breakdown-empty">@Model.MenuDetail</div>
                 }
-                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourMenuSubtotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.ItemSubtotal.ToString("N0")</strong></div>
+                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourMenuSubtotal"]</span><span role="cell"></span><strong role="cell">@currencyLabel @Model.ItemSubtotal.ToString("N0")</strong></div>
                 @if (Model.Adjustments.Count > 0)
                 {
                     <div class="breakdown-section-label">@L["DiscountsAndOtherCharges"]</div>
@@ -63,11 +68,11 @@
                     {
                         var label = adjustment.Label ?? (adjustment.Kind == ParticipantAdjustmentKind.UnitemizedAdjustment ? L["OtherAdjustment"].Value : L["RoundingAdjustment"].Value);
                         var sign = adjustment.Operation == ChargeOperation.Subtract ? "-" : "+";
-                        <div class="member-breakdown-row adjustment-row @(adjustment.Operation == ChargeOperation.Subtract ? "subtract" : "add")" role="row"><span role="cell"><strong>@label</strong>@if (adjustment.ReceiptPercentage.HasValue) { <small class="member-rate">@L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")].Value</small> }</span><span role="cell">@sign Rp @adjustment.ReceiptAmount.ToString("N0")</span><strong role="cell">@sign Rp @adjustment.Amount.ToString("N0")</strong></div>
+                        <div class="member-breakdown-row adjustment-row @(adjustment.Operation == ChargeOperation.Subtract ? "subtract" : "add")" role="row"><span role="cell"><strong>@label</strong>@if (adjustment.ReceiptPercentage.HasValue) { <small class="member-rate">@L["EffectiveRate", adjustment.ReceiptPercentage.Value.ToString("0.##")].Value</small> }</span><span role="cell">@sign @currencyLabel @adjustment.ReceiptAmount.ToString("N0")</span><strong role="cell">@sign @currencyLabel @adjustment.Amount.ToString("N0")</strong></div>
                     }
                 }
-                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourAdjustmentTotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.AdjustmentTotal.ToString("N0")</strong></div>
-                <div class="member-breakdown-row total-row" role="row"><span role="cell">@L["YourBillTotal"]</span><span role="cell"></span><strong role="cell">Rp @Model.Amount.ToString("N0")</strong></div>
+                <div class="member-breakdown-row subtotal-row" role="row"><span role="cell">@L["YourAdjustmentTotal"]</span><span role="cell"></span><strong role="cell">@currencyLabel @Model.AdjustmentTotal.ToString("N0")</strong></div>
+                <div class="member-breakdown-row total-row" role="row"><span role="cell">@L["YourBillTotal"]</span><span role="cell"></span><strong role="cell">@currencyLabel @Model.Amount.ToString("N0")</strong></div>
             </div>
         </section>
 
