@@ -9,7 +9,7 @@ public sealed class ShareRendererAssetTests
         var source = File.ReadAllText(path);
         Assert.Contains("canvas.width = WIDTH", source);
         Assert.Contains("canvas.height = Math.ceil(measured.height)", source);
-        Assert.Contains("const summaryHeight = 168 + receiptRowsHeight", source);
+        Assert.Contains("const summaryHeight = 200 + receiptRowsHeight", source);
         Assert.Contains("toBlob", source);
         Assert.DoesNotContain("window.innerHeight", source, StringComparison.Ordinal);
         Assert.DoesNotContain("html2canvas", source, StringComparison.OrdinalIgnoreCase);

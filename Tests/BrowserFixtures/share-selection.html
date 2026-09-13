@@ -64,11 +64,17 @@
     check(JSON.stringify(painted.at(-1)) === '["p1","p2","p3"]', "all mode ignores earlier checkbox selection");
 
     const ctx = { measureText: value => ({ width: String(value).length * 9 }) };
-    const layout = window.SplitBillShare.layout({ ...payload, Participants: [{ ...payload.Participants[0], Items: [{ Name: "Nasi", ShareDescription: "× 1", AmountText: "Rp 12,000" }], MenuSubtotalText: "Rp 12,000", Adjustments: [] }], ReceiptSummary: { SubtotalText: "Rp 12,000", Adjustments: [], GrandTotalText: "Rp 12,000" } }, ctx);
+    const layout = window.SplitBillShare.layout({ ...payload, Participants: [{ ...payload.Participants[0], Items: [{ Name: "Nasi", ShareDescription: "× 1", AmountText: "Rp 12,000" }], MenuSubtotalText: "Rp 12,000", Adjustments: [] }], ReceiptSummary: { SubtotalText: "Rp 12,000", Adjustments: [{ Label: "Delivery", AmountText: "Rp 1,000", IsSubtract: false }], GrandTotalText: "Rp 13,000" } }, ctx);
     const subtotal = layout.commands.find(x => x.type === "labelAmount" && x.label === "Menu subtotal");
     const rule = layout.commands.filter(x => x.type === "rule" && x.y < subtotal.y).at(-1);
     check(subtotal.y - rule.y >= 25, "menu subtotal has breathing room below divider");
-    document.getElementById("results").textContent = errors.length ? `FAIL: ${errors.join("; ")}` : "PASS: all, selected, individual, subtotal spacing";
+    const summaryTitle = layout.commands.find(x => x.type === "summaryTitle");
+    const receiptSubtotal = layout.commands.find(x => x.type === "labelAmount" && x.label === "Subtotal");
+    const delivery = layout.commands.find(x => x.type === "row" && x.label.includes("Delivery"));
+    const grandTotal = layout.commands.find(x => x.type === "labelAmount" && x.label === "Grand total");
+    check(receiptSubtotal.y - (summaryTitle.y + 24) >= 40, "receipt subtotal has breathing room below title");
+    check(delivery.y - receiptSubtotal.y >= 30 && grandTotal.y - delivery.y >= 30, "receipt summary rows do not overlap");
+    document.getElementById("results").textContent = errors.length ? `FAIL: ${errors.join("; ")}` : "PASS: all, selected, individual, both subtotal spacings";
   })().catch(error => { document.getElementById("results").textContent = `FAIL: ${error.stack}`; });
 </script>
 </body></html>

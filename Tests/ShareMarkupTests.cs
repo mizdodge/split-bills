@@ -82,5 +82,6 @@ public sealed class ShareMarkupTests
         Assert.Contains("individual mode selects the clicked participant", fixture);
         Assert.Contains("selected mode includes exactly checked participants", fixture);
         Assert.Contains("menu subtotal has breathing room", fixture);
+        Assert.Contains("receipt subtotal has breathing room", fixture);
     }
 }

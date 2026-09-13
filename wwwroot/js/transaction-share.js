@@ -119,11 +119,11 @@
       return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${(adjustment.isSubtract ?? adjustment.IsSubtract) ? "−" : "+"} ${valueOf(adjustment, "amountText", "AmountText")}` };
     });
     const receiptRowsHeight = receiptRows.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 27 + 11, 0);
-    const summaryHeight = 168 + receiptRowsHeight;
+    const summaryHeight = 200 + receiptRowsHeight;
     addBox(0, summaryHeight, COLORS.cool, null, 18);
     commands.push({ type: "summaryTitle", label: labels.receiptSummary || labels.ReceiptSummary || "Receipt summary", y: cursor + 24 });
-    commands.push({ type: "labelAmount", label: labels.subtotal || labels.Subtotal || "Subtotal", amount: valueOf(summary, "subtotalText", "SubtotalText"), y: cursor + 63, weight: 700 });
-    let summaryInner = 96;
+    commands.push({ type: "labelAmount", label: labels.subtotal || labels.Subtotal || "Subtotal", amount: valueOf(summary, "subtotalText", "SubtotalText"), y: cursor + 95, weight: 700 });
+    let summaryInner = 128;
     for (const row of receiptRows) {
       commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + summaryInner, lineHeight: 27, color: row.amount.startsWith("−") ? COLORS.danger : COLORS.emerald, size: 18 });
       summaryInner += Math.max(1, row.lines.length) * 27 + 11;
