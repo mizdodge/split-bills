@@ -45,30 +45,44 @@
       if (!response.ok) throw new Error("share-data-failed");
       payload = await response.json(); return payload;
     };
+    const participantsOf = data => data?.participants ?? data?.Participants ?? [];
+    const valueOf = (item, camel, pascal) => item?.[camel] ?? item?.[pascal] ?? "";
     const selected = () => {
       if (!payload) return [];
       const mode = root.querySelector("input[name='share-mode']:checked")?.value || "all";
-      if (mode === "all" || !dialog) return payload.participants || [];
+      const participants = participantsOf(payload);
+      if (mode === "all" || !dialog) return participants;
       const keys = [...root.querySelectorAll("[data-share-participant]:checked")].map(x => x.value);
-      if (mode === "individual") return (payload.participants || []).filter(x => x.participantKey === keys[0]);
-      return (payload.participants || []).filter(x => keys.includes(x.participantKey));
+      if (mode === "individual") return participants.filter(x => valueOf(x, "participantKey", "ParticipantKey") === keys[0]);
+      return participants.filter(x => keys.includes(valueOf(x, "participantKey", "ParticipantKey")));
     };
     const updateMode = () => {
       const mode = root.querySelector("input[name='share-mode']:checked")?.value || "all";
       const cards = root.querySelector("[data-share-participants]"); if (cards) cards.hidden = mode === "all";
-      root.querySelectorAll("[data-share-participant]").forEach(input => { input.disabled = mode === "all"; if (mode === "individual" && input.checked) root.querySelectorAll("[data-share-participant]").forEach(other => { if (other !== input) other.checked = false; }); });
+      const inputs = [...root.querySelectorAll("[data-share-participant]")];
+      inputs.forEach(input => { input.disabled = mode === "all"; });
+      if (mode === "individual" && inputs.filter(input => input.checked).length !== 1) {
+        inputs.forEach((input, index) => { input.checked = index === 0; });
+      }
     };
     const renderCards = data => {
       const holder = root.querySelector("[data-share-participants]"); if (!holder) return;
-      holder.replaceChildren(...(data.participants || []).map(participant => {
+      holder.querySelectorAll(".share-participant-card").forEach(card => card.remove());
+      participantsOf(data).forEach(participant => {
         const label = document.createElement("label"); label.className = "share-participant-card";
-        const input = document.createElement("input"); input.type = "checkbox"; input.name = "share-participant"; input.value = participant.participantKey; input.dataset.shareParticipant = ""; input.checked = true;
+        const input = document.createElement("input"); input.type = "checkbox"; input.name = "share-participant"; input.value = valueOf(participant, "participantKey", "ParticipantKey"); input.dataset.shareParticipant = ""; input.checked = true;
         const copy = document.createElement("span"); copy.className = "share-participant-copy";
-        const name = document.createElement("strong"); name.textContent = participant.displayName;
-        const detail = document.createElement("small"); detail.textContent = `${participant.paymentStatusText} · ${participant.finalAmountText}`;
+        const name = document.createElement("strong"); name.textContent = valueOf(participant, "displayName", "DisplayName");
+        const detail = document.createElement("small"); detail.textContent = `${valueOf(participant, "paymentStatusText", "PaymentStatusText")} · ${valueOf(participant, "finalAmountText", "FinalAmountText")}`;
         copy.append(name, detail); label.append(input, copy); holder.append(label);
-      }));
-      holder.addEventListener("change", updateMode); updateMode();
+      });
+      holder.addEventListener("change", event => {
+        if (root.querySelector("input[name='share-mode']:checked")?.value === "individual" && event.target.matches("[data-share-participant]")) {
+          holder.querySelectorAll("[data-share-participant]").forEach(input => { input.checked = input === event.target; });
+        }
+        updateMode();
+      });
+      updateMode();
     };
     const close = () => {
       if (!dialog) return;

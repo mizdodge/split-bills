@@ -11,7 +11,7 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-190_passing-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-191_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -176,4 +176,4 @@ SplitBill is available under the [MIT License](LICENSE).
 
 ## Status
 
-The current release gate passes **190 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.
+The current release gate passes **191 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.

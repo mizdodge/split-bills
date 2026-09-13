@@ -89,7 +89,7 @@
         return { label, lines: wrap(ctx, label, CONTENT - 210), amount: `${(adjustment.isSubtract ?? adjustment.IsSubtract) ? "−" : "+"} ${valueOf(adjustment, "amountText", "AmountText")}` };
       });
       let height = 72 + itemLines.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 27 + 12, 0);
-      height += 42 + adjustmentLines.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 26 + 10, 0);
+      height += 60 + adjustmentLines.reduce((sum, row) => sum + Math.max(1, row.lines.length) * 26 + 10, 0);
       height += 84;
       addBox(0, height, COLORS.white, "#d9dde0", 18);
       commands.push({ type: "participantHeader", name: valueOf(participant, "displayName", "DisplayName"), status: valueOf(participant, "paymentStatusText", "PaymentStatusText"), y: cursor + 22 });
@@ -98,9 +98,9 @@
         commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + inner, lineHeight: 27, color: COLORS.stone, size: 18 });
         inner += Math.max(1, row.lines.length) * 27 + 12;
       }
-      addRule(inner + 2);
-      commands.push({ type: "labelAmount", label: labels.menuSubtotal || labels.MenuSubtotal || "Menu subtotal", amount: valueOf(participant, "menuSubtotalText", "MenuSubtotalText"), y: cursor + inner + 18, weight: 700 });
-      inner += 54;
+      addRule(inner + 8);
+      commands.push({ type: "labelAmount", label: labels.menuSubtotal || labels.MenuSubtotal || "Menu subtotal", amount: valueOf(participant, "menuSubtotalText", "MenuSubtotalText"), y: cursor + inner + 36, weight: 700 });
+      inner += 72;
       for (const row of adjustmentLines) {
         commands.push({ type: "row", label: row.lines, amount: row.amount, x: PAD + 24, y: cursor + inner, lineHeight: 26, color: row.amount.startsWith("−") ? COLORS.danger : COLORS.emerald, size: 17 });
         inner += Math.max(1, row.lines.length) * 26 + 10;

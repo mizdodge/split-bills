@@ -73,4 +73,14 @@ public sealed class ShareMarkupTests
         Assert.DoesNotContain("https://", script, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("html2canvas", script, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void BrowserSelectionRegressionFixtureIsPresent()
+    {
+        var fixture = File.ReadAllText(Path.Combine(Root, "Tests", "BrowserFixtures", "share-selection.html"));
+        Assert.Contains("no undefined text in selector", fixture);
+        Assert.Contains("individual mode selects the clicked participant", fixture);
+        Assert.Contains("selected mode includes exactly checked participants", fixture);
+        Assert.Contains("menu subtotal has breathing room", fixture);
+    }
 }

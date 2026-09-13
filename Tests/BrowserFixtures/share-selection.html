@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Share selection regression</title>
+<body>
+<section data-share-export data-share-endpoint="/fixture/share-data">
+  <dialog data-share-dialog hidden>
+    <button data-share-close>Close</button>
+    <button data-share-tab="jpg">JPG</button>
+    <section data-share-panel="jpg">
+      <label><input type="radio" name="share-mode" value="all" checked>All</label>
+      <label><input type="radio" name="share-mode" value="selected">Selected</label>
+      <label><input type="radio" name="share-mode" value="individual">Individual</label>
+      <div data-share-participants hidden><p>Choose participants</p></div>
+      <button data-share-generate>Generate</button>
+      <p data-share-status></p>
+    </section>
+  </dialog>
+  <canvas></canvas>
+</section>
+<button data-share-open>Share</button>
+<pre id="results">Running</pre>
+<script src="../../wwwroot/js/transaction-share.js"></script>
+<script>
+  const payload = {
+    FileName: "selection.jpg", MerchantName: "Test Merchant", Participants: [
+      { ParticipantKey: "p1", DisplayName: "Mizan", PaymentStatusText: "Unpaid", FinalAmountText: "Rp 12,000" },
+      { ParticipantKey: "p2", DisplayName: "Ragil", PaymentStatusText: "Paid", FinalAmountText: "Rp 20,000" },
+      { ParticipantKey: "p3", DisplayName: "Agi", PaymentStatusText: "Unpaid", FinalAmountText: "Rp 8,000" }
+    ]
+  };
+  window.fetch = async () => ({ ok: true, json: async () => payload });
+  const painted = [];
+  window.SplitBillShare.paint = (_, data) => { painted.push(data.participants.map(x => x.ParticipantKey)); return { canvas: document.createElement("canvas") }; };
+  window.SplitBillShare.toJpeg = async () => { throw new Error("fixture-stop-after-paint"); };
+</script>
+<script src="../../wwwroot/js/share-actions.js"></script>
+<script>
+  const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+  (async () => {
+    const errors = [];
+    const check = (condition, message) => { if (!condition) errors.push(message); };
+    document.querySelector("[data-share-open]").click();
+    document.querySelector('[data-share-tab="jpg"]').click();
+    await tick();
+    const cards = [...document.querySelectorAll(".share-participant-card")];
+    check(cards.length === 3, "three participant cards are rendered");
+    check(!document.querySelector("[data-share-participants]").textContent.includes("undefined"), "no undefined text in selector");
+    check(cards[1]?.textContent.includes("Ragil") && cards[1]?.textContent.includes("Rp 20,000"), "participant data is visible");
+
+    document.querySelector('[value="individual"]').click();
+    document.querySelector('[data-share-participant][value="p2"]').click();
+    document.querySelector("[data-share-generate]").click();
+    await tick();
+    check(JSON.stringify(painted.at(-1)) === '["p2"]', "individual mode selects the clicked participant");
+
+    document.querySelector('[value="selected"]').click();
+    document.querySelector('[data-share-participant][value="p3"]').click();
+    document.querySelector("[data-share-generate]").click();
+    await tick();
+    check(JSON.stringify(painted.at(-1)) === '["p2","p3"]', "selected mode includes exactly checked participants");
+
+    document.querySelector('[value="all"]').click();
+    document.querySelector("[data-share-generate]").click();
+    await tick();
+    check(JSON.stringify(painted.at(-1)) === '["p1","p2","p3"]', "all mode ignores earlier checkbox selection");
+
+    const ctx = { measureText: value => ({ width: String(value).length * 9 }) };
+    const layout = window.SplitBillShare.layout({ ...payload, Participants: [{ ...payload.Participants[0], Items: [{ Name: "Nasi", ShareDescription: "× 1", AmountText: "Rp 12,000" }], MenuSubtotalText: "Rp 12,000", Adjustments: [] }], ReceiptSummary: { SubtotalText: "Rp 12,000", Adjustments: [], GrandTotalText: "Rp 12,000" } }, ctx);
+    const subtotal = layout.commands.find(x => x.type === "labelAmount" && x.label === "Menu subtotal");
+    const rule = layout.commands.filter(x => x.type === "rule" && x.y < subtotal.y).at(-1);
+    check(subtotal.y - rule.y >= 25, "menu subtotal has breathing room below divider");
+    document.getElementById("results").textContent = errors.length ? `FAIL: ${errors.join("; ")}` : "PASS: all, selected, individual, subtotal spacing";
+  })().catch(error => { document.getElementById("results").textContent = `FAIL: ${error.stack}`; });
+</script>
+</body></html>
