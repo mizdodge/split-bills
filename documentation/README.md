@@ -10,7 +10,7 @@ The authoritative product and architecture reference is [`project_guide.md`](../
 - [`SHAREPOINT_SETUP.md`](guides/SHAREPOINT_SETUP.md) — Microsoft Entra permissions, SharePoint List schema, site grant, Power Automate, Teams, and troubleshooting
 - [`SECURITY.md`](SECURITY.md) — supported versions, private vulnerability reporting, secret handling, and deployment boundaries
 
-Share exports are generated locally from server-projected strings: uploader full-transaction sharing and Member own-bill sharing are available from the final detail views. The JPEG is a single dynamically sized 1000px Canvas image; raw HTTP automatically downloads it when native file sharing is unavailable.
+Share exports are generated locally from server-projected strings: the uploader or Admin can export the full transaction, and a Member can export only their own bill. The JPEG is a single dynamically sized 1000px Canvas image; raw HTTP automatically downloads it when native file sharing is unavailable.
 
 ## Visual previews
 
