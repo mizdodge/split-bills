@@ -98,7 +98,7 @@ public sealed class TransactionShareExportService(IStringLocalizer<SharedResourc
         if (selected.Count != participants.Count) throw new InvalidOperationException("Participant breakdown is incomplete.");
 
         var keys = selected.Select((_, index) => $"p{index + 1}").ToArray();
-        var namesByItem = BuildSharedNames(transaction, selected);
+        var namesByItem = BuildSharedNames(selected);
         var exportedParticipants = selected.Select((participant, index) =>
         {
             var breakdown = breakdownById[participant.Id];
@@ -174,14 +174,17 @@ public sealed class TransactionShareExportService(IStringLocalizer<SharedResourc
             charge.Operation == ChargeOperation.Subtract);
 
     private Dictionary<(long ParticipantId, long ItemId), string?> BuildSharedNames(
-        BillTransaction transaction,
         IReadOnlyList<TransactionParticipant> selected)
     {
         var result = new Dictionary<(long, long), string?>();
         foreach (var participant in selected)
         foreach (var allocation in participant.ItemAllocations)
         {
-            var names = selected.Where(other => other.ItemAllocations.Any(x => x.TransactionItemId == allocation.TransactionItemId))
+            if (allocation.QuantityShare <= 0 || allocation.QuantityShare >= 1)
+                continue;
+
+            var names = selected.Where(other => other.ItemAllocations.Any(x =>
+                    x.TransactionItemId == allocation.TransactionItemId && x.QuantityShare > 0 && x.QuantityShare < 1))
                 .Where(other => other.Id != participant.Id)
                 .Select(DisplayName)
                 .Distinct(StringComparer.CurrentCultureIgnoreCase)
