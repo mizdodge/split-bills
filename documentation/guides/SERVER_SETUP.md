@@ -67,7 +67,7 @@ Preserve `publish\App_Data\data-protection-keys` and the SQLite database during 
 
 ## Backup and restore
 
-An Admin can open **System tools** and enter the current password to download a no-store ZIP backup. The package contains a consistent SQLite snapshot, receipt/payment-proof files, the Data Protection key ring, and a checksum manifest. Uploading a ZIP in the same page only validates and stages it; it never replaces the live database from a web request.
+An Admin can open **Update Center** to see the running semantic version and source revision. From the same page, enter the current password to download a no-store ZIP backup. The package contains a consistent SQLite snapshot, receipt/payment-proof files, the Data Protection key ring, and a checksum manifest. Uploading a ZIP there only validates and stages it; it never replaces the live database from a web request.
 
 Run the packaged elevated handoff from the server after stopping other maintenance work:
 

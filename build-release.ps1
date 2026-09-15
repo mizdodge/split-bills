@@ -14,6 +14,12 @@ $artifactsRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts'))
 $requestedOutputValue = if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $artifactsRoot } else { $OutputRoot }
 $requestedOutput = [IO.Path]::GetFullPath($requestedOutputValue)
 $separator = [IO.Path]::DirectorySeparatorChar
+$projectPath = Join-Path $repoRoot 'Splitbill.csproj'
+$projectXml = [xml](Get-Content -LiteralPath $projectPath -Raw)
+$appVersion = @($projectXml.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) | Select-Object -Last 1
+if ([string]::IsNullOrWhiteSpace($appVersion) -or $appVersion -notmatch '^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$') {
+    throw 'Splitbill.csproj must define a valid semantic Version.'
+}
 
 function Test-ChildPath([string]$Path, [string]$Parent) {
     $fullPath = [IO.Path]::GetFullPath($Path).TrimEnd('\', '/')
@@ -27,7 +33,7 @@ if ($requestedOutput -ne $artifactsRoot -and -not (Test-ChildPath $requestedOutp
 New-Item -ItemType Directory -Path $requestedOutput -Force | Out-Null
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$packageName = if ($UserEmailUpdate) { "SplitBill-Server-$stamp (update user email)" } else { "SplitBill-Server-$stamp" }
+$packageName = if ($UserEmailUpdate) { "SplitBill-v$appVersion-Server-$stamp (update user email)" } else { "SplitBill-v$appVersion-Server-$stamp" }
 $packageRoot = Join-Path $requestedOutput $packageName
 $zipPath = Join-Path $requestedOutput "$packageName.zip"
 if ((Test-Path -LiteralPath $packageRoot -PathType Container) -or (Test-Path -LiteralPath $zipPath -PathType Leaf)) {
@@ -105,6 +111,23 @@ if ($settingsText -match '(?i)OpenAI|ApiKey|ProtectedApiKey|AzureOpenAI') {
     throw 'Published appsettings.json contains an AI credential/configuration key.'
 }
 
+$sourceRevision = 'unknown'
+$gitCommand = Get-Command git -ErrorAction SilentlyContinue
+if ($null -ne $gitCommand) {
+    $gitRevision = & $gitCommand.Source -C $repoRoot rev-parse --short=12 HEAD 2>$null
+    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($gitRevision)) {
+        $sourceRevision = $gitRevision.Trim()
+    }
+}
+$builtAtUtc = [DateTimeOffset]::UtcNow.ToString('O')
+$versionFile = Join-Path $packageRoot 'VERSION.txt'
+Set-Content -LiteralPath $versionFile -Encoding UTF8 -Value @(
+    "Version: $appVersion"
+    "Source revision: $sourceRevision"
+    "Built at UTC: $builtAtUtc"
+    "Runtime: $Runtime"
+)
+
 $manifestPath = Join-Path $packageRoot 'SHA256SUMS.txt'
 $manifestLines = foreach ($file in (Get-ChildItem -LiteralPath $packageRoot -File -Recurse | Where-Object FullName -ne $manifestPath | Sort-Object FullName)) {
     $relative = $file.FullName.Substring($packageRoot.Length + 1).Replace('\', '/')
@@ -116,5 +139,7 @@ Compress-Archive -LiteralPath $packageRoot -DestinationPath $zipPath -Compressio
 $zipHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
 $zipSize = (Get-Item -LiteralPath $zipPath).Length
 Write-Host "RELEASE_PACKAGE=$zipPath"
+Write-Host "RELEASE_VERSION=v$appVersion"
+Write-Host "RELEASE_REVISION=$sourceRevision"
 Write-Host "RELEASE_SIZE_BYTES=$zipSize"
 Write-Host "RELEASE_SHA256=$zipHash"

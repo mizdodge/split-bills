@@ -1025,10 +1025,10 @@
     <value>A new SplitBill version is available.</value>
   </data>
   <data name="SystemTools" xml:space="preserve">
-    <value>System tools</value>
+    <value>Update Center</value>
   </data>
   <data name="SystemToolsDescription" xml:space="preserve">
-    <value>Back up and restore installation data with admin confirmation.</value>
+    <value>View the application version and manage installation backup and recovery.</value>
   </data>
   <data name="CreateBackup" xml:space="preserve">
     <value>Create backup</value>
@@ -2135,4 +2135,11 @@ Go, hero of hungry bellies! 🛵😆</value>
   <data name="OneCurrencyEquals" xml:space="preserve"><value>1 {0} equals</value></data>
   <data name="PreviousRateChange" xml:space="preserve"><value>{0}% from the previous rate</value></data>
   <data name="CloseFilter" xml:space="preserve"><value>Close settings</value></data>
+  <data name="ApplicationVersion" xml:space="preserve"><value>Application version</value></data>
+  <data name="ApplicationVersionDescription" xml:space="preserve"><value>The identity of the SplitBill release currently running.</value></data>
+  <data name="SemanticVersion" xml:space="preserve"><value>Version</value></data>
+  <data name="SourceRevision" xml:space="preserve"><value>Source revision</value></data>
+  <data name="ReleaseChannel" xml:space="preserve"><value>Release channel</value></data>
+  <data name="Stable" xml:space="preserve"><value>Stable</value></data>
+  <data name="Unavailable" xml:space="preserve"><value>Unavailable</value></data>
 </root>

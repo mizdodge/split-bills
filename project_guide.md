@@ -113,6 +113,7 @@ Splitbill/
 |-- Program.cs                         Dependency injection and middleware
 |-- appsettings.json                   Connection string, logging, and allowed hosts only
 |-- restore-splitbill.ps1              Elevated restore and rollback handoff
+|-- Splitbill.csproj                   Authoritative semantic application version
 |-- CHANGELOG.md                       Public release history
 |-- documentation/
 |   |-- README.md                      Documentation index
@@ -350,7 +351,7 @@ For a clean server package, run the release builder from the repository root:
 .\build-release.ps1
 ```
 
-It runs the Release build and tests, publishes to a validated staging directory, excludes runtime data/secrets, generates a SHA-256 manifest, and creates a versioned ZIP under `artifacts/`. The ZIP contains `publish/`, setup/update/restore scripts, the root README/project guide, and the `documentation/` directory. It never reads the current live database into the package.
+It runs the Release build and tests, publishes to a validated staging directory, excludes runtime data/secrets, generates `VERSION.txt` and a SHA-256 manifest, and creates a semantic-versioned timestamped ZIP under `artifacts/`. The `<Version>` in `Splitbill.csproj` is the single release-version source used by assembly metadata, the runtime **Update Center**, HTTP integration user agents, and package naming. Git release tags use the matching `vMAJOR.MINOR.PATCH` form. The ZIP contains `publish/`, setup/update/restore scripts, the root README/project guide, and the `documentation/` directory. It never reads the current live database into the package.
 
 For a direct local publish during development, use:
 

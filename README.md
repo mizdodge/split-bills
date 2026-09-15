@@ -11,6 +11,7 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
+![Release](https://img.shields.io/badge/release-v1.0.0-CDFF70?labelColor=003A40)
 ![Tests](https://img.shields.io/badge/tests-192_passing-CDFF70?labelColor=003A40)
 
 </div>
@@ -139,7 +140,7 @@ dotnet test Tests\Splitbill.Tests.csproj
 .\build-release.ps1
 ```
 
-The release builder restores, builds, runs the full test suite, publishes Windows x64 output, checks the sanitized package, creates `SHA256SUMS.txt`, and writes a timestamped ZIP under `artifacts/`.
+The release builder restores, builds, runs the full test suite, publishes Windows x64 output, checks the sanitized package, creates `VERSION.txt` plus `SHA256SUMS.txt`, and writes a semantic-versioned, timestamped ZIP such as `SplitBill-v1.0.0-Server-20260915-120000.zip` under `artifacts/`. Admins can see the running version and source revision in **Update Center**.
 
 For IIS prerequisites, first installation, upgrades, permissions, backup, restore, and migration, follow the [Windows Server guide](documentation/guides/SERVER_SETUP.md).
 

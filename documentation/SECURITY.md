@@ -6,6 +6,7 @@ Security fixes are applied to the latest code on the default branch. Older snaps
 
 | Version | Supported |
 | --- | --- |
+| Latest tagged release | Yes |
 | Latest default branch | Yes |
 | Older releases or forks | No guaranteed support |
 

@@ -1025,10 +1025,10 @@
     <value>Versi SplitBill baru tersedia.</value>
   </data>
   <data name="SystemTools" xml:space="preserve">
-    <value>Tools sistem</value>
+    <value>Pusat Pembaruan</value>
   </data>
   <data name="SystemToolsDescription" xml:space="preserve">
-    <value>Backup dan pemulihan data instalasi dengan konfirmasi admin.</value>
+    <value>Lihat versi aplikasi serta kelola backup dan pemulihan instalasi.</value>
   </data>
   <data name="CreateBackup" xml:space="preserve">
     <value>Buat backup</value>
@@ -2135,4 +2135,11 @@ Semangat, pahlawan perut lapar! 🛵😆</value>
   <data name="OneCurrencyEquals" xml:space="preserve"><value>1 {0} setara dengan</value></data>
   <data name="PreviousRateChange" xml:space="preserve"><value>{0}% dari kurs sebelumnya</value></data>
   <data name="CloseFilter" xml:space="preserve"><value>Tutup pengaturan</value></data>
+  <data name="ApplicationVersion" xml:space="preserve"><value>Versi aplikasi</value></data>
+  <data name="ApplicationVersionDescription" xml:space="preserve"><value>Identitas rilis SplitBill yang sedang berjalan.</value></data>
+  <data name="SemanticVersion" xml:space="preserve"><value>Versi</value></data>
+  <data name="SourceRevision" xml:space="preserve"><value>Revisi sumber</value></data>
+  <data name="ReleaseChannel" xml:space="preserve"><value>Kanal rilis</value></data>
+  <data name="Stable" xml:space="preserve"><value>Stabil</value></data>
+  <data name="Unavailable" xml:space="preserve"><value>Tidak tersedia</value></data>
 </root>

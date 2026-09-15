@@ -10,6 +10,8 @@ The authoritative product and architecture reference is [`project_guide.md`](../
 - [`SHAREPOINT_SETUP.md`](guides/SHAREPOINT_SETUP.md) — Microsoft Entra permissions, SharePoint List schema, site grant, Power Automate, Teams, and troubleshooting
 - [`SECURITY.md`](SECURITY.md) — supported versions, private vulnerability reporting, secret handling, and deployment boundaries
 
+Application releases use semantic versions from `Splitbill.csproj`. The same version appears in the Admin **Update Center**, DLL metadata, release ZIP name, packaged `VERSION.txt`, and matching Git tag.
+
 Share exports are generated locally from server-projected strings: the uploader or Admin can export the full transaction, and a Member can export only their own bill. The JPEG is a single dynamically sized 1000px Canvas image; raw HTTP automatically downloads it when native file sharing is unavailable. The “Shared with” label is shown only when an item share is below one unit; whole-unit shares are not labeled as shared.
 
 ## Visual previews

@@ -1,6 +1,11 @@
 @model SystemBackupViewModel
 @{ ViewData["Title"] = L["SystemTools"]; }
 <div class="page-heading compact"><div><span class="eyebrow">@L["Admin"]</span><h1>@L["SystemTools"]</h1><p>@L["SystemToolsDescription"]</p></div></div>
+<section class="content-card application-version-card">
+    <div class="application-version-mark">S</div>
+    <div class="application-version-copy"><span class="eyebrow">@L["ApplicationVersion"]</span><strong>@AppVersion.Current.DisplayVersion</strong><small>@L["ApplicationVersionDescription"]</small></div>
+    <dl class="application-version-meta"><div><dt>@L["SemanticVersion"]</dt><dd>@AppVersion.Current.SemanticVersion</dd></div><div><dt>@L["SourceRevision"]</dt><dd><code>@(AppVersion.Current.SourceRevision ?? L["Unavailable"].Value)</code></dd></div><div><dt>@L["ReleaseChannel"]</dt><dd>@L["Stable"]</dd></div></dl>
+</section>
 <div class="system-tools-grid">
     <section class="content-card"><div class="section-head"><div><h2>@L["CreateBackup"]</h2><p>@L["BackupDescription"]</p></div></div>
         <form asp-action="Backup" method="post" class="form-grid"><div asp-validation-summary="All" class="validation-summary"></div><div class="form-group"><label asp-for="Password">@L["ConfirmAdminPassword"]</label><input asp-for="Password" class="form-control" autocomplete="current-password" /><small>@L["BackupPasswordHint"]</small></div><button class="btn btn-primary" type="submit">@L["DownloadBackup"]</button></form>

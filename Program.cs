@@ -97,17 +97,18 @@ var dataProtection = builder.Services.AddDataProtection()
 if (!OperatingSystem.IsWindows())
     throw new PlatformNotSupportedException("SplitBill encrypted AI settings require Windows DPAPI.");
 dataProtection.ProtectKeysWithDpapi(protectToLocalMachine: true);
+builder.Services.AddSingleton<IApplicationVersionProvider, ApplicationVersionProvider>();
 builder.Services.AddHttpClient(nameof(AiReceiptService), client => client.Timeout = TimeSpan.FromSeconds(90));
 builder.Services.AddHttpClient(nameof(AiModelCatalogService), client => client.Timeout = TimeSpan.FromSeconds(30));
-builder.Services.AddHttpClient("SharePointGraph", client =>
+builder.Services.AddHttpClient("SharePointGraph", (services, client) =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-    client.DefaultRequestHeaders.UserAgent.ParseAdd("SplitBill/1.0");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd($"SplitBill/{services.GetRequiredService<IApplicationVersionProvider>().Current.SemanticVersion}");
 });
-builder.Services.AddHttpClient("CurrencyRateProvider", client =>
+builder.Services.AddHttpClient("CurrencyRateProvider", (services, client) =>
 {
     client.Timeout = TimeSpan.FromSeconds(20);
-    client.DefaultRequestHeaders.UserAgent.ParseAdd("SplitBill/1.0");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd($"SplitBill/{services.GetRequiredService<IApplicationVersionProvider>().Current.SemanticVersion}");
     client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 });
 builder.Services.AddHttpClient(nameof(LibNetWebPushTransport), client => client.Timeout = TimeSpan.FromSeconds(30));

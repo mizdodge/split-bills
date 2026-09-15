@@ -4,12 +4,7 @@ All notable public changes to SplitBill are documented here.
 
 ## Unreleased
 
-- Added an optional per-transaction pickup switch with surprise-only winner reveal and preserved pickup history.
-- Added privacy-scoped Transaction and Member share projections and a two-pass long JPEG Canvas renderer with a 25-participant clipping fixture.
-- Added All/Selected/Individual uploader sharing, Member own-bill sharing, Web Share API detection, and automatic download fallback.
-- Unified guest-link management under the Transaction Details header Share modal, with independent transaction-wide and participant-scoped tokens, copy fallback, regeneration, and revocation.
-
-## 1.0.0 - 2026-09-11
+## 1.0.0 - 2026-09-15
 
 First public release.
 
@@ -23,6 +18,8 @@ First public release.
 - Transparent per-person item, discount, fee, percentage, and rounding breakdowns.
 - Role-aware dashboards, detailed reports, and four-sheet Excel exports.
 - Weighted Random and deterministic Round Robin food-pickup rotation.
+- Optional per-transaction pickup with surprise-only winner reveal and preserved history.
+- Privacy-scoped All, Selected, Individual, and Member long-JPEG sharing with guest-link management.
 - Optional SharePoint List outbox integration for Power Automate and Teams messages.
 - Responsive Indonesian and English UI, installable PWA shell, private media viewers, backup, restore, and IIS update tooling.
 
