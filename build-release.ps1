@@ -75,6 +75,7 @@ Copy-Item -LiteralPath (Join-Path $repoRoot 'setup-iis.ps1') -Destination $packa
 Copy-Item -LiteralPath (Join-Path $repoRoot 'update-iis.ps1') -Destination $packageRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'restore-splitbill.ps1') -Destination $packageRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'project_guide.md') -Destination $packageRoot -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'design.md') -Destination $packageRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'README.md') -Destination $packageRoot -Force
 $publicDocumentation = Join-Path $packageRoot 'documentation'
 New-Item -ItemType Directory -Path $publicDocumentation -Force | Out-Null

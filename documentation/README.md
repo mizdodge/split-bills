@@ -2,7 +2,7 @@
 
 This directory contains the operational guides, security policy, visual previews, and historical implementation plans for SplitBill.
 
-The authoritative product and architecture reference is [`project_guide.md`](../project_guide.md). The public project overview is the root [`README.md`](../README.md), and release-level changes are recorded in [`CHANGELOG.md`](../CHANGELOG.md).
+The authoritative product and architecture reference is [`project_guide.md`](../project_guide.md). The visual and interaction reference is [`design.md`](../design.md). The public project overview is the root [`README.md`](../README.md), and release-level changes are recorded in [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## Guides
 

@@ -12,7 +12,7 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
 ![Release](https://img.shields.io/badge/release-v1.0.0-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-192_passing-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-194_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -157,6 +157,7 @@ For IIS prerequisites, first installation, upgrades, permissions, backup, restor
 
 ## Documentation
 
+- [Design system](design.md) — visual foundations, responsive shell, reusable components, page blueprints, accessibility, and UI review rules
 - [Project guide](project_guide.md) — authoritative behavior, architecture, data model, security boundaries, and extension rules
 - [Documentation index](documentation/README.md) — setup guides, security policy, and current interface screenshots
 - [Windows Server and IIS setup](documentation/guides/SERVER_SETUP.md)
@@ -177,4 +178,4 @@ SplitBill is available under the [MIT License](LICENSE).
 
 ## Status
 
-The current release gate passes **192 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.
+The current release gate passes **194 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.

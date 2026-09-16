@@ -115,6 +115,7 @@ Splitbill/
 |-- restore-splitbill.ps1              Elevated restore and rollback handoff
 |-- Splitbill.csproj                   Authoritative semantic application version
 |-- CHANGELOG.md                       Public release history
+|-- design.md                          Canonical visual and interaction system
 |-- documentation/
 |   |-- README.md                      Documentation index
 |   |-- SECURITY.md                    Security and disclosure policy
@@ -312,7 +313,7 @@ Manage Users uses ASP.NET Core Identity through `IAdminUserService`. Admin can c
 | `POST /AdminUsers/Enable|Disable/{id}` | Admin | Enable or disable login and revoke the existing security stamp |
 | `/AdminSystem` | Admin | Download a verified backup or stage a restore package |
 
-The UI has a desktop sidebar and a responsive mobile shell. Mobile keeps a visible **Keluar** action in the header, shows notifications beside the profile, and exposes the relevant workflow tabs: Dashboard, Upload, Transactions, Reports, Member bills, moderator approvals, and Admin AI Settings. SharePoint Integration, Manage Users, Food Pickup Rotation, and System Tools remain reachable through the Admin mobile overflow menu so the bottom bar stays usable. Upload/Review/Split activate only the Upload tab; transaction list/detail activate only Transactions. The primary path remains upload, review, split, and Paid. Empty valid validation summaries are hidden, while actual error messages stay next to the action that needs correction. The core palette is Lime `#CDFF70`, Emerald `#003A40`, Stone Grey `#444547`, and Cool White `#F2F0FA`.
+The UI has a desktop sidebar and a responsive mobile shell. Mobile keeps a visible **Keluar** action in the header, shows notifications beside the profile, and exposes the relevant workflow tabs: Dashboard, Upload, Transactions, Reports, Member bills, moderator approvals, and Admin AI Settings. SharePoint Integration, Manage Users, Food Pickup Rotation, and System Tools remain reachable through the Admin mobile overflow menu so the bottom bar stays usable. Upload/Review/Split activate only the Upload tab; transaction list/detail activate only Transactions. The primary path remains upload, review, split, and Paid. Empty valid validation summaries are hidden, while actual error messages stay next to the action that needs correction. The core palette is Lime `#CDFF70`, Emerald `#003A40`, Stone Grey `#444547`, and Cool White `#F2F0FA`. [`design.md`](design.md) is the canonical reference for tokens, components, responsive behavior, page blueprints, accessibility, and UI review rules.
 
 Dashboard analytics are calculated on the server. Admin sees all permitted transactions and Moderator sees only transactions they uploaded. Their shared operational dashboard shows six-month non-draft bill value, the five largest outstanding participant balances, the oldest outstanding transaction, the most frequent merchants, and average full-settlement duration, plus the existing totals and recent activity. A pure Member receives a separate personal dashboard derived only from `ParticipantAccountLink` rows for the signed-in account: current and previous month totals, lifetime paid/outstanding amounts, a six-month paid/outstanding history, and direct links to that Member's recent bill details. Drafts never contribute to analytics; awaiting confirmation remains outstanding until an authorized approver confirms it.
 
@@ -351,7 +352,7 @@ For a clean server package, run the release builder from the repository root:
 .\build-release.ps1
 ```
 
-It runs the Release build and tests, publishes to a validated staging directory, excludes runtime data/secrets, generates `VERSION.txt` and a SHA-256 manifest, and creates a semantic-versioned timestamped ZIP under `artifacts/`. The `<Version>` in `Splitbill.csproj` is the single release-version source used by assembly metadata, the runtime **Update Center**, HTTP integration user agents, and package naming. Git release tags use the matching `vMAJOR.MINOR.PATCH` form. The ZIP contains `publish/`, setup/update/restore scripts, the root README/project guide, and the `documentation/` directory. It never reads the current live database into the package.
+It runs the Release build and tests, publishes to a validated staging directory, excludes runtime data/secrets, generates `VERSION.txt` and a SHA-256 manifest, and creates a semantic-versioned timestamped ZIP under `artifacts/`. The `<Version>` in `Splitbill.csproj` is the single release-version source used by assembly metadata, the runtime **Update Center**, HTTP integration user agents, and package naming. Git release tags use the matching `vMAJOR.MINOR.PATCH` form. The ZIP contains `publish/`, setup/update/restore scripts, the root README/project guide/design system, and the `documentation/` directory. It never reads the current live database into the package.
 
 For a direct local publish during development, use:
 

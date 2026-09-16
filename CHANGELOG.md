@@ -4,6 +4,10 @@ All notable public changes to SplitBill are documented here.
 
 ## Unreleased
 
+### Documentation
+
+- Added a source-aligned design system covering visual tokens, responsive layout, reusable components, page blueprints, accessibility, localization, financial presentation, and UI review rules.
+
 ## 1.0.0 - 2026-09-15
 
 First public release.
