@@ -27,4 +27,15 @@ public sealed class AdminSharePointAuthorizationTests
             Assert.NotNull(method.GetCustomAttribute<Microsoft.AspNetCore.Mvc.ValidateAntiForgeryTokenAttribute>());
         }
     }
+
+    [Fact]
+    public void IndexRedirectsToAdminMicrosoftSharePointTab()
+    {
+        var controller = new AdminSharePointController(null!, null!, null!, null!, null!, null!);
+        var result = Assert.IsType<Microsoft.AspNetCore.Mvc.RedirectToActionResult>(controller.Index());
+        Assert.Equal("Index", result.ActionName);
+        Assert.Equal("AdminMicrosoft", result.ControllerName);
+        Assert.NotNull(result.RouteValues);
+        Assert.Equal("sharepoint", result.RouteValues["tab"]);
+    }
 }

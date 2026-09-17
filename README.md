@@ -12,7 +12,7 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
 ![Release](https://img.shields.io/badge/release-v1.0.0-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-194_passing-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-205_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -80,6 +80,7 @@ SplitBill is a self-hosted ASP.NET Core 8 application that turns one or more rec
 | ✅ | **Two-step payment** | Members upload proof and select **I've paid**; Admin or the owning Moderator approves, rejects with a reason, reopens, or marks payment directly. |
 | 📊 | **Reports and Excel** | Role-scoped date/status filters, all payment states, per-person order detail, and four Excel sheets: Summary, Payment Details, Pivot by Person, and Pickup Rotation. |
 | 🛵 | **Food pickup rotation** | Admin-managed eligibility, secure weighted random or deterministic Round Robin, participant-only candidates, stable winners, reasoned rerolls, and auditable history. |
+| 🔑 | **Microsoft Entra SSO** | Unified 2-tab Admin integration (`/admin/microsoft`), shared DPAPI-encrypted credentials, interactive Microsoft OAuth login, smart multi-stage user matching, and auto-linking. |
 | 💬 | **SharePoint + Teams** | Durable outbox events for bill assignment, payment approval, rejection, and pickup winner; Power Automate sends localized Teams messages with deep links. |
 | 🖼️ | **One long share image** | Uploader or Admin shares all, selected, or one participant in a single readable 1000px JPEG; Members can share only their own bill. “Shared with” appears for fractional item shares below one unit, with HTTP download fallback. |
 | 🔗 | **Guest access** | Account-free read-only personal and whole-transaction links with separate revocation. The Share dialog includes one whole-transaction link, guest-specific links, and the JPG tab for the uploader or Admin, even when every participant is a guest. |
@@ -119,6 +120,7 @@ Requirements:
 - OpenAI or Azure OpenAI credentials for receipt extraction
 - Optional: IIS with the ASP.NET Core Hosting Bundle
 - Optional: Microsoft Entra + SharePoint + Power Automate for Teams notifications
+- Optional: Microsoft Entra Sign in / SSO for existing, verified SplitBill account links
 
 ```powershell
 git clone https://github.com/mizdodge/split-bills.git
@@ -130,7 +132,7 @@ dotnet run
 
 Open `http://localhost:5081/setup`, enter the one-time bootstrap code, and create the first Admin. Fresh installations seed roles only; users are created from **Admin → Manage users**.
 
-Configure the AI provider and encrypted API key from **Admin → AI settings**. Configure optional Microsoft Entra and SharePoint list discovery from **Admin → SharePoint integration**. Secrets never belong in `appsettings.json`.
+Configure the AI provider and encrypted API key from **Admin → AI settings**. Configure optional Microsoft Entra credentials once from **Admin → Microsoft Integration**; use the SSO and SharePoint tabs for independent switches and settings. Existing SharePoint credentials can be migrated server-side without re-entry. Secrets never belong in `appsettings.json`. See the [Microsoft login setup guide](documentation/guides/MICROSOFT_LOGIN_SETUP.md).
 
 ## Build, test, and release
 
@@ -161,6 +163,7 @@ For IIS prerequisites, first installation, upgrades, permissions, backup, restor
 - [Project guide](project_guide.md) — authoritative behavior, architecture, data model, security boundaries, and extension rules
 - [Documentation index](documentation/README.md) — setup guides, security policy, and current interface screenshots
 - [Windows Server and IIS setup](documentation/guides/SERVER_SETUP.md)
+- [Microsoft Entra login and integration setup](documentation/guides/MICROSOFT_LOGIN_SETUP.md)
 - [SharePoint and Power Automate setup](documentation/guides/SHAREPOINT_SETUP.md)
 - [Currency and guest-link setup](documentation/guides/CURRENCY_AND_GUEST_SETUP.md)
 - [Security policy](documentation/SECURITY.md)
@@ -178,4 +181,4 @@ SplitBill is available under the [MIT License](LICENSE).
 
 ## Status
 
-The current release gate passes **194 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.
+The current release gate passes **205 tests** with zero build warnings and zero errors. SplitBill is actively developed as a self-hosted application; practical feedback and contributions are welcome.

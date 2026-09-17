@@ -7,7 +7,8 @@ The authoritative product and architecture reference is [`project_guide.md`](../
 ## Guides
 
 - [`SERVER_SETUP.md`](guides/SERVER_SETUP.md) — Windows Server, IIS, first Admin bootstrap, updates, backup, restore, rollback, and cross-server migration
-- [`SHAREPOINT_SETUP.md`](guides/SHAREPOINT_SETUP.md) — Microsoft Entra permissions, SharePoint List schema, site grant, Power Automate, Teams, and troubleshooting
+- [`SHAREPOINT_SETUP.md`](guides/SHAREPOINT_SETUP.md) — SharePoint List schema, site grant, Power Automate, Teams, and troubleshooting
+- [`MICROSOFT_LOGIN_SETUP.md`](guides/MICROSOFT_LOGIN_SETUP.md) — shared Entra credentials, SSO, verified account linking, independent switches, migration, and HTTPS prerequisites
 - [`SECURITY.md`](SECURITY.md) — supported versions, private vulnerability reporting, secret handling, and deployment boundaries
 
 Application releases use semantic versions from `Splitbill.csproj`. The same version appears in the Admin **Update Center**, DLL metadata, release ZIP name, packaged `VERSION.txt`, and matching Git tag.
@@ -27,6 +28,7 @@ Public setup and operational guides:
 
 - [Currency and guest-link setup](guides/CURRENCY_AND_GUEST_SETUP.md)
 - The currency guide explains why dashboard charts show up to seven **stored rate dates**, which may cover more than seven calendar days, and how the Admin chooses the current-rate cards.
+- [Microsoft Entra login and integration setup](guides/MICROSOFT_LOGIN_SETUP.md) — shared credentials, SSO, account linking, migration, and verification boundaries
 - [SharePoint setup](guides/SHAREPOINT_SETUP.md)
 - [IIS setup and deployment](guides/SERVER_SETUP.md)
 

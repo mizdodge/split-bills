@@ -1,12 +1,44 @@
-# Changelog
+## 2026-09-17
+
+- Added Microsoft Integration with one encrypted shared Microsoft Entra credential source and independent Sign-in/SSO and SharePoint controls.
+- Added verified linking for existing local users while preserving local login, user IDs, roles, bills, and old SharePoint routes.
+- Added idempotent migration of existing protected SharePoint credentials without requiring secret re-entry; failures are recorded without exposing plaintext.
+- Added setup documentation, localized labels, migration and protection regression tests, and included the Microsoft guide in release packages.
+- Release gate: `build-release.ps1` completed successfully; artifact: `artifacts/_batch6-release/SplitBill-v1.0.0-Server-20260917-131929.zip`; 197 tests passed. Real-tenant HTTPS/browser SSO round trip remains unverified because no live tenant activation was available.
 
 All notable public changes to SplitBill are documented here.
 
 ## Unreleased
 
+### Added
+
+- Unified Microsoft & SharePoint Integration Admin interface (`/admin/microsoft`) providing a consolidated 2-tab layout (`tab=sso` and `tab=sharepoint`), copyable callback URL helper, and live Outbox metrics.
+- Microsoft OAuth JWT `id_token` parsing service (`MicrosoftOAuthClaimsParser`) extracting `oid`, `sub`, `tid`, `name`, `email`, `preferred_username`, and `upn`.
+- Multi-stage user matching on Microsoft sign-in callback: matches by persistent `(tenant, subject)`, exact email, normalized email, username, email prefix (e.g. `mizan` matching `mizan@glmsystems.com`), and `MicrosoftAccountEmail`.
+- Automatic verified account linking and persistent sign-in on first successful Microsoft authentication.
+- Visual `TempData["ErrorMessage"]` and `TempData["StatusMessage"]` alert banners on `Login.cshtml`.
+- Explicit `Cache-Control` headers for static files in `Program.cs`: `no-cache, no-store, must-revalidate` for `push-service-worker.js` and `public, max-age=31536000, immutable` for fingerprinted assets (`?v=...`).
+
+### Changed
+
+- Upgraded PWA Service Worker (`push-service-worker.js`, cache version `splitbill-static-v3`) from Cache-First to Network-First with cache fallback for static stylesheets and scripts, eliminating stale CSS on deployed updates without requiring browser hard refresh.
+- Consolidated navigation menus in both desktop sidebar and mobile bottom nav: removed duplicate SharePoint link, routing administrators through the unified **Microsoft Integration** page.
+- Refined integration tab styling to a clean segmented pill control with signature SplitBill Lime (`var(--primary)` `#CDFF70`) active highlight and deep emerald (`#003A40`) typography.
+
+### Fixed
+
+- Resolved HTTP 500 startup crash caused by unconfigured OAuth client options via dynamic `MicrosoftOAuthNamedOptions`.
+- Fixed sign-in callback redirect loop where users were returned to login unauthenticated due to missing token claims.
+- Added automatic fallback in `AdminSharePointController` to reuse shared Microsoft credentials when no independent SharePoint secret is specified.
+- Maintained backward compatibility for `/AdminSharePoint` with an automatic HTTP 302 redirect to `/admin/microsoft?tab=sharepoint`.
+- Constrained desktop left sidebar to viewport height with an isolated vertical scroll container for navigation links, preventing long menus from clipping the user profile, password change link, logout button, and version.
+- Added a short-height desktop fallback (`max-height: 520px`) enabling full-sidebar scroll when viewport height is too short for static headers and footers.
+- Replaced diagonal arrow logout glyphs with a recognizable door-and-outward-arrow SVG across desktop and mobile shells with a minimum 44px hit target.
+- Replaced diamond glyphs with an outline bell SVG for Notifications navigation with inverted active badge coloring and zero clipping.
+
 ### Documentation
 
-- Added a source-aligned design system covering visual tokens, responsive layout, reusable components, page blueprints, accessibility, localization, financial presentation, and UI review rules.
+- Updated `project_guide.md`, `design.md`, `README.md`, and `MICROSOFT_LOGIN_SETUP.md` with the unified 2-tab integration model, Service Worker Network-First caching, and 205-test release gate.
 
 ## 1.0.0 - 2026-09-15
 

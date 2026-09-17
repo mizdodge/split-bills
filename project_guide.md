@@ -2,7 +2,11 @@
 
 ## 1. Product purpose
 
-SplitBill is a small internal web application for turning receipt photos into trackable split bills. Admin and Moderator users can upload a receipt, review AI-extracted items, assign the bill to participants, and mark each participant as paid. Admin can view and manage every transaction, while a Moderator can only view and manage transactions they uploaded. Admin also manages the Microsoft Entra/SharePoint destination and SplitBill user accounts from the Admin section.
+SplitBill is a small internal web application for turning receipt photos into trackable split bills. Admin and Moderator users can upload a receipt, review AI-extracted items, assign the bill to participants, and mark each participant as paid. Admin can view and manage every transaction, while a Moderator can only view and manage transactions they uploaded. Admin also manages the unified Microsoft Integration surface and SplitBill user accounts from the Admin section.
+
+Microsoft Integration has one shared encrypted Entra credential record. The **Sign-in / SSO** and **SharePoint** tabs have independent feature switches; local login and existing SharePoint routes remain available. SSO accepts only a verified Microsoft identity already linked to an existing local `ApplicationUser`, preserving the local UserId, bill history, and role. It never creates users from claims or assigns roles from Entra groups. The self-link flow is short-lived, single-use, bound to the local security stamp/browser and credential revision, and does not store Microsoft passwords or plaintext tokens.
+
+Existing protected SharePoint credentials are migrated once at startup: the legacy purpose decrypts the value, then the dedicated Microsoft Integration purpose re-encrypts it. The secret is never sent to the browser. A failed migration records a safe error and leaves the legacy connection usable, so administrators can remediate without data loss.
 
 The application intentionally excludes QRIS, bank transfers, reminders, multi-currency settlement, and automatic payment verification. It supports read-only guest links and currency-specific payment obligations with reporting conversions; it does not perform currency exchange or settlement.
 
@@ -63,12 +67,15 @@ The application uses `Database.EnsureCreatedAsync()` for automatic first-run set
 ```text
 Splitbill/
 |-- Controllers/
-|   |-- AccountController.cs          Login, logout, access denied
+|   |-- AccountController.cs          Login, logout, access denied, remote error rendering
 |   |-- DashboardController.cs        Role-scoped overview
 |   |-- TransactionsController.cs     Upload through Paid workflow
 |   |-- ReportsController.cs          Admin/global and Moderator/owned reports
 |   |-- AdminSettingsController.cs    AI provider settings and connection test
-|   |-- AdminSharePointController.cs  SharePoint site/list discovery settings
+|   |-- AdminMicrosoftController.cs   Unified Microsoft & SharePoint Integration (2-tab interface)
+|   |-- AdminSharePointController.cs  SharePoint compatibility controller (redirects to /admin/microsoft?tab=sharepoint)
+|   |-- MicrosoftSignInController.cs  Microsoft Entra interactive OAuth sign-in, auto-matching, and auto-linking
+|   |-- MicrosoftAccountController.cs Verified profile self-linking
 |   |-- AdminUsersController.cs       Admin user/account management
 |   |-- AdminFoodPickupController.cs  Admin pickup eligibility and draw history
 |   |-- AdminSystemController.cs      Backup download and restore staging
@@ -78,8 +85,8 @@ Splitbill/
 |   |-- DatabaseSeeder.cs             Roles and installation state
 |   `-- DatabaseSchemaUpdater.cs      Additive SQLite schema guards
 |-- Models/
-|   |-- ApplicationUser.cs            Identity user extension
-|   |-- DomainModels.cs               Database entities and enums
+|   |-- ApplicationUser.cs            Identity user extension with Microsoft link metadata
+|   |-- DomainModels.cs               Database entities and enums (MicrosoftIntegration, MicrosoftLogin, SharePoint)
 |   `-- AiReceiptModels.cs            Stable AI output contract
 |-- Services/
 |   |-- AiReceiptService.cs           Provider/endpoint adapter
@@ -89,6 +96,12 @@ Splitbill/
 |   |-- SplitBillCalculator.cs        Pure deterministic calculation
 |   |-- TransactionAccessService.cs   Admin/global and Moderator/owner management rule
 |   |-- TransactionStatusService.cs   Draft/Unpaid/Partial/Paid calculation
+|   |-- MicrosoftIntegrationService.cs Shared Microsoft Entra credentials and status resolution
+|   |-- MicrosoftOAuthClaimsParser.cs Base64Url JWT id_token parser for Entra claims
+|   |-- MicrosoftOAuthNamedOptions.cs Dynamic IConfigureNamedOptions for runtime credentials
+|   |-- MicrosoftSecretProtector.cs   DPAPI encryption for Microsoft client secrets
+|   |-- MicrosoftLinkStateProtector.cs Tamper-evident state tokens for self-linking
+|   |-- MicrosoftGraphIdentityService.cs Microsoft Graph profile verification
 |   |-- SharePointGraphService.cs     Entra token and Graph site/list discovery
 |   |-- SharePointTestStateProtector.cs Short-lived tested list state
 |   |-- SharePointNotificationService.cs Localized outbox event creation
@@ -164,7 +177,10 @@ BillTransaction (header)
 
 `ApplicationUser` inherits the standard `Email` and `NormalizedEmail` fields from ASP.NET Identity, so user email is stored directly in `AspNetUsers` without a duplicate custom column. Email remains nullable for compatibility with existing seeded accounts. Startup checks both columns and the normalized-email index idempotently, allowing older installations to upgrade without recreating the user table.
 
-`SharePointConfiguration` is a singleton additive table. It stores normalized Tenant/Client IDs, the SharePoint Site URL and stable Graph Site/List IDs, display metadata, connection-test state, and a Data Protection ciphertext for the Microsoft Entra client secret. The plaintext secret, OAuth token, and tested list payload are never stored in `appsettings.json`, HTML, logs, or the database. A short-lived protected test-state token binds a successful list discovery to the current Admin session/configuration fingerprint; Save rejects stale or forged list selections. `AdminUserAuditLog` records only the Admin actor, target user, action, non-secret changed-field summary, and UTC timestamp.
+- **Configuration:** The singleton `MicrosoftIntegrationConfiguration` stores tenant/client identifiers and the DPAPI-protected shared client secret, with credential revision and migration/reset metadata. `MicrosoftLoginConfiguration` stores only SSO switch/health/origin metadata. `SharePointConfiguration.UseSharedMicrosoftCredentials` selects the shared source per existing destination; false preserves independent legacy SharePoint credentials. Secrets are never returned to views, stored in `appsettings.json`, or logged.
+- **Identity:** `ApplicationUser` stores verified Microsoft tenant/object mapping and link metadata. `MicrosoftAccountLinkIntent` is short-lived, single-use, server-side state bound to UserId, security stamp, browser binding, and credential revision. Existing users only; no JIT registration, email-only linking, group role mapping, or implicit identity moves.
+- **Migration:** Startup invokes an idempotent migration that reads the existing SharePoint ciphertext with its original purpose, writes a new Microsoft ciphertext with its dedicated purpose, and opts the legacy SharePoint singleton into shared credentials only after success. Failure is safe and leaves the old path available. `BackupService.ResetMachineSecretsAsync` clears machine-bound protected values without altering live files unless explicitly invoked.
+configuration fingerprint; Save rejects stale or forged list selections. `AdminUserAuditLog` records only the Admin actor, target user, action, non-secret changed-field summary, and UTC timestamp.
 
 `SharePointNotificationOutbox` is the durable boundary between payment actions and Power Automate. When SharePoint integration is enabled, saving a split creates one `BillAssigned` event for each registered participant with an email; submitting **I've paid** creates `PaymentApprovalRequested` for the transaction uploader; rejecting that request creates `PaymentRejected` for the linked member and includes the rejection reason; each actual pickup winner change creates one stable `FoodPickupSelected` event for the selected account. Guests and accounts without email are skipped. The business change and outbox row are committed together, while `SharePointNotificationDispatcher` publishes the row independently every 15 seconds and retries transient failures with exponential backoff up to eight attempts. This prevents Microsoft 365 availability from breaking receipt, split, payment, or pickup operations.
 
@@ -265,7 +281,7 @@ Receipt photos can contain sensitive information. They are stored under `App_Dat
 
 Uploads accept one to five common raster images, 10 MB per image, and 30 MB combined. The shared Magick.NET processor bounds decoded dimensions (12,000px per side / 40MP), ignores the browser MIME/extension, auto-orients EXIF, strips metadata, flattens transparency to white, and emits a static JPEG with a GUID filename. The shipped Windows native build was verified for JPEG/JFIF, PNG, WebP, GIF, BMP, and TIFF; HEIC/HEIF and AVIF use the same decoder boundary when an optional ImageMagick delegate is installed, otherwise they receive a clear unsupported-format error. Animated/multi-page input uses its first frame/page; SVG/SVGZ, PDF/PS/EPS, PSD/XCF, RAW, icon/cursor, and unknown formats are rejected. Generated filenames never reuse a client-provided path. The endpoint takes only `Path.GetFileName()` from stored data before resolving the physical path.
 
-The single root `push-service-worker.js` also provides a PWA offline shell. Only versioned static assets and the neutral offline page are cached. Authenticated HTML, APIs, receipt photos, and payment proofs always use the network and are never placed in Cache Storage. `manifest.webmanifest` and `pwa.js` provide install metadata and the browser install prompt without creating a second worker that could break Web Push.
+The single root `push-service-worker.js` (cache version `splitbill-static-v3`) provides both Web Push handling and an installable PWA offline shell. Static assets (`/css/site.css`, `/js/site.js`, `/js/pwa.js`, `/manifest.webmanifest`, `/favicon.ico`, `/offline.html`) use a **Network-First** strategy with cache fallback: when online, the browser always requests the fresh asset from the server and updates the local cache in the background; when offline, it transparently serves the cached asset. The worker calls `self.skipWaiting()` on install and cleans up legacy cache stores on activation (`clients.claim()`). In `Program.cs`, `UseStaticFiles` sets `Cache-Control: no-cache, no-store, must-revalidate` for `push-service-worker.js` so browsers detect worker updates immediately, while fingerprinted query strings (`?v=...`) receive `Cache-Control: public, max-age=31536000, immutable`. Authenticated HTML, APIs, receipt photos, and payment proofs always use the network and are never stored in browser Cache Storage. `manifest.webmanifest` and `pwa.js` provide install metadata and the browser install prompt without creating a second worker that could break Web Push.
 
 Admin **System tools** creates a consistent SQLite `VACUUM INTO` snapshot and a ZIP manifest containing checksummed database, protected files, and the Data Protection key ring. Backup downloads are no-store and require the current Admin password. Restore upload only stages and validates a ZIP; `restore-splitbill.ps1` performs the elevated `app_offline.htm`/app-pool handoff, creates a rollback copy of `App_Data`, checks every manifest hash and same-install `InstallationId`, and supports `-Migration`, which deliberately omits the old DPAPI key ring and runs the package's `--reset-machine-secrets` against the target data to disable and clear AI, SharePoint, and Web Push machine-bound material for re-entry on the new server.
 
@@ -302,9 +318,16 @@ Manage Users uses ASP.NET Core Identity through `IAdminUserService`. Admin can c
 | `/account/change-password` | Authenticated | Change password with Identity validation |
 | `/AdminSettings` | Admin | AI configuration |
 | `/AdminSettings/Models` | Admin | Server-side provider model discovery |
-| `/AdminSharePoint` | Admin | Enter Entra credentials and a SharePoint Site URL, test the connection, auto-populate lists, and save a destination |
-| `POST /AdminSharePoint/TestConnection` | Admin | Resolve the site through Microsoft Graph and return selectable lists |
-| `POST /AdminSharePoint/Save` | Admin | Persist the tested Site/List IDs and encrypted client secret |
+| `/admin/microsoft` (`/AdminMicrosoft`) | Admin | Unified Microsoft & SharePoint Integration page with two tabs: `tab=sso` (Entra credentials, SSO toggle, callback URL with copy button, legacy migration) and `tab=sharepoint` (Site URL, live Graph test connection, dynamic list picker, destination status, outbox metrics) |
+| `POST /admin/microsoft/save` | Admin | Save shared Entra credentials and SSO toggle |
+| `POST /admin/microsoft/migrate-sharepoint` | Admin | Server-side DPAPI migration of legacy SharePoint credentials into shared Microsoft storage |
+| `/account/microsoft` (`/account/microsoft-signin/start`) | Anonymous | Start interactive Microsoft Entra OAuth authorization when SSO is enabled |
+| `/account/microsoft/oauth-callback` | Anonymous | Microsoft OAuth callback: parses JWT `id_token` claims (`oid`, `sub`, `tid`, `name`, `email`, `preferred_username`, `upn`), performs multi-stage user matching, auto-links account, and establishes persistent Identity session |
+| `GET /account/microsoft/link` | Authenticated | Begin short-lived verified linking for the current local user |
+| `GET /account/microsoft/link/callback` | Authenticated | Consume the single-use linking intent and persist the verified tenant/object mapping |
+| `/AdminSharePoint` | Admin | Backward compatibility route: issues HTTP 302 redirect to `/admin/microsoft?tab=sharepoint` |
+| `POST /AdminSharePoint/TestConnection` | Admin | Resolve the site through Microsoft Graph and return selectable lists (uses shared credentials fallback) |
+| `POST /AdminSharePoint/Save` | Admin | Persist the tested Site/List IDs and notification destination |
 | `/AdminFoodPickup` | Admin | Enable rotation, select eligible accounts, view current pickup/participation counts, and review draw history |
 | `POST /AdminFoodPickup/Save` | Admin | Replace the eligible account set and rotation switch through one antiforgery-protected request |
 | `/AdminUsers` | Admin | Search/filter Identity users and view role, email, and access state |
@@ -313,7 +336,7 @@ Manage Users uses ASP.NET Core Identity through `IAdminUserService`. Admin can c
 | `POST /AdminUsers/Enable|Disable/{id}` | Admin | Enable or disable login and revoke the existing security stamp |
 | `/AdminSystem` | Admin | Download a verified backup or stage a restore package |
 
-The UI has a desktop sidebar and a responsive mobile shell. Mobile keeps a visible **Keluar** action in the header, shows notifications beside the profile, and exposes the relevant workflow tabs: Dashboard, Upload, Transactions, Reports, Member bills, moderator approvals, and Admin AI Settings. SharePoint Integration, Manage Users, Food Pickup Rotation, and System Tools remain reachable through the Admin mobile overflow menu so the bottom bar stays usable. Upload/Review/Split activate only the Upload tab; transaction list/detail activate only Transactions. The primary path remains upload, review, split, and Paid. Empty valid validation summaries are hidden, while actual error messages stay next to the action that needs correction. The core palette is Lime `#CDFF70`, Emerald `#003A40`, Stone Grey `#444547`, and Cool White `#F2F0FA`. [`design.md`](design.md) is the canonical reference for tokens, components, responsive behavior, page blueprints, accessibility, and UI review rules.
+The UI has a desktop sidebar and a responsive mobile shell. Mobile keeps a visible **Keluar** action in the header, shows notifications beside the profile, and exposes the relevant workflow tabs: Dashboard, Upload, Transactions, Reports, Member bills, moderator approvals, and Admin AI Settings. Administration of Microsoft Entra credentials, SSO, and SharePoint integration is unified under a single **Microsoft Integration** navigation item (`/admin/microsoft`), eliminating redundant sidebar links while preserving `/AdminSharePoint` bookmarks via automatic HTTP 302 redirect. The unified page features a clean segmented pill control with signature SplitBill Lime (`var(--primary)` `#CDFF70`) active highlight and deep emerald text (`var(--emerald)` `#003A40`). Upload/Review/Split activate only the Upload tab; transaction list/detail activate only Transactions. The primary path remains upload, review, split, and Paid. Empty valid validation summaries are hidden, while actual error messages stay next to the action that needs correction. The core palette is Lime `#CDFF70`, Emerald `#003A40`, Stone Grey `#444547`, and Cool White `#F2F0FA`. [`design.md`](design.md) is the canonical reference for tokens, components, responsive behavior, page blueprints, accessibility, and UI review rules.
 
 Dashboard analytics are calculated on the server. Admin sees all permitted transactions and Moderator sees only transactions they uploaded. Their shared operational dashboard shows six-month non-draft bill value, the five largest outstanding participant balances, the oldest outstanding transaction, the most frequent merchants, and average full-settlement duration, plus the existing totals and recent activity. A pure Member receives a separate personal dashboard derived only from `ParticipantAccountLink` rows for the signed-in account: current and previous month totals, lifetime paid/outstanding amounts, a six-month paid/outstanding history, and direct links to that Member's recent bill details. Drafts never contribute to analytics; awaiting confirmation remains outstanding until an authorized approver confirms it.
 
@@ -426,11 +449,12 @@ To upgrade an existing IIS installation from a package root, run `.\update-iis.p
 
 ## 14. Natural next features
 
+- **Implemented, but requires activation:** Microsoft Entra interactive SSO, verified account linking, and shared-credential SharePoint operation are implemented and covered by offline tests. Production activation still requires the existing App Registration's correct HTTPS redirect URI, secret validity, Graph permissions/admin consent, and a successful real browser callback round trip. A settings connection test alone is insufficient.
 Useful follow-up work includes pagination for large datasets, background AI processing, richer audit exports, scheduled payment reminders, formal EF migrations, broader browser/end-to-end tests, and optional observability/health dashboards. SharePoint/Teams delivery, browser push, analytics, PWA installation, backup/restore, and pickup rotation are already implemented.
 
-## 15. Current vNext implementation
-
 The approved vNext scope is implemented in source: Member accounts and registered participant links, guest participants, quantity allocation groups, two-step payment approval with proof images, in-app and optional browser notifications, password changes, dedicated reports, role-specific analytics dashboards, SharePoint/Teams delivery, Food Pickup Rotation, PWA installation, Admin backup/restore tools, complete `id-ID`/`en-US` localization, and route-aware responsive navigation. Database upgrades are additive and run automatically at startup, so an existing SQLite installation keeps its transactions, receipts, proofs, settings, and protected Data Protection keys.
+
+The desktop application shell pins the left brand, ID/EN language switcher, user account footer, and version block (`flex-shrink: 0`) while isolating navigation links inside a dedicated vertical scroll container (`.side-nav` with `flex: 1 1 0; min-height: 0; overflow-y: auto`). This guarantees that all 13 Admin navigation links remain fully accessible on common laptop screens (such as 1366×768 and 1280×720) without pushing the user profile, Change Password link, Logout action, or version out of view. An explicit short-height desktop fallback (`@media (min-width: 761px) and (max-height: 520px)`) enables full-sidebar scrolling so all controls remain reachable on very short screens without clipping. Navigation icons use a consistent outline bell SVG for Notifications across desktop and mobile, with inverted badge coloring when active, and logout controls across desktop and mobile share a recognizable door-and-outward-arrow SVG meeting a 44px hit target with localized accessible names.
 
 Payment states are `Unpaid`, `AwaitingConfirmation`, and `Paid`. A linked Member submits a proof-backed claim from My Bills; the transaction owner or Admin confirms or rejects it with a visible reason. A Moderator/Admin can mark a participant Paid directly and can reopen Paid back to Unpaid. Each transition creates typed history and the appropriate notification. Excel exports contain Summary, Payment Details, Pivot per Person, and Pickup Rotation sheets; visible totals and pickup metrics are calculated on the server and written as typed cells, so the workbook remains populated without depending on Excel recalculation.
 

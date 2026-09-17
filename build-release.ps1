@@ -79,8 +79,11 @@ Copy-Item -LiteralPath (Join-Path $repoRoot 'design.md') -Destination $packageRo
 Copy-Item -LiteralPath (Join-Path $repoRoot 'README.md') -Destination $packageRoot -Force
 $publicDocumentation = Join-Path $packageRoot 'documentation'
 New-Item -ItemType Directory -Path $publicDocumentation -Force | Out-Null
-foreach ($fileName in @('README.md', 'SECURITY.md')) {
-    Copy-Item -LiteralPath (Join-Path $repoRoot (Join-Path 'documentation' $fileName)) -Destination $publicDocumentation -Force
+foreach ($fileName in @('README.md', 'SECURITY.md', 'guides/MICROSOFT_LOGIN_SETUP.md')) {
+    $sourcePath = Join-Path $repoRoot (Join-Path 'documentation' $fileName)
+    $destinationPath = Join-Path $publicDocumentation $fileName
+    New-Item -ItemType Directory -Path (Split-Path $destinationPath -Parent) -Force | Out-Null
+    Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
 }
 foreach ($directoryName in @('guides', 'screenshots')) {
     Copy-Item -LiteralPath (Join-Path $repoRoot (Join-Path 'documentation' $directoryName)) -Destination $publicDocumentation -Recurse -Force

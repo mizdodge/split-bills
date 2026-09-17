@@ -40,6 +40,10 @@ Never commit or publish these files. Preserve the database and Data Protection k
 
 AI API keys and Microsoft Entra client secrets must be entered only through the Admin settings pages. Do not place them in `appsettings.json`, source files, issue reports, build artifacts, or screenshots. Revoke and rotate a credential immediately if exposure is suspected.
 
+Microsoft Integration uses one DPAPI-protected shared Entra client secret. The SSO and SharePoint switches are independent, and SharePoint can continue using its legacy ciphertext when shared mode is off. Existing SharePoint ciphertext is migrated server-side only: it is decrypted under the old purpose and immediately re-encrypted under the dedicated Microsoft purpose; plaintext is never returned to the browser, persisted, or logged. SSO does not provision accounts or trust mutable email claims. It validates the tenant/object identity and signs in only an enabled existing user with a matching verified link. Account linking requires an authenticated local session, fresh local verification, short-lived single-use state, security-stamp/browser/config-revision binding, duplicate-link rejection, and explicit unlink/revocation handling.
+
+OAuth callback activation requires a real HTTPS origin registered in the reused Entra App Registration (localhost is suitable only for local development). A successful client-credential/SharePoint settings test is not proof that interactive SSO works; verify a complete real-tenant browser round trip before enabling SSO in production. This repository's offline test/release gate does not claim that live round trip.
+
 ## Deployment expectations
 
 - Run the application on supported Windows hosts because machine-scope DPAPI is enforced at startup.

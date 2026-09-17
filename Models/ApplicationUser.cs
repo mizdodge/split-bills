@@ -12,5 +12,16 @@ public sealed class ApplicationUser : IdentityUser
 
     public DateTimeOffset CreatedAt { get; set; }
 
+    // Microsoft identity is link-only; it is never used as an implicit account selector.
+    [MaxLength(200)] public string? MicrosoftSubject { get; set; }
+    [MaxLength(36)] public string? MicrosoftTenantId { get; set; }
+    public DateTimeOffset? MicrosoftLinkedAt { get; set; }
+    public DateTimeOffset? MicrosoftLastVerifiedAt { get; set; }
+    public bool MicrosoftLinkRevoked { get; set; }
+    public long? MicrosoftCredentialRevision { get; set; }
+    [MaxLength(200)] public string? MicrosoftAccountDisplayName { get; set; }
+    [MaxLength(320)] public string? MicrosoftAccountEmail { get; set; }
+    public long MicrosoftLinkVersion { get; set; }
+
     public List<WebPushSubscription> WebPushSubscriptions { get; set; } = [];
 }

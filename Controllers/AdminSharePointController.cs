@@ -23,12 +23,8 @@ public sealed class AdminSharePointController(
     private const int ConfigurationId = 1;
 
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
-    {
-        var settings = await db.SharePointConfigurations.AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == ConfigurationId, cancellationToken);
-        return View(settings is null ? new SharePointSettingsViewModel() : ToViewModel(settings));
-    }
+    public IActionResult Index()
+        => RedirectToAction("Index", "AdminMicrosoft", new { tab = "sharepoint" });
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> TestConnection(
@@ -144,44 +140,49 @@ public sealed class AdminSharePointController(
             db.SharePointConfigurations.Add(existing);
 
         await db.SaveChangesAsync(cancellationToken);
-        TempData["Success"] = localizer["SharePointConfigurationSaved"].Value;
-        return RedirectToAction(nameof(Index));
+        TempData["StatusMessage"] = localizer["SharePointConfigurationSaved"].Value;
+        return RedirectToAction("Index", "AdminMicrosoft", new { tab = "sharepoint" });
     }
 
-    private async Task<IActionResult> InvalidSaveAsync(SharePointSaveViewModel input, CancellationToken cancellationToken)
+    private Task<IActionResult> InvalidSaveAsync(SharePointSaveViewModel input, CancellationToken cancellationToken)
     {
-        var settings = await db.SharePointConfigurations.AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == ConfigurationId, cancellationToken);
-        var model = settings is null ? new SharePointSettingsViewModel() : ToViewModel(settings);
-        model.Enabled = input.Enabled;
-        model.TenantId = input.TenantId;
-        model.ClientId = input.ClientId;
-        model.SiteUrl = input.SiteUrl;
-        model.SiteId = input.SiteId;
-        model.SelectedListId = input.ListId;
-        model.TestedStateToken = input.TestedStateToken;
-        model.HasStoredClientSecret = settings is not null && !string.IsNullOrWhiteSpace(settings.ProtectedClientSecret);
-        return View("Index", model);
+        TempData["ErrorMessage"] = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+        return Task.FromResult<IActionResult>(RedirectToAction("Index", "AdminMicrosoft", new { tab = "sharepoint" }));
     }
 
-    private Task<string?> ResolveSecretAsync(
+    private async Task<string?> ResolveSecretAsync(
         string tenantId,
         string clientId,
         string? submittedSecret,
         SharePointConfiguration? existing)
     {
-        if (!string.IsNullOrWhiteSpace(submittedSecret)) return Task.FromResult<string?>(submittedSecret.Trim());
-        if (existing is null || !string.Equals(existing.TenantId, NormalizeGuidOrEmpty(tenantId), StringComparison.OrdinalIgnoreCase) ||
-            !string.Equals(existing.ClientId, NormalizeGuidOrEmpty(clientId), StringComparison.OrdinalIgnoreCase) ||
-            string.IsNullOrWhiteSpace(existing.ProtectedClientSecret)) return Task.FromResult<string?>(null);
-        try
+        if (!string.IsNullOrWhiteSpace(submittedSecret)) return submittedSecret.Trim();
+        if (existing is not null && string.Equals(existing.TenantId, NormalizeGuidOrEmpty(tenantId), StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(existing.ClientId, NormalizeGuidOrEmpty(clientId), StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(existing.ProtectedClientSecret))
         {
-            return Task.FromResult<string?>(secretProtector.Unprotect(existing.ProtectedClientSecret));
+            try
+            {
+                return secretProtector.Unprotect(existing.ProtectedClientSecret);
+            }
+            catch (InvalidOperationException) { }
         }
-        catch (InvalidOperationException)
+
+        var msConfig = await db.MicrosoftIntegrationConfigurations.FindAsync(1);
+        if (msConfig is not null &&
+            string.Equals(msConfig.TenantId, NormalizeGuidOrEmpty(tenantId), StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(msConfig.ClientId, NormalizeGuidOrEmpty(clientId), StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(msConfig.ProtectedClientSecret))
         {
-            return Task.FromResult<string?>(null);
+            try
+            {
+                var msProtector = HttpContext.RequestServices.GetRequiredService<IMicrosoftSecretProtector>();
+                return msProtector.Unprotect(msConfig.ProtectedClientSecret);
+            }
+            catch (InvalidOperationException) { }
         }
+
+        return null;
     }
 
     private string CurrentUserId()

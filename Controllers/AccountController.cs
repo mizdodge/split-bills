@@ -7,18 +7,25 @@ using Splitbill.Models;
 using Splitbill.Data;
 using Splitbill;
 using Splitbill.ViewModels;
+using Splitbill.Services;
 
 namespace Splitbill.Controllers;
 
 public sealed class AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager,
-    IStringLocalizer<SharedResource> localizer) : Controller
+    IStringLocalizer<SharedResource> localizer, IMicrosoftIntegrationService microsoftIntegration) : Controller
 {
     [AllowAnonymous, HttpGet("account/login")]
-    public IActionResult Login(string? returnUrl = null)
+    public async Task<IActionResult> Login(string? returnUrl = null, string? remoteError = null)
     {
         if (User.Identity?.IsAuthenticated == true) return RedirectToLanding();
         if (!userManager.Users.Any()) return RedirectToAction("Index", "Setup");
+        if (!string.IsNullOrWhiteSpace(remoteError))
+        {
+            ModelState.AddModelError(string.Empty, remoteError);
+        }
         ViewBag.ReturnUrl = returnUrl;
+        var ms = await microsoftIntegration.GetSettingsAsync();
+        ViewBag.ShowMicrosoftLogin = ms.MicrosoftLoginEnabled && ms.HasStoredClientSecret;
         return View(new LoginViewModel());
     }
 
@@ -27,6 +34,8 @@ public sealed class AccountController(SignInManager<ApplicationUser> signInManag
     {
         if (!await userManager.Users.AnyAsync()) return RedirectToAction("Index", "Setup");
         ViewBag.ReturnUrl = returnUrl;
+        var ms = await microsoftIntegration.GetSettingsAsync();
+        ViewBag.ShowMicrosoftLogin = ms.MicrosoftLoginEnabled && ms.HasStoredClientSecret;
         if (!ModelState.IsValid) return View(model);
         var user = await userManager.FindByNameAsync(model.Username.Trim());
         if (user is null)
@@ -74,6 +83,10 @@ public sealed class AccountController(SignInManager<ApplicationUser> signInManag
         Response.Headers.CacheControl = "no-store";
         return new EmptyResult();
     }
+
+    [AllowAnonymous, HttpGet("account/microsoft")]
+    public IActionResult Microsoft(string? returnUrl = null)
+        => RedirectToAction("Start", "MicrosoftSignIn", new { returnUrl });
 
     [AllowAnonymous, HttpGet("account/access-denied")]
     public IActionResult AccessDenied() => View();

@@ -1,7 +1,9 @@
 bin/
 obj/
 publish/
+publish-backups/
 artifacts/
+artifacts_verification-publish/
 Tests/bin/
 Tests/obj/
 .vs/

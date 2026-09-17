@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1330,9 +1330,79 @@
   <data name="ParticipantBillTotal" xml:space="preserve">
     <value>Participant bill total</value>
   </data>
-  <data name="SharePointIntegration" xml:space="preserve">
-    <value>SharePoint integration</value>
+  <data name="MicrosoftIntegration" xml:space="preserve">
+    <value>Microsoft Integration</value>
   </data>
+  <data name="MicrosoftLogin" xml:space="preserve">
+    <value>Microsoft sign-in</value>
+  </data>
+  <data name="MicrosoftIntegrationDescription" xml:space="preserve">
+    <value>Manage shared Entra credentials, Microsoft sign-in, and SharePoint independently.</value>
+  </data>
+  <data name="MicrosoftLoginEnabled" xml:space="preserve">
+    <value>Enable Microsoft sign-in</value>
+  </data>
+  <data name="MicrosoftIntegrationEnabled" xml:space="preserve">
+    <value>Shared Microsoft credentials configured</value>
+  </data>
+  <data name="MicrosoftCredentialSharedHint" xml:space="preserve">
+    <value>Share these encrypted credentials with SharePoint connections that opt in.</value>
+  </data>
+  <data name="MicrosoftMigrationComplete" xml:space="preserve">
+    <value>Existing SharePoint credentials were migrated without re-entry.</value>
+  </data>
+  <data name="MicrosoftMigrationPending" xml:space="preserve">
+    <value>Existing SharePoint credentials have not been migrated yet.</value>
+  </data>
+  <data name="MicrosoftMigrationFailed" xml:space="preserve">
+    <value>Existing SharePoint credentials could not be migrated automatically.</value>
+  </data>
+  <data name="SignInWithMicrosoft" xml:space="preserve">
+    <value>Sign in with Microsoft</value>
+  </data>
+  <data name="MicrosoftAccountLink" xml:space="preserve">
+    <value>Microsoft account linking</value>
+  </data>
+  <data name="MicrosoftAccountLinkHint" xml:space="preserve">
+    <value>Link only a verified Microsoft account to your existing SplitBill user.</value>
+  </data>
+  <data name="MicrosoftSharePointTab" xml:space="preserve">
+    <value>SharePoint</value>
+  </data>
+  <data name="MicrosoftSsoTab" xml:space="preserve">
+    <value>Sign-in / SSO</value>
+  </data>
+  <data name="SharePointUsesSharedCredentials" xml:space="preserve">
+    <value>Use shared Microsoft credentials</value>
+  </data>
+  <data name="MicrosoftConfigurationRequired" xml:space="preserve">
+    <value>Microsoft Integration is not configured.</value>
+  </data>
+  <data name="MicrosoftLinkVerifiedOnly" xml:space="preserve">
+    <value>Only a verified Microsoft identity can be linked.</value>
+  </data>
+  <data name="MicrosoftLoginUnavailable" xml:space="preserve">
+    <value>Microsoft sign-in is currently unavailable.</value>
+  </data>
+  <data name="MicrosoftSignInFailed" xml:space="preserve">
+    <value>Microsoft sign-in could not be completed.</value>
+  </data>
+  <data name="MicrosoftSignInNotLinked" xml:space="preserve">
+    <value>Your Microsoft account is not linked to an existing SplitBill user. Sign in locally and link it from your account settings.</value>
+  </data>
+  <data name="MicrosoftLinkSuccess" xml:space="preserve">
+    <value>Your verified Microsoft account is now linked.</value>
+  </data>
+  <data name="MicrosoftUnlinkSuccess" xml:space="preserve">
+    <value>Your Microsoft account was unlinked.</value>
+  </data>
+  <data name="MicrosoftCredentialsSaved" xml:space="preserve">
+    <value>Microsoft Integration settings saved.</value>
+  </data>
+  <data name="MicrosoftCredentialValidationFailed" xml:space="preserve">
+    <value>Microsoft credentials could not be validated.</value>
+  </data>
+
   <data name="SharePointSettingsDescription" xml:space="preserve">
     <value>Connect SplitBill to the selected SharePoint site.</value>
   </data>
@@ -2142,4 +2212,12 @@ Go, hero of hungry bellies! 🛵😆</value>
   <data name="ReleaseChannel" xml:space="preserve"><value>Release channel</value></data>
   <data name="Stable" xml:space="preserve"><value>Stable</value></data>
   <data name="Unavailable" xml:space="preserve"><value>Unavailable</value></data>
+  <data name="MicrosoftSignInTab" xml:space="preserve"><value>Microsoft Sign-in (SSO)</value></data>
+  <data name="SharePointIntegrationTab" xml:space="preserve"><value>SharePoint Integration</value></data>
+  <data name="MicrosoftCallbackUrl" xml:space="preserve"><value>Authorization Callback URL (Redirect URI)</value></data>
+  <data name="MicrosoftCallbackHint" xml:space="preserve"><value>Register this URL in Microsoft Entra ID (Azure Portal) -> App Registrations -> Authentication (Web platform).</value></data>
+  <data name="CopyCallbackUrl" xml:space="preserve"><value>Copy Callback URL</value></data>
+  <data name="CallbackUrlCopied" xml:space="preserve"><value>Callback URL copied.</value></data>
+  <data name="SharedCredentialsDescription" xml:space="preserve"><value>These Microsoft Entra credentials are shared for Single Sign-On (SSO) and SharePoint.</value></data>
+  <data name="AccountNotRegistered" xml:space="preserve"><value>This Microsoft account ({0}) is not registered in SplitBill. Contact your administrator.</value></data>
 </root>

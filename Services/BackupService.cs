@@ -114,6 +114,22 @@ public sealed class BackupService(IWebHostEnvironment environment, IConfiguratio
             item.LastTestSucceeded = null;
             item.LastError = "Migration restore requires SharePoint credentials to be entered again.";
         }
+        foreach (var item in await db.SharePointConfigurations.ToListAsync(cancellationToken))
+        {
+            if (item.UseSharedMicrosoftCredentials) continue;
+            item.UseSharedMicrosoftCredentials = true;
+        }
+        await db.SaveChangesAsync(cancellationToken);
+
+        foreach (var item in await db.MicrosoftIntegrationConfigurations.ToListAsync(cancellationToken))
+        {
+            item.ProtectedClientSecret = string.Empty;
+            item.PendingTenantId = null;
+            item.PendingClientId = null;
+            item.ProtectedPendingClientSecret = null;
+            item.LegacyMigrationCompleted = false;
+            item.ResetMarker = "machine-secrets-reset";
+        }
         foreach (var item in await db.WebPushConfigurations.ToListAsync(cancellationToken))
         {
             item.Enabled = false;

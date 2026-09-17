@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Splitbill.Data;
 using Microsoft.Extensions.Logging;
 
 namespace Splitbill.Services;
@@ -10,7 +12,8 @@ public sealed record SharePointConnectionRequest(
     string TenantId,
     string ClientId,
     string ClientSecret,
-    string SiteUrl);
+    string SiteUrl,
+    bool UseSharedMicrosoftCredentials = false);
 
 public sealed record SharePointListOption(string Id, string DisplayName, string? WebUrl);
 
@@ -28,7 +31,8 @@ public sealed record SharePointListItemRequest(
     string ListId,
     string Title,
     string Email,
-    string Description);
+    string Description,
+    bool UseSharedMicrosoftCredentials = false);
 
 public enum SharePointGraphErrorCategory
 {
@@ -74,6 +78,8 @@ public interface ISharePointGraphService
 /// </summary>
 public sealed class SharePointGraphService(
     IHttpClientFactory httpClientFactory,
+    IMicrosoftSecretProtector microsoftSecrets,
+    ApplicationDbContext db,
     ILogger<SharePointGraphService> logger) : ISharePointGraphService
 {
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0";
@@ -84,6 +90,19 @@ public sealed class SharePointGraphService(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        if (request.UseSharedMicrosoftCredentials)
+        {
+            var shared = await db.MicrosoftIntegrationConfigurations.SingleOrDefaultAsync(x => x.Id == 1, cancellationToken);
+            if (shared is null || string.IsNullOrWhiteSpace(shared.ProtectedClientSecret))
+                throw new SharePointGraphException(SharePointGraphErrorCategory.InvalidInput, "Shared Microsoft credentials are not configured.");
+            request = request with
+            {
+                TenantId = shared.TenantId,
+                ClientId = shared.ClientId,
+                ClientSecret = microsoftSecrets.Unprotect(shared.ProtectedClientSecret)
+            };
+        }
 
         var tenantId = ValidateGuid(request.TenantId, "Tenant ID");
         var clientId = ValidateGuid(request.ClientId, "Client ID");
@@ -111,6 +130,18 @@ public sealed class SharePointGraphService(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
+        if (request.UseSharedMicrosoftCredentials)
+        {
+            var shared = await db.MicrosoftIntegrationConfigurations.SingleOrDefaultAsync(x => x.Id == 1, cancellationToken);
+            if (shared is null || string.IsNullOrWhiteSpace(shared.ProtectedClientSecret))
+                throw new SharePointGraphException(SharePointGraphErrorCategory.InvalidInput, "Shared Microsoft credentials are not configured.");
+            request = request with
+            {
+                TenantId = shared.TenantId,
+                ClientId = shared.ClientId,
+                ClientSecret = microsoftSecrets.Unprotect(shared.ProtectedClientSecret)
+            };
+        }
         var tenantId = ValidateGuid(request.TenantId, "Tenant ID");
         var clientId = ValidateGuid(request.ClientId, "Client ID");
         if (string.IsNullOrWhiteSpace(request.ClientSecret) ||

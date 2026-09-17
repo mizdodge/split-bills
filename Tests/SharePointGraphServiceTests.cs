@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Splitbill.Data;
 using Splitbill.Services;
 
 namespace Splitbill.Tests;
@@ -210,8 +212,11 @@ public sealed class SharePointGraphServiceTests
     {
         var services = new ServiceCollection();
         services.AddHttpClient("SharePointGraph").ConfigurePrimaryHttpMessageHandler(() => handler);
+        services.AddSingleton<IMicrosoftSecretProtector, MicrosoftSecretProtector>();
+        services.AddDataProtection();
+        services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         var provider = services.BuildServiceProvider();
-        return new SharePointGraphService(provider.GetRequiredService<IHttpClientFactory>(), NullLogger<SharePointGraphService>.Instance);
+        return new SharePointGraphService(provider.GetRequiredService<IHttpClientFactory>(), provider.GetRequiredService<IMicrosoftSecretProtector>(), provider.GetRequiredService<ApplicationDbContext>(), NullLogger<SharePointGraphService>.Instance);
     }
 
     private static HttpResponseMessage Json(HttpStatusCode status, string body)

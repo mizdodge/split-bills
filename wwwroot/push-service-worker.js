@@ -1,16 +1,14 @@
 /* SplitBill's single root worker owns both Web Push and the safe offline shell.
    Authenticated HTML, API responses, receipts and payment proofs never enter
    the cache. */
-var SPLITBILL_STATIC_CACHE = 'splitbill-static-v2';
+var SPLITBILL_STATIC_CACHE = 'splitbill-static-v3';
 var SPLITBILL_STATIC_ASSETS = ['/offline.html', '/favicon.ico', '/manifest.webmanifest', '/css/site.css', '/js/site.js', '/js/pwa.js'];
 
 self.addEventListener('install', function (event) {
     event.waitUntil(caches.open(SPLITBILL_STATIC_CACHE).then(function (cache) {
         return cache.addAll(SPLITBILL_STATIC_ASSETS);
     }).then(function () {
-        // First install can take control immediately; later releases wait for
-        // the user-facing Refresh action so a form is never interrupted.
-        if (!self.registration.active) return self.skipWaiting();
+        return self.skipWaiting();
     }));
 });
 
@@ -32,7 +30,19 @@ self.addEventListener('fetch', function (event) {
         url.pathname === '/offline.html' || url.pathname === '/css/site.css' ||
         url.pathname === '/js/site.js' || url.pathname === '/js/pwa.js';
     if (isStatic) {
-        event.respondWith(caches.match(url.pathname).then(function (cached) { return cached || fetch(request); }));
+        event.respondWith(
+            fetch(request).then(function (networkResponse) {
+                if (networkResponse && networkResponse.ok) {
+                    var responseClone = networkResponse.clone();
+                    caches.open(SPLITBILL_STATIC_CACHE).then(function (cache) {
+                        cache.put(url.pathname, responseClone);
+                    });
+                }
+                return networkResponse;
+            }).catch(function () {
+                return caches.match(url.pathname);
+            })
+        );
         return;
     }
     if (request.mode === 'navigate') {

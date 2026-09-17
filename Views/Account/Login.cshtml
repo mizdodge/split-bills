@@ -16,6 +16,14 @@
             <span class="eyebrow">@L["WelcomeBack"]</span>
             <h2>@L["LoginTitle"]</h2>
             <p class="text-muted">@L["LoginDescription"]</p>
+            @if (TempData["ErrorMessage"] is string err)
+            {
+                <div class="alert alert-danger mt-3 mb-0">@err</div>
+            }
+            @if (TempData["StatusMessage"] is string status)
+            {
+                <div class="alert alert-success mt-3 mb-0">@status</div>
+            }
             <form method="post" asp-route-returnUrl="@ViewBag.ReturnUrl" class="mt-4">
                 <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
                 <div class="form-group">
@@ -30,6 +38,10 @@
                 </div>
                 <label class="check-line"><input asp-for="RememberMe" /> @L["RememberMe"]</label>
                 <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">@L["Login"] <span>→</span></button>
+                @if (ViewBag.ShowMicrosoftLogin == true)
+                {
+                    <a class="btn btn-outline-secondary btn-lg w-100 mt-2" href="@Url.Action("Microsoft", "Account", new { returnUrl = ViewBag.ReturnUrl })">@L["SignInWithMicrosoft"]</a>
+                }
             </form>
             <p class="login-foot">@L["AdminAccess"]</p>
         </div>

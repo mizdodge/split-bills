@@ -1,0 +1,378 @@
+@model AdminMicrosoftUnifiedViewModel
+@{
+    ViewData["Title"] = L["MicrosoftIntegration"];
+}
+
+<div class="page-heading compact">
+    <div>
+        <span class="eyebrow">@L["Admin"]</span>
+        <h1>@L["MicrosoftIntegration"]</h1>
+        <p>@L["MicrosoftIntegrationDescription"]</p>
+    </div>
+</div>
+
+@if (TempData["StatusMessage"] is string status)
+{
+    <div class="alert alert-success mb-3">@status</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger mb-3">@error</div>
+}
+
+<div class="integration-tabs-nav" role="tablist">
+    <button type="button" class="tab-btn @(Model.ActiveTab != "sharepoint" ? "active" : "")" id="tab-btn-sso" role="tab" aria-selected="@(Model.ActiveTab != "sharepoint" ? "true" : "false")" aria-controls="pane-sso" data-tab="sso">
+        <span class="tab-bullet"></span> @L["MicrosoftSignInTab"]
+    </button>
+    <button type="button" class="tab-btn @(Model.ActiveTab == "sharepoint" ? "active" : "")" id="tab-btn-sharepoint" role="tab" aria-selected="@(Model.ActiveTab == "sharepoint" ? "true" : "false")" aria-controls="pane-sharepoint" data-tab="sharepoint">
+        <span class="tab-bullet"></span> @L["SharePointIntegrationTab"]
+    </button>
+</div>
+
+<style>
+    .integration-tabs-nav {
+        display: inline-flex;
+        gap: 4px;
+        background: #e9ecf2;
+        border: 1px solid rgba(68, 69, 71, 0.12);
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 24px;
+    }
+    .integration-tabs-nav .tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        padding: 8px 18px;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+    .integration-tabs-nav .tab-btn:hover {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.6);
+    }
+    .integration-tabs-nav .tab-btn.active {
+        color: var(--emerald);
+        background: var(--primary);
+        font-weight: 800;
+        border-color: rgba(0, 58, 64, 0.12);
+        box-shadow: 0 4px 12px rgba(0, 58, 64, 0.14);
+    }
+    .integration-tabs-nav .tab-btn.active:hover {
+        color: var(--emerald);
+        background: var(--primary);
+    }
+    .integration-tabs-nav .tab-btn .tab-bullet {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #a0a6b5;
+        transition: background 0.18s ease;
+    }
+    .integration-tabs-nav .tab-btn.active .tab-bullet {
+        background: var(--emerald);
+    }
+    .callback-url-box {
+        background: #fafaff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-top: 18px;
+    }
+    .callback-url-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .callback-url-row input {
+        font-family: monospace;
+        font-size: 0.85rem;
+        background: #fff;
+    }
+    .tab-pane {
+        display: none;
+    }
+    .tab-pane.active {
+        display: block;
+    }
+</style>
+
+<!-- ============================================== -->
+<!-- TAB 1: MICROSOFT SIGN-IN / SSO                -->
+<!-- ============================================== -->
+<div id="pane-sso" class="tab-pane @(Model.ActiveTab != "sharepoint" ? "active" : "")" role="tabpanel" aria-labelledby="tab-btn-sso">
+    <form method="post" asp-controller="AdminMicrosoft" asp-action="Save" class="settings-layout mb-4">
+        @Html.AntiForgeryToken()
+        <section class="content-card">
+            <div class="section-head">
+                <div>
+                    <h2>@L["MicrosoftEntra"]</h2>
+                    <p>@L["SharedCredentialsDescription"]</p>
+                </div>
+                <label class="toggle-line">
+                    <input type="checkbox" name="MicrosoftIntegrationEnabled" value="true" @(Model.Microsoft.MicrosoftIntegrationEnabled ? "checked" : "") />
+                    <span>@L["Enabled"]</span>
+                </label>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <div class="settings-form">
+                <div class="form-grid two">
+                    <div class="form-group">
+                        <label for="ms-tenant-id">@L["TenantId"]</label>
+                        <input id="ms-tenant-id" name="TenantId" value="@Model.Microsoft.TenantId" class="form-control" autocomplete="off" spellcheck="false" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ms-client-id">@L["ClientId"]</label>
+                        <input id="ms-client-id" name="ClientId" value="@Model.Microsoft.ClientId" class="form-control" autocomplete="off" spellcheck="false" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ms-client-secret">@L["ClientSecret"]</label>
+                    <input id="ms-client-secret" name="ClientSecret" type="password" class="form-control" placeholder="@(Model.Microsoft.HasStoredClientSecret ? L["StoredSecretPlaceholder"].Value : L["EnterClientSecret"].Value)" autocomplete="new-password" spellcheck="false" />
+                    <small class="text-muted">@(Model.Microsoft.HasStoredClientSecret ? L["StoredSecretHint"] : L["SecretRequiredForTest"])</small>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="toggle-line">
+                        <input type="checkbox" name="MicrosoftLoginEnabled" value="true" @(Model.Microsoft.MicrosoftLoginEnabled ? "checked" : "") />
+                        <span><strong>@L["MicrosoftLoginEnabled"]</strong> — @L["SignInWithMicrosoft"]</span>
+                    </label>
+                </div>
+
+                <div class="callback-url-box">
+                    <label class="form-label mb-1"><strong>@L["MicrosoftCallbackUrl"]</strong></label>
+                    <div class="callback-url-row">
+                        <input type="text" id="oauth-callback-url" class="form-control form-control-sm" value="@Model.CallbackUrl" readonly />
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-copy-callback" title='@L["CopyCallbackUrl"]'>
+                            📋 @L["CopyCallbackUrl"]
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1">@L["MicrosoftCallbackHint"]</small>
+                </div>
+
+                <div class="form-actions mt-4">
+                    <button class="btn btn-primary" type="submit">@L["SaveConfiguration"]</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="content-card">
+            <h2>@L["MicrosoftAccountLink"]</h2>
+            <p>@L["MicrosoftAccountLinkHint"]</p>
+            <hr />
+            <h3>Status SSO</h3>
+            <ul class="status-list mb-3">
+                <li>
+                    <span>Status login:</span>
+                    <strong>@(Model.Microsoft.MicrosoftLoginEnabled ? "Aktif" : "Nonaktif")</strong>
+                </li>
+                <li>
+                    <span>Kredensial tersimpan:</span>
+                    <strong>@(Model.Microsoft.HasStoredClientSecret ? "Ya (Terenkripsi DPAPI)" : "Belum")</strong>
+                </li>
+            </ul>
+
+            <h3 class="mt-3">@L["WhatWillBeSaved"]</h3>
+            <ul>
+                <li>@L["EncryptedClientSecret"]</li>
+                <li>Tenant ID &amp; Client ID (App Registration)</li>
+                <li>Mode SSO interaktif untuk akun perusahaan</li>
+            </ul>
+
+            @if (!Model.Microsoft.LegacyMigrationCompleted)
+            {
+                <hr />
+                <h3>Migrasi Kredensial SharePoint</h3>
+                <p class="text-muted small">Pindahkan kredensial SharePoint terenkripsi yang sudah ada tanpa perlu memasukkan ulang secret.</p>
+                <button class="btn btn-sm btn-outline-secondary" type="submit" formaction="@Url.Action("MigrateSharePoint", "AdminMicrosoft")">
+                    Migrasi Kredensial SharePoint
+                </button>
+            }
+        </aside>
+    </form>
+</div>
+
+<!-- ============================================== -->
+<!-- TAB 2: SHAREPOINT INTEGRATION                 -->
+<!-- ============================================== -->
+<div id="pane-sharepoint" class="tab-pane @(Model.ActiveTab == "sharepoint" ? "active" : "")" role="tabpanel" aria-labelledby="tab-btn-sharepoint">
+    <form method="post" asp-controller="AdminSharePoint" asp-action="Save" class="settings-layout sharepoint-settings-form" id="sharepoint-settings-form"
+          data-test-url="@Url.Action("TestConnection", "AdminSharePoint")"
+          data-testing-text='@L["TestingConnection"]' data-connection-ready-text='@L["ConnectionReady"]'
+          data-connection-failed-text='@L["ConnectionFailed"]' data-choose-list-text='@L["ChooseSharePointList"]'
+          data-lists-loaded-text='@L["ListsAvailable"]' data-not-connected-text='@L["NotConnected"]'
+          data-list-not-loaded-text='@L["ListNotLoaded"]'>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="SiteId" value="@Model.SharePoint.SiteId" id="sharepoint-site-id" />
+        <input type="hidden" name="TestedStateToken" value="@Model.SharePoint.TestedStateToken" id="sharepoint-tested-token" />
+        <input type="hidden" name="SelectedListDisplayName" value="@Model.SharePoint.SelectedListDisplayName" id="sharepoint-list-name" />
+        <input type="hidden" name="SelectedListWebUrl" value="@Model.SharePoint.SelectedListWebUrl" id="sharepoint-list-url" />
+
+        <section class="content-card">
+            <div class="section-head">
+                <div>
+                    <h2>@L["SharePointIntegration"]</h2>
+                    <p>@L["SharePointSettingsDescription"]</p>
+                </div>
+                <label class="toggle-line">
+                    <input type="checkbox" name="Enabled" value="true" @(Model.SharePoint.Enabled ? "checked" : "") />
+                    <span>@L["Enabled"]</span>
+                </label>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <div class="settings-form">
+                <div class="form-grid two">
+                    <div class="form-group">
+                        <label for="sp-tenant-id">@L["TenantId"]</label>
+                        <input id="sp-tenant-id" name="TenantId" value="@Model.SharePoint.TenantId" class="form-control sharepoint-input" autocomplete="off" spellcheck="false" required />
+                        <span class="text-danger" data-valmsg-for="TenantId" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="sp-client-id">@L["ClientId"]</label>
+                        <input id="sp-client-id" name="ClientId" value="@Model.SharePoint.ClientId" class="form-control sharepoint-input" autocomplete="off" spellcheck="false" required />
+                        <span class="text-danger" data-valmsg-for="ClientId" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sp-client-secret">@L["ClientSecret"]</label>
+                    <input id="sp-client-secret" name="ClientSecret" type="password" class="form-control sharepoint-input" placeholder="@(Model.SharePoint.HasStoredClientSecret ? L["StoredSecretPlaceholder"].Value : L["EnterClientSecret"].Value)" autocomplete="new-password" spellcheck="false" />
+                    <small>@(Model.SharePoint.HasStoredClientSecret ? L["StoredSecretHint"] : L["SecretRequiredForTest"])</small>
+                    <span class="text-danger" data-valmsg-for="ClientSecret" data-valmsg-replace="true"></span>
+                </div>
+                <div class="form-group">
+                    <label for="sp-site-url">@L["SharePointSiteUrl"]</label>
+                    <input id="sp-site-url" name="SiteUrl" value="@Model.SharePoint.SiteUrl" class="form-control sharepoint-input" placeholder="https://tenant.sharepoint.com/sites/Office" autocomplete="url" spellcheck="false" required />
+                    <small>@L["SharePointSiteUrlHint"]</small>
+                    <span class="text-danger" data-valmsg-for="SiteUrl" data-valmsg-replace="true"></span>
+                </div>
+                <div class="form-actions sharepoint-test-actions">
+                    <span id="sharepoint-test-status" class="model-load-status" aria-live="polite">@L["TestConnectionBeforeSave"]</span>
+                    <button class="btn btn-light" type="button" id="sharepoint-test-button">@L["TestConnection"]</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="content-card connection-card sharepoint-destination-card">
+            <h2>@L["SharePointDestination"]</h2>
+            <p>@L["SharePointListHint"]</p>
+            <div id="sharepoint-site-status" class="sharepoint-site-status" data-has-site="@(Model.SharePoint.LastTestSucceeded == true ? "true" : "false")">
+                @if (Model.SharePoint.LastTestSucceeded == true && !string.IsNullOrWhiteSpace(Model.SharePoint.SiteDisplayName))
+                {
+                    <strong>@Model.SharePoint.SiteDisplayName</strong><small>@Model.SharePoint.SiteId</small>
+                }
+                else
+                {
+                    <span>@L["NotConnected"]</span>
+                }
+            </div>
+            <div class="form-group">
+                <label for="sharepoint-list-id">@L["SharePointList"]</label>
+                <select id="sharepoint-list-id" name="ListId" class="form-select" disabled required data-selected-list="@Model.SharePoint.SelectedListId">
+                    @if (Model.SharePoint.LastTestSucceeded == true && !string.IsNullOrWhiteSpace(Model.SharePoint.SelectedListId))
+                    {
+                        <option value="@Model.SharePoint.SelectedListId" selected>@Model.SharePoint.SelectedListDisplayName</option>
+                    }
+                    else
+                    {
+                        <option value="">@L["TestConnectionToLoadLists"]</option>
+                    }
+                </select>
+                <small id="sharepoint-list-status">@L["ListNotLoaded"]</small>
+            </div>
+            <hr />
+            <h3>Status Antrean Outbox</h3>
+            <ul class="status-list mb-3">
+                <li><span>Tertunda:</span> <strong>@Model.OutboxPendingCount</strong></li>
+                <li><span>Terkirim:</span> <strong>@Model.OutboxDeliveredCount</strong></li>
+                <li><span>Gagal (Dead Letter):</span> <strong>@Model.OutboxDeadLetterCount</strong></li>
+            </ul>
+
+            <hr />
+            <h3>@L["WhatWillBeSaved"]</h3>
+            <ul>
+                <li>@L["EncryptedClientSecret"]</li>
+                <li>@L["StableSiteAndListIds"]</li>
+                <li>@L["LastConnectionTest"]</li>
+            </ul>
+            @if (Model.SharePoint.LastTestSucceeded == false && !string.IsNullOrWhiteSpace(Model.SharePoint.LastError))
+            {
+                <div class="info-box danger-box">@Model.SharePoint.LastError</div>
+            }
+        </aside>
+
+        <div class="form-actions full">
+            <button class="btn btn-primary" type="submit" id="sharepoint-save-button" disabled>@L["SaveConfiguration"]</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/sharepoint-settings.js" asp-append-version="true"></script>
+    <script>
+        (() => {
+            // Tab switching logic
+            const ssoBtn = document.getElementById('tab-btn-sso');
+            const spBtn = document.getElementById('tab-btn-sharepoint');
+            const ssoPane = document.getElementById('pane-sso');
+            const spPane = document.getElementById('pane-sharepoint');
+
+            function switchTab(tab) {
+                if (tab === 'sharepoint') {
+                    spBtn.classList.add('active');
+                    spBtn.setAttribute('aria-selected', 'true');
+                    ssoBtn.classList.remove('active');
+                    ssoBtn.setAttribute('aria-selected', 'false');
+                    spPane.classList.add('active');
+                    ssoPane.classList.remove('active');
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', 'sharepoint');
+                    window.history.replaceState(null, '', url);
+                } else {
+                    ssoBtn.classList.add('active');
+                    ssoBtn.setAttribute('aria-selected', 'true');
+                    spBtn.classList.remove('active');
+                    spBtn.setAttribute('aria-selected', 'false');
+                    ssoPane.classList.add('active');
+                    spPane.classList.remove('active');
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', 'sso');
+                    window.history.replaceState(null, '', url);
+                }
+            }
+
+            ssoBtn?.addEventListener('click', () => switchTab('sso'));
+            spBtn?.addEventListener('click', () => switchTab('sharepoint'));
+
+            // Copy callback URL button
+            const copyBtn = document.getElementById('btn-copy-callback');
+            const callbackInput = document.getElementById('oauth-callback-url');
+            if (copyBtn && callbackInput) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(callbackInput.value);
+                        const origText = copyBtn.textContent;
+                        copyBtn.textContent = '✓ @L["CallbackUrlCopied"]';
+                        copyBtn.classList.remove('btn-outline-secondary');
+                        copyBtn.classList.add('btn-success');
+                        setTimeout(() => {
+                            copyBtn.textContent = origText;
+                            copyBtn.classList.remove('btn-success');
+                            copyBtn.classList.add('btn-outline-secondary');
+                        }, 2500);
+                    } catch (e) {
+                        callbackInput.select();
+                        document.execCommand('copy');
+                    }
+                });
+            }
+        })();
+    </script>
+}

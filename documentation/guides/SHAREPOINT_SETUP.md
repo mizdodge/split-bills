@@ -1,6 +1,6 @@
 # SplitBill SharePoint connection setup
 
-This document configures the SharePoint destination used by the Admin **SharePoint Integration** page and the notification rows consumed by Power Automate.
+> Microsoft Entra credentials are now managed from the unified **Admin → Microsoft Integration → SharePoint** tab. This legacy guide remains valid for site permissions, list preparation, and Power Automate. Existing `/AdminSharePoint` bookmarks remain supported.
 
 ## 1. Create the Microsoft Entra app
 
@@ -21,9 +21,9 @@ The SplitBill test can read lists only after both steps are complete: tenant adm
 
 ## 3. Configure SplitBill
 
-Sign in as an Admin and open **Admin → SharePoint Integration**.
+Sign in as an Admin and open **Admin → Microsoft Integration → SharePoint**. Shared Tenant ID, Client ID, and client secret are entered once above the tabs. Existing installations can migrate their encrypted SharePoint secret without re-entry. The SharePoint feature switch remains independent from Microsoft SSO.
 
-Enter:
+Enter the SharePoint-specific fields:
 
 ```text
 Tenant ID       Directory (tenant) ID from the app registration

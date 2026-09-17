@@ -6,19 +6,10 @@ public sealed class SharePointSettingsViewModel
 {
     public int Id { get; set; }
     public bool Enabled { get; set; }
-
-    [Display(Name = "Tenant ID")]
     public string TenantId { get; set; } = string.Empty;
-
-    [Display(Name = "Client ID")]
     public string ClientId { get; set; } = string.Empty;
-
-    [DataType(DataType.Password)]
-    [Display(Name = "Client Secret")]
     public string? ClientSecret { get; set; }
-
-    [Required, Url, MaxLength(500)]
-    [Display(Name = "SharePoint Site URL")]
+    public bool UseSharedMicrosoftCredentials { get; set; }
     public string SiteUrl { get; set; } = string.Empty;
 
     public string? SiteId { get; set; }
@@ -31,6 +22,9 @@ public sealed class SharePointSettingsViewModel
     public string? LastError { get; set; }
     public bool HasStoredClientSecret { get; set; }
     public bool HasSuccessfulTest { get; set; }
+    public bool IsMicrosoftIntegrationEnabled { get; set; }
+    public bool IsMicrosoftLoginEnabled { get; set; }
+    public bool MicrosoftCredentialsAreShared { get; set; }
     public string? TestedStateToken { get; set; }
     public IReadOnlyList<SharePointListOptionViewModel> Lists { get; set; } = [];
 }
@@ -53,6 +47,7 @@ public sealed class SharePointSaveViewModel
     public string TenantId { get; set; } = string.Empty;
     public string ClientId { get; set; } = string.Empty;
     public string? ClientSecret { get; set; }
+    public bool UseSharedMicrosoftCredentials { get; set; }
     public string SiteUrl { get; set; } = string.Empty;
     public string SiteId { get; set; } = string.Empty;
     public string ListId { get; set; } = string.Empty;

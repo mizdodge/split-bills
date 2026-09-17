@@ -29,6 +29,11 @@ public static class DatabaseSeeder
             });
             await db.SaveChangesAsync();
         }
+        if (!await db.MicrosoftIntegrationConfigurations.AnyAsync(x => x.Id == 1))
+            db.MicrosoftIntegrationConfigurations.Add(new MicrosoftIntegrationConfiguration { Id = 1, UpdatedAt = DateTimeOffset.UtcNow });
+        if (!await db.MicrosoftLoginConfigurations.AnyAsync(x => x.Id == 1))
+            db.MicrosoftLoginConfigurations.Add(new MicrosoftLoginConfiguration { Id = 1, UpdatedAt = DateTimeOffset.UtcNow });
+        await db.SaveChangesAsync();
         await db.Database.ExecuteSqlRawAsync("""
             CREATE TABLE IF NOT EXISTS "TransactionCharges" (
                 "Id" INTEGER NOT NULL CONSTRAINT "PK_TransactionCharges" PRIMARY KEY AUTOINCREMENT,

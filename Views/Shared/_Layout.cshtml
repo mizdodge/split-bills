@@ -38,13 +38,13 @@
             {
                 <a asp-controller="Payments" asp-action="Approvals" class="@(currentController == "Payments" ? "active" : "")"><span>✓</span> @L["Approvals"]</a>
             }
-            <a asp-controller="Notifications" asp-action="Index" class="@(currentController == "Notifications" ? "active" : "")"><span>♢</span> @L["Notifications"] @await Component.InvokeAsync("NotificationBadge")</a>
+            <a asp-controller="Notifications" asp-action="Index" class="@(currentController == "Notifications" ? "active" : "")"><span class="nav-icon"><partial name="_BellIcon" /></span> @L["Notifications"] @await Component.InvokeAsync("NotificationBadge")</a>
             @if (User.IsInRole(DatabaseSeeder.AdminRole))
             {
                 <div class="nav-label">@L["Admin"]</div>
                 <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span> @L["AISettings"]</a>
                 <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span> @L["CurrencySettings"]</a>
-                <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span> @L["SharePointIntegration"]</a>
+                <a asp-controller="AdminMicrosoft" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() is "AdminMicrosoft" or "AdminSharePoint" ? "active" : "")"><span>◉</span> @L["MicrosoftIntegration"]</a>
                 <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span> @L["ManageUsers"]</a>
                 <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span> @L["FoodPickupRotation"]</a>
                 <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span> @L["SystemTools"]</a>
@@ -52,14 +52,14 @@
         </nav>
         <div class="sidebar-user">
             <span class="avatar">@User.Identity.Name![0].ToString().ToUpperInvariant()</span>
-            <div><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a></small></div>
-            <form asp-controller="Account" asp-action="Logout" method="post"><button title='@L["Logout"]'>↗</button></form>
+            <div class="sidebar-user-info"><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a></small></div>
+            <form asp-controller="Account" asp-action="Logout" method="post"><button class="sidebar-logout" type="submit" aria-label='@L["Logout"]' title='@L["Logout"]'><partial name="_LogoutIcon" /></button></form>
         </div>
         <div class="sidebar-version" title="@AppVersion.Current.InformationalVersion">@AppVersion.Current.DisplayVersion</div>
     </aside>
     <header class="mobile-header">
         <a class="brand" asp-controller="Dashboard" asp-action="Index"><span class="brand-mark">S</span><span>SplitBill</span><small class="mobile-app-version">@AppVersion.Current.DisplayVersion</small></a>
-        <div class="mobile-account"><partial name="_CultureSwitcher" /><a class="mobile-notification-link" asp-controller="Notifications" asp-action="Index" aria-label='@L["Notifications"]'>♢ @await Component.InvokeAsync("NotificationBadge")</a><a asp-controller="Account" asp-action="ChangePassword" class="avatar" aria-label='@L["ChangePassword"]'>@User.Identity.Name![0].ToString().ToUpperInvariant()</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="mobile-logout" type="submit" aria-label='@L["Logout"]'><span>@L["Logout"]</span> ↗</button></form></div>
+        <div class="mobile-account"><partial name="_CultureSwitcher" /><a class="mobile-notification-link" asp-controller="Notifications" asp-action="Index" aria-label='@L["Notifications"]' title='@L["Notifications"]'><partial name="_BellIcon" />@await Component.InvokeAsync("NotificationBadge")</a><a asp-controller="Account" asp-action="ChangePassword" class="avatar" aria-label='@L["ChangePassword"]'>@User.Identity.Name![0].ToString().ToUpperInvariant()</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="mobile-logout" type="submit" aria-label='@L["Logout"]'><span>@L["Logout"]</span> <partial name="_LogoutIcon" /></button></form></div>
     </header>
     <main class="main-content">
         <div class="pwa-install-banner" data-pwa-install-hint hidden><span>@L["InstallAppHint"]</span><button type="button" class="btn btn-soft" data-pwa-install>@L["InstallApp"]</button></div>
@@ -97,7 +97,7 @@
         {
             <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span>@L["AISettings"]</a>
             <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span>@L["CurrencySettings"]</a>
-            <a asp-controller="AdminSharePoint" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSharePoint" ? "active" : "")"><span>▦</span>@L["SharePointIntegration"]</a>
+            <a asp-controller="AdminMicrosoft" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() is "AdminMicrosoft" or "AdminSharePoint" ? "active" : "")"><span>◉</span>@L["MicrosoftIntegration"]</a>
             <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span>@L["ManageUsers"]</a>
             <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span>@L["FoodPickupRotation"]</a>
             <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span>@L["SystemTools"]</a>

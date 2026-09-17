@@ -9,6 +9,13 @@ namespace Splitbill.Data;
 /// </summary>
 public static class DatabaseSchemaUpdater
 {
+    private static readonly string[] MicrosoftCredentialColumns =
+    [
+        "TenantId", "ClientId", "ProtectedClientSecret", "CredentialRevision", "UpdatedAt", "UpdatedByUserId",
+        "LegacyMigrationAttempted", "LegacyMigrationCompleted", "LegacyMigrationError", "ResetMarker",
+        "PendingTenantId", "PendingClientId", "ProtectedPendingClientSecret", "PendingCredentialRevision", "PendingUpdatedAt", "PendingUpdatedByUserId"
+    ];
+
     public static async Task EnsureAsync(ApplicationDbContext db, CancellationToken cancellationToken = default)
     {
         await db.Database.OpenConnectionAsync(cancellationToken);
@@ -111,24 +118,84 @@ public static class DatabaseSchemaUpdater
                 await ExecuteAsync(db, "ALTER TABLE \"CurrencyConfigurations\" ADD COLUMN \"DashboardPrimaryCurrencyCode\" TEXT NOT NULL DEFAULT 'USD';", cancellationToken);
 
             await ExecuteAsync(db, """
-                CREATE TABLE IF NOT EXISTS "SharePointConfigurations" (
-                    "Id" INTEGER NOT NULL CONSTRAINT "PK_SharePointConfigurations" PRIMARY KEY,
-                    "Enabled" INTEGER NOT NULL,
-                    "TenantId" TEXT NOT NULL,
-                    "ClientId" TEXT NOT NULL,
-                    "ProtectedClientSecret" TEXT NOT NULL,
-                    "SiteUrl" TEXT NOT NULL,
-                    "SiteId" TEXT NOT NULL,
-                    "SiteDisplayName" TEXT NOT NULL,
-                    "ListId" TEXT NOT NULL,
-                    "ListDisplayName" TEXT NOT NULL,
-                    "ListWebUrl" TEXT NULL,
-                    "LastTestAt" TEXT NULL,
-                    "LastTestSucceeded" INTEGER NULL,
+                CREATE TABLE IF NOT EXISTS "MicrosoftIntegrationConfigurations" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_MicrosoftIntegrationConfigurations" PRIMARY KEY,
+                    "TenantId" TEXT NOT NULL DEFAULT '',
+                    "ClientId" TEXT NOT NULL DEFAULT '',
+                    "ProtectedClientSecret" TEXT NOT NULL DEFAULT '',
+                    "CredentialRevision" INTEGER NOT NULL DEFAULT 0,
+                    "UpdatedAt" TEXT NOT NULL DEFAULT '0001-01-01T00:00:00.0000000+00:00',
+                    "UpdatedByUserId" TEXT NULL,
+                    "LegacyMigrationAttempted" INTEGER NOT NULL DEFAULT 0,
+                    "LegacyMigrationCompleted" INTEGER NOT NULL DEFAULT 0,
+                    "LegacyMigrationError" TEXT NULL,
+                    "ResetMarker" TEXT NULL,
+                    "PendingTenantId" TEXT NULL,
+                    "PendingClientId" TEXT NULL,
+                    "ProtectedPendingClientSecret" TEXT NULL,
+                    "PendingCredentialRevision" INTEGER NULL,
+                    "PendingUpdatedAt" TEXT NULL,
+                    "PendingUpdatedByUserId" TEXT NULL
+                );
+                CREATE TABLE IF NOT EXISTS "MicrosoftLoginConfigurations" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_MicrosoftLoginConfigurations" PRIMARY KEY,
+                    "Enabled" INTEGER NOT NULL DEFAULT 0,
+                    "CanonicalOrigin" TEXT NULL,
+                    "ConfigurationRevision" INTEGER NOT NULL DEFAULT 0,
+                    "LastCheckAt" TEXT NULL,
+                    "LastCheckSucceeded" INTEGER NULL,
                     "LastError" TEXT NULL,
-                    "UpdatedAt" TEXT NOT NULL,
+                    "UpdatedAt" TEXT NOT NULL DEFAULT '0001-01-01T00:00:00.0000000+00:00',
                     "UpdatedByUserId" TEXT NULL
                 );
+                CREATE TABLE IF NOT EXISTS "MicrosoftAccountLinkIntents" (
+                    "Id" TEXT NOT NULL CONSTRAINT "PK_MicrosoftAccountLinkIntents" PRIMARY KEY,
+                    "UserId" TEXT NOT NULL,
+                    "ProtectedState" TEXT NOT NULL,
+                    "SecurityStampHash" TEXT NOT NULL,
+                    "BrowserBindingHash" TEXT NOT NULL,
+                    "CredentialRevision" INTEGER NOT NULL,
+                    "CreatedAt" TEXT NOT NULL,
+                    "ExpiresAt" TEXT NOT NULL,
+                    "UsedAt" TEXT NULL,
+                    CONSTRAINT "FK_MicrosoftAccountLinkIntents_AspNetUsers_UserId"
+                        FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+                );
+                CREATE INDEX IF NOT EXISTS "IX_MicrosoftAccountLinkIntents_UserId_ExpiresAt"
+                    ON "MicrosoftAccountLinkIntents" ("UserId", "ExpiresAt");
+                """, cancellationToken);
+
+            foreach (var column in new[]
+            {
+                ("MicrosoftSubject", "TEXT NULL"), ("MicrosoftTenantId", "TEXT NULL"),
+                ("MicrosoftLinkedAt", "TEXT NULL"), ("MicrosoftLastVerifiedAt", "TEXT NULL"),
+                ("MicrosoftLinkRevoked", "INTEGER NOT NULL DEFAULT 0"),
+                ("MicrosoftCredentialRevision", "INTEGER NULL"),
+                ("MicrosoftAccountDisplayName", "TEXT NULL"), ("MicrosoftAccountEmail", "TEXT NULL"),
+                ("MicrosoftLinkVersion", "INTEGER NOT NULL DEFAULT 0")
+            })
+            {
+                if (!await HasColumnAsync(db, "AspNetUsers", column.Item1, cancellationToken))
+                    await ExecuteAsync(db, $"ALTER TABLE \"AspNetUsers\" ADD COLUMN \"{column.Item1}\" {column.Item2};", cancellationToken);
+            }
+            await ExecuteAsync(db, "CREATE UNIQUE INDEX IF NOT EXISTS \"IX_AspNetUsers_MicrosoftTenantId_MicrosoftSubject\" ON \"AspNetUsers\" (\"MicrosoftTenantId\", \"MicrosoftSubject\") WHERE \"MicrosoftTenantId\" IS NOT NULL AND \"MicrosoftSubject\" IS NOT NULL;", cancellationToken);
+
+            foreach (var column in MicrosoftCredentialColumns)
+            {
+                var definition = column switch
+                {
+                    "CredentialRevision" or "PendingCredentialRevision" => "INTEGER NULL",
+                    "UpdatedAt" => "TEXT NOT NULL DEFAULT '0001-01-01T00:00:00.0000000+00:00'",
+                    "LegacyMigrationAttempted" or "LegacyMigrationCompleted" => "INTEGER NOT NULL DEFAULT 0",
+                    _ => "TEXT NULL"
+                };
+                if (!await HasColumnAsync(db, "MicrosoftIntegrationConfigurations", column, cancellationToken))
+                    await ExecuteAsync(db, $"ALTER TABLE \"MicrosoftIntegrationConfigurations\" ADD COLUMN \"{column}\" {definition};", cancellationToken);
+            }
+            if (!await HasColumnAsync(db, "SharePointConfigurations", "UseSharedMicrosoftCredentials", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"SharePointConfigurations\" ADD COLUMN \"UseSharedMicrosoftCredentials\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
+
+            await ExecuteAsync(db, """
                 CREATE TABLE IF NOT EXISTS "AdminUserAuditLogs" (
                     "Id" INTEGER NOT NULL CONSTRAINT "PK_AdminUserAuditLogs" PRIMARY KEY AUTOINCREMENT,
                     "ActorUserId" TEXT NOT NULL,

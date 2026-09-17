@@ -30,7 +30,61 @@ public enum AdminUserAuditAction
     RoleChanged = 2,
     PasswordReset = 3,
     Disabled = 4,
-    Enabled = 5
+    Enabled = 5,
+    MicrosoftLinked = 6,
+    MicrosoftUnlinked = 7,
+    MicrosoftAdminPrelinked = 8
+}
+
+/// <summary>Authoritative shared Entra credentials for Microsoft Integration.</summary>
+public sealed class MicrosoftIntegrationConfiguration
+{
+    public int Id { get; set; } = 1;
+    [MaxLength(36)] public string TenantId { get; set; } = string.Empty;
+    [MaxLength(36)] public string ClientId { get; set; } = string.Empty;
+    public string ProtectedClientSecret { get; set; } = string.Empty;
+    public long CredentialRevision { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public string? UpdatedByUserId { get; set; }
+    public bool LegacyMigrationAttempted { get; set; }
+    public bool LegacyMigrationCompleted { get; set; }
+    [MaxLength(1000)] public string? LegacyMigrationError { get; set; }
+    [MaxLength(100)] public string? ResetMarker { get; set; }
+    [MaxLength(36)] public string? PendingTenantId { get; set; }
+    [MaxLength(36)] public string? PendingClientId { get; set; }
+    public string? ProtectedPendingClientSecret { get; set; }
+    public long? PendingCredentialRevision { get; set; }
+    public DateTimeOffset? PendingUpdatedAt { get; set; }
+    public string? PendingUpdatedByUserId { get; set; }
+}
+
+/// <summary>SSO-only settings. The credential secret is deliberately not duplicated here.</summary>
+public sealed class MicrosoftLoginConfiguration
+{
+    public int Id { get; set; } = 1;
+    public bool Enabled { get; set; }
+    [MaxLength(500)] public string? CanonicalOrigin { get; set; }
+    public long ConfigurationRevision { get; set; }
+    public DateTimeOffset? LastCheckAt { get; set; }
+    public bool? LastCheckSucceeded { get; set; }
+    [MaxLength(1000)] public string? LastError { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public string? UpdatedByUserId { get; set; }
+}
+
+/// <summary>Single-use, short-lived self-link state. Sensitive state is protected at rest.</summary>
+public sealed class MicrosoftAccountLinkIntent
+{
+    [MaxLength(64)] public string Id { get; set; } = string.Empty;
+    [MaxLength(450)] public string UserId { get; set; } = string.Empty;
+    public ApplicationUser? User { get; set; }
+    public string ProtectedState { get; set; } = string.Empty;
+    [MaxLength(128)] public string SecurityStampHash { get; set; } = string.Empty;
+    [MaxLength(128)] public string BrowserBindingHash { get; set; } = string.Empty;
+    public long CredentialRevision { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? UsedAt { get; set; }
 }
 
 /// <summary>Singleton installation metadata used by the one-time first-admin setup.</summary>
@@ -104,7 +158,8 @@ public sealed class SharePointConfiguration
 {
     public int Id { get; set; }
     public bool Enabled { get; set; }
-    [MaxLength(36)] public string TenantId { get; set; } = string.Empty;
+    public bool UseSharedMicrosoftCredentials { get; set; }
+    public string TenantId { get; set; } = string.Empty;
     [MaxLength(36)] public string ClientId { get; set; } = string.Empty;
     public string ProtectedClientSecret { get; set; } = string.Empty;
     [MaxLength(500)] public string SiteUrl { get; set; } = string.Empty;

@@ -8,6 +8,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<AiConfiguration> AiConfigurations => Set<AiConfiguration>();
+    public DbSet<MicrosoftIntegrationConfiguration> MicrosoftIntegrationConfigurations => Set<MicrosoftIntegrationConfiguration>();
+    public DbSet<MicrosoftLoginConfiguration> MicrosoftLoginConfigurations => Set<MicrosoftLoginConfiguration>();
+    public DbSet<MicrosoftAccountLinkIntent> MicrosoftAccountLinkIntents => Set<MicrosoftAccountLinkIntent>();
     public DbSet<SharePointConfiguration> SharePointConfigurations => Set<SharePointConfiguration>();
     public DbSet<SharePointNotificationOutbox> SharePointNotificationOutbox => Set<SharePointNotificationOutbox>();
     public DbSet<FoodPickupConfiguration> FoodPickupConfigurations => Set<FoodPickupConfiguration>();
@@ -49,8 +52,23 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             .HasForeignKey(x => x.UploadedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<MicrosoftIntegrationConfiguration>().HasKey(x => x.Id);
+        builder.Entity<MicrosoftIntegrationConfiguration>().Property(x => x.Id).ValueGeneratedNever();
+        builder.Entity<MicrosoftLoginConfiguration>().HasKey(x => x.Id);
+        builder.Entity<MicrosoftLoginConfiguration>().Property(x => x.Id).ValueGeneratedNever();
+        builder.Entity<MicrosoftAccountLinkIntent>().HasKey(x => x.Id);
+        builder.Entity<MicrosoftAccountLinkIntent>()
+            .HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<MicrosoftAccountLinkIntent>()
+            .HasIndex(x => new { x.UserId, x.ExpiresAt });
+
         builder.Entity<SharePointConfiguration>()
             .HasKey(x => x.Id);
+        builder.Entity<SharePointConfiguration>()
+            .Property(x => x.UseSharedMicrosoftCredentials).HasDefaultValue(false);
 
         builder.Entity<InstallationState>()
             .HasKey(x => x.Id);

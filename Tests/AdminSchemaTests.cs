@@ -33,6 +33,9 @@ public sealed class AdminSchemaTests
         Assert.Contains("FoodPickupEligibleUsers", tables);
         Assert.Contains("FoodPickupAssignments", tables);
         Assert.Contains("FoodPickupDrawHistories", tables);
+        Assert.Contains("MicrosoftIntegrationConfigurations", tables);
+        Assert.Contains("MicrosoftLoginConfigurations", tables);
+        Assert.Contains("MicrosoftAccountLinkIntents", tables);
 
         var columns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         await using var columnCommand = connection.CreateCommand();

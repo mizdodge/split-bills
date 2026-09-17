@@ -16,11 +16,15 @@ The interface follows five principles:
 4. **Use progressive detail.** Lists stay scannable; details, allocation groups, approval evidence, and share controls expand only when needed.
 5. **Work at phone width first.** Every workflow must remain usable with touch, long localized labels, large amounts, and many participants.
 
-## 2. Brand foundation
+## Microsoft Integration, login, and admin settings
 
+- Keep the existing local login as the visually primary fallback; place **Sign in with Microsoft** as a clearly labeled secondary action and never imply that Microsoft login creates a new account.
+- The Admin Microsoft Integration page uses one credential section and separate **Sign-in / SSO** and **SharePoint** tabs. Show status, revision, migration result, and safe error text, but never render a client secret or token.
+- Make independent switches explicit. Explain that disabling SSO does not disable SharePoint, and disabling shared SharePoint credentials does not erase the legacy connection.
+- Account linking must identify the currently authenticated local account and the verified Microsoft display identity before confirmation. Long names/emails wrap rather than overflow; cancellation and stale-state errors stay visible and do not discard the local session.
+- The Microsoft button, tabs, forms, and validation summaries use existing focus states, keyboard order, mobile spacing, and ID/EN localization. Test at desktop and phone widths with long localized labels.
 ### 2.1 Core palette
-
-| Token | Value | Purpose |
+ | Value | Purpose |
 | --- | --- | --- |
 | Lime / `--primary` | `#CDFF70` · `rgb(205, 255, 112)` | Primary action, active navigation, selected control, progress, avatar and icon background |
 | Emerald / `--emerald`, `--ink`, `--primary-dark` | `#003A40` · `rgb(0, 58, 64)` | Main text, sidebar, strong panels, primary hover, high-emphasis totals |
@@ -112,18 +116,25 @@ Use the existing spacing rhythm rather than arbitrary values: `6`, `8`, `10`, `1
 
 ### 3.1 Desktop
 
-- A fixed `244px` Emerald sidebar contains the brand, ID/EN switcher, role-scoped navigation, account controls, and version.
+- A fixed `244px` Emerald sidebar constrained to viewport height (`100vh`/`100dvh`) with `overflow: hidden` contains the brand, ID/EN switcher, role-scoped navigation, account controls, and version.
+- The brand, ID/EN language switcher, account footer, and version block are non-shrinking (`flex-shrink: 0`), keeping identity and session controls continuously visible.
+- The navigation region (`.side-nav`) is an independent scroll container (`flex: 1 1 0; min-height: 0; overflow-y: auto`) with a subtle thin Lime scrollbar (`rgba(205, 255, 112, .35)`), ensuring all menu links are reachable without zooming or pushing profile controls below the viewport.
+- At exceptionally short desktop viewports (`@media (min-width: 761px) and (max-height: 520px)`), an explicit fallback enables full-sidebar scrolling (`.sidebar { overflow-y: auto }`, `.side-nav { overflow-y: visible }`) so every control remains reachable without clipping.
 - The main region begins after the sidebar with `38px clamp(24px, 4vw, 64px) 70px` padding and a `1640px` maximum width.
-- Active navigation uses a Lime rounded rectangle with Emerald text.
-- Navigation labels are short; an icon or symbol appears in a fixed-width leading slot.
-- The account block stays at the bottom of the sidebar. The application version sits below it in quiet uppercase metadata.
+- Active navigation uses a Lime rounded rectangle with Emerald text. When Notifications is active, the unread counter badge inverts to Emerald background with Lime text.
+- Navigation labels are short; an icon or symbol appears in a fixed-width leading slot (`.nav-icon`). Notifications uses a consistent outline bell SVG.
+- The account block (`.sidebar-user`) stays pinned above the version with a subtle white border. Username and role text wrap safely inside `.sidebar-user-info` (`minmax(0, 1fr)`) without horizontal overflow.
+- Desktop logout uses an outline door-and-outward-arrow SVG button (`.sidebar-logout`) with a minimum 44×44px hit target, localized `aria-label` and `title`, and clear Lime hover/focus outlines. The application version sits below it in quiet uppercase metadata.
 
 ### 3.2 Mobile
 
 At `760px` and below:
 
 - Hide the desktop sidebar.
-- Show a sticky white header with brand, language, notification, profile/password, and logout access.
+- Show a sticky white header with brand, language switcher, notification link, profile avatar, and logout access.
+- The mobile notification link uses the outline bell SVG with a 44×44px hit target and clear badge clearance; unread badges (e.g. 1, 15, 50, 110/99+) display without clipping or overlapping adjacent chrome.
+- Mobile logout uses a visible localized text button (`Keluar` / `Logout`) paired with the shared door-and-outward-arrow SVG, meeting a 44px minimum touch target.
+- At very narrow phone widths (`<=380px`), header controls tighten gracefully to guarantee all items remain accessible without crowding.
 - Show a fixed, horizontally scrollable bottom navigation. Each destination occupies a stable `76px` slot.
 - Keep the active destination Lime or Lime-soft; Upload is not allowed to leave Transactions highlighted.
 - Remove the desktop left margin and use `24px 14px 94px` main padding so content clears the bottom bar.
@@ -247,6 +258,14 @@ All clickable receipt and payment-proof images use the shared modal:
 - Previous/next controls for a gallery.
 - Zoom controls with the current zoom label.
 - Close by button, backdrop, or `Escape`.
+
+### 5.7 Segmented tab controls
+
+For multi-view configuration surfaces such as the unified Microsoft Integration page (`/admin/microsoft`):
+
+- **Container (`.integration-tabs-nav`):** Light neutral grey track (`background: #e9ecf2; border: 1px solid rgba(68, 69, 71, 0.12); border-radius: 12px; padding: 4px; gap: 4px;`).
+- **Inactive tab (`.tab-btn`):** Transparent background, muted text (`color: var(--muted)` `#444547`), neutral circular bullet (`#a0a6b5`), smooth hover transition (`background: rgba(255, 255, 255, 0.6)`).
+- **Active tab (`.tab-btn.active`):** SplitBill signature Lime pill (`background: var(--primary)` `#CDFF70`), high-contrast deep emerald text (`color: var(--emerald)` `#003A40`, `font-weight: 800`), dark emerald bullet dot, and subtle elevation shadow (`0 4px 12px rgba(0, 58, 64, 0.14)`).
 - Meaningful `alt` text and accessible button labels.
 
 Do not open protected images in a new browser tab as the primary interaction.

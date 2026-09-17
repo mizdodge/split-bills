@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -48,6 +49,45 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication()
+    .AddCookie("MicrosoftLinkCookie", options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.SlidingExpiration = false;
+    })
+    .AddOAuth("MicrosoftLink", options =>
+    {
+        options.SignInScheme = "MicrosoftLinkCookie";
+        options.AuthorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
+        options.TokenEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+        options.UserInformationEndpoint = "https://graph.microsoft.com/oidc/userinfo";
+        options.CallbackPath = "/account/microsoft/oauth-callback";
+        options.ClientId = "unconfigured";
+        options.ClientSecret = "unconfigured";
+        options.Scope.Add("openid"); options.Scope.Add("profile"); options.Scope.Add("email");
+        options.SaveTokens = true;
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.NameIdentifier, "sub");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Email, "email");
+        options.ClaimActions.MapJsonKey("preferred_username", "preferred_username");
+        options.ClaimActions.MapJsonKey(MicrosoftOAuthClaimsParser.OidClaimType, "oid");
+        options.ClaimActions.MapJsonKey(MicrosoftOAuthClaimsParser.TenantIdClaimType, "tid");
+        options.Events.OnCreatingTicket = context =>
+        {
+            MicrosoftOAuthClaimsParser.PopulateClaimsFromIdToken(context);
+            return Task.CompletedTask;
+        };
+        options.Events.OnRemoteFailure = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("MicrosoftOAuth");
+            logger.LogWarning(context.Failure, "Microsoft OAuth remote failure: {Message}", context.Failure?.Message);
+            context.Response.Redirect("/account/login?remoteError=" + Uri.EscapeDataString(context.Failure?.Message ?? "Microsoft authentication failed."));
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
+    });
+builder.Services.AddSingleton<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions>, MicrosoftOAuthNamedOptions>();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/account/login";
@@ -91,6 +131,7 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 var dataProtection = builder.Services.AddDataProtection()
     .SetApplicationName("SplitBill")
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath));
@@ -100,6 +141,11 @@ dataProtection.ProtectKeysWithDpapi(protectToLocalMachine: true);
 builder.Services.AddSingleton<IApplicationVersionProvider, ApplicationVersionProvider>();
 builder.Services.AddHttpClient(nameof(AiReceiptService), client => client.Timeout = TimeSpan.FromSeconds(90));
 builder.Services.AddHttpClient(nameof(AiModelCatalogService), client => client.Timeout = TimeSpan.FromSeconds(30));
+builder.Services.AddHttpClient("MicrosoftGraph", (services, client) =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd($"SplitBill/{services.GetRequiredService<IApplicationVersionProvider>().Current.SemanticVersion}");
+});
 builder.Services.AddHttpClient("SharePointGraph", (services, client) =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
@@ -115,12 +161,16 @@ builder.Services.AddHttpClient(nameof(LibNetWebPushTransport), client => client.
 builder.Services.AddScoped<IAiReceiptService, AiReceiptService>();
 builder.Services.AddScoped<IAiModelCatalogService, AiModelCatalogService>();
 builder.Services.AddScoped<ISharePointGraphService, SharePointGraphService>();
+builder.Services.AddScoped<IMicrosoftGraphIdentityService, MicrosoftGraphIdentityService>();
+builder.Services.AddScoped<IMicrosoftIntegrationService, MicrosoftIntegrationService>();
 builder.Services.AddScoped<ISharePointNotificationOutboxService, SharePointNotificationOutboxService>();
 builder.Services.AddScoped<IFoodPickupRotationService, FoodPickupRotationService>();
 builder.Services.AddSingleton<IFoodPickupRandomSource, SecureFoodPickupRandomSource>();
 builder.Services.AddScoped<SharePointNotificationProcessor>();
 builder.Services.AddHostedService<SharePointNotificationDispatcher>();
 builder.Services.AddSingleton<SharePointSecretProtector>();
+builder.Services.AddSingleton<IMicrosoftSecretProtector, MicrosoftSecretProtector>();
+builder.Services.AddSingleton<IMicrosoftLinkStateProtector, MicrosoftLinkStateProtector>();
 builder.Services.AddSingleton<ISharePointTestStateProtector, SharePointTestStateProtector>();
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 builder.Services.AddSingleton<WebPushSecretProtector>();
@@ -169,7 +219,24 @@ if (!app.Environment.IsDevelopment())
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        if (ctx.File.Name.Equals("push-service-worker.js", StringComparison.OrdinalIgnoreCase))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+        else if (ctx.Context.Request.Query.ContainsKey("v"))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=31536000, immutable");
+        }
+        else
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, must-revalidate");
+        }
+    }
+});
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("id-ID"),
@@ -177,6 +244,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") }
 });
 app.UseRouting();
+app.UseSession();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -186,6 +254,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 await DatabaseSeeder.SeedAsync(app.Services);
+await using (var migrationScope = app.Services.CreateAsyncScope())
+{
+    var migration = migrationScope.ServiceProvider.GetRequiredService<IMicrosoftIntegrationService>();
+    await migration.MigrateLegacySharePointAsync();
+}
 if (printBootstrapCode)
 {
     await using var scope = app.Services.CreateAsyncScope();
