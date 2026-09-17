@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Splitbill.Models;
 using Splitbill.Services;
 
@@ -15,6 +16,7 @@ public sealed class MicrosoftSignInController(
     IMicrosoftIntegrationService integration,
     SignInManager<ApplicationUser> signInManager,
     UserManager<ApplicationUser> userManager,
+    IStringLocalizer<SharedResource> localizer,
     ILogger<MicrosoftSignInController> logger) : Controller
 {
     [HttpGet("start")]
@@ -56,7 +58,7 @@ public sealed class MicrosoftSignInController(
         if (string.IsNullOrWhiteSpace(subject))
         {
             logger.LogWarning("Microsoft sign-in callback missing subject/objectidentifier.");
-            TempData["ErrorMessage"] = "Microsoft tidak menyediakan identitas pengguna yang valid.";
+            TempData["ErrorMessage"] = localizer["MicrosoftInvalidIdentity"].Value;
             return RedirectToAction("Login", "Account", new { returnUrl });
         }
 
@@ -103,7 +105,7 @@ public sealed class MicrosoftSignInController(
         if (user == null)
         {
             logger.LogWarning("No SplitBill user found for Microsoft login (email: {Email}, subject: {Subject})", email, subject);
-            TempData["ErrorMessage"] = $"Akun Microsoft ({email ?? subject}) belum terdaftar di SplitBill. Hubungi administrator.";
+            TempData["ErrorMessage"] = localizer["AccountNotRegistered", email ?? subject].Value;
             return RedirectToAction("Login", "Account", new { returnUrl });
         }
 
@@ -111,7 +113,7 @@ public sealed class MicrosoftSignInController(
         if (await userManager.IsLockedOutAsync(user))
         {
             logger.LogWarning("User {Username} is locked out", user.UserName);
-            TempData["ErrorMessage"] = "Akun Anda sedang terkunci.";
+            TempData["ErrorMessage"] = localizer["AccountLocked"].Value;
             return RedirectToAction("Login", "Account", new { returnUrl });
         }
 

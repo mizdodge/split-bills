@@ -1,5 +1,5 @@
 @model GuestBillViewModel
-@{ ViewData["Title"] = "Whole transaction"; var money = Model.CurrencyCode == "IDR" ? "Rp" : Model.CurrencyCode; }
+@{ ViewData["Title"] = L["WholeTransaction"]; var money = Model.CurrencyCode == "IDR" ? "Rp" : Model.CurrencyCode; }
 <div class="page-heading compact"><div><span class="eyebrow">SplitBill · @L["GuestAccess"]</span><h1>@Model.MerchantName</h1><p>@Model.TransactionNumber · @(Model.TransactionDate?.ToString("dd MMMM yyyy") ?? "-")</p></div><span class="status large @Model.Status.ToString().ToLowerInvariant()">@L[Model.Status.ToString()]</span></div>
 <div class="guest-nav">@if (Model.HasPersonalView) { <a href="/g/my-bill/@Uri.EscapeDataString(Model.Token)">@L["MyBill"]</a> }<a class="active" href="/g/transaction/@Uri.EscapeDataString(Model.Token)">@L["WholeTransaction"]</a></div>
 <section class="content-card guest-card"><div class="section-head"><div><h2>@L["WholeTransaction"]</h2><p>@L["GuestReadOnlyHint"]</p></div><strong>@money @Model.GrandTotal.ToString("N2")</strong></div>

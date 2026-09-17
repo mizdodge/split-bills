@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Splitbill.Data;
 using Splitbill.Models;
 using Splitbill.Services;
@@ -19,6 +20,7 @@ public sealed class MicrosoftAccountController(
     IMicrosoftIntegrationService integration,
     IMicrosoftLinkStateProtector stateProtector,
     UserManager<ApplicationUser> users,
+    IStringLocalizer<SharedResource> localizer,
     ILogger<MicrosoftAccountController> logger) : Controller
 {
     [HttpGet("link")]
@@ -79,7 +81,7 @@ public sealed class MicrosoftAccountController(
         await db.SaveChangesAsync(cancellationToken);
         await HttpContext.SignOutAsync("MicrosoftLinkCookie");
         logger.LogInformation("User {UserId} linked Microsoft account {Subject}", currentUser.Id, subject);
-        TempData["StatusMessage"] = "Microsoft account linked after verification.";
+        TempData["StatusMessage"] = localizer["MicrosoftLinkSuccess"].Value;
         return RedirectToAction("Index", "Account");
     }
 

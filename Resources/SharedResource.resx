@@ -2220,4 +2220,23 @@ Semangat, pahlawan perut lapar! 🛵😆</value>
   <data name="CallbackUrlCopied" xml:space="preserve"><value>Callback URL berhasil disalin.</value></data>
   <data name="SharedCredentialsDescription" xml:space="preserve"><value>Kredensial Microsoft Entra ini digunakan bersama untuk Single Sign-On (SSO) dan SharePoint.</value></data>
   <data name="AccountNotRegistered" xml:space="preserve"><value>Akun Microsoft ({0}) belum terdaftar di SplitBill. Hubungi administrator.</value></data>
+  <data name="SsoStatus" xml:space="preserve"><value>Status SSO</value></data>
+  <data name="LoginStatus" xml:space="preserve"><value>Status login</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Nonaktif</value></data>
+  <data name="StoredCredentials" xml:space="preserve"><value>Kredensial tersimpan</value></data>
+  <data name="StoredSecretYesDpapi" xml:space="preserve"><value>Ya (Terenkripsi DPAPI)</value></data>
+  <data name="StoredSecretNone" xml:space="preserve"><value>Belum</value></data>
+  <data name="InteractiveSsoModeHint" xml:space="preserve"><value>Mode SSO interaktif untuk akun perusahaan</value></data>
+  <data name="MigrateSharePointCredentials" xml:space="preserve"><value>Migrasi Kredensial SharePoint</value></data>
+  <data name="MigrateSharePointHint" xml:space="preserve"><value>Pindahkan kredensial SharePoint terenkripsi yang sudah ada tanpa perlu memasukkan ulang secret.</value></data>
+  <data name="OutboxQueueStatus" xml:space="preserve"><value>Status Antrean Outbox</value></data>
+  <data name="Pending" xml:space="preserve"><value>Tertunda</value></data>
+  <data name="Delivered" xml:space="preserve"><value>Terkirim</value></data>
+  <data name="DeadLetter" xml:space="preserve"><value>Gagal (Dead Letter)</value></data>
+  <data name="MicrosoftInvalidIdentity" xml:space="preserve"><value>Microsoft tidak menyediakan identitas pengguna yang valid.</value></data>
+  <data name="AiConfidenceLabel" xml:space="preserve"><value>✦ Keyakinan {0}</value></data>
+  <data name="RateToReporting" xml:space="preserve"><value>Kurs ke {0}</value></data>
+  <data name="RateSourceNote" xml:space="preserve"><value>Sumber kurs/catatan</value></data>
+  <data name="RateSourceNotePlaceholder" xml:space="preserve"><value>Frankfurter, faktur, atau sumber manual</value></data>
+  <data name="ReceiptCurrencySaveNote" xml:space="preserve"><value>Nilai disimpan dalam mata uang struk. Nilai ekuivalen pelaporan hanya sebagai referensi.</value></data>
 </root>

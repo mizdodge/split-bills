@@ -7,6 +7,8 @@ using Splitbill.Models;
 using Splitbill.Services;
 using Splitbill.ViewModels;
 
+using Microsoft.Extensions.Localization;
+
 namespace Splitbill.Controllers;
 
 [Authorize(Roles = "Admin")]
@@ -15,6 +17,7 @@ namespace Splitbill.Controllers;
 public sealed class AdminMicrosoftController(
     IMicrosoftIntegrationService microsoft,
     ApplicationDbContext db,
+    IStringLocalizer<SharedResource> localizer,
     ILogger<AdminMicrosoftController> logger) : Controller
 {
     [HttpGet("")]
@@ -41,7 +44,7 @@ public sealed class AdminMicrosoftController(
         try
         {
             await microsoft.SaveAsync(model, User.FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken);
-            TempData["StatusMessage"] = "Pengaturan Integrasi Microsoft berhasil disimpan.";
+            TempData["StatusMessage"] = localizer["MicrosoftCredentialsSaved"].Value;
             return RedirectToAction(nameof(Index), new { tab = "sso" });
         }
         catch (InvalidOperationException ex)
@@ -58,7 +61,7 @@ public sealed class AdminMicrosoftController(
     {
         var result = await microsoft.MigrateLegacySharePointAsync(cancellationToken);
         TempData[result.Succeeded ? "StatusMessage" : "ErrorMessage"] = result.Succeeded
-            ? "Kredensial SharePoint yang ada berhasil dimigrasikan ke kredensial Microsoft bersama."
+            ? localizer["MicrosoftMigrationComplete"].Value
             : result.Error;
         return RedirectToAction(nameof(Index), new { tab = "sso" });
     }

@@ -2220,4 +2220,23 @@ Go, hero of hungry bellies! 🛵😆</value>
   <data name="CallbackUrlCopied" xml:space="preserve"><value>Callback URL copied.</value></data>
   <data name="SharedCredentialsDescription" xml:space="preserve"><value>These Microsoft Entra credentials are shared for Single Sign-On (SSO) and SharePoint.</value></data>
   <data name="AccountNotRegistered" xml:space="preserve"><value>This Microsoft account ({0}) is not registered in SplitBill. Contact your administrator.</value></data>
+  <data name="SsoStatus" xml:space="preserve"><value>SSO Status</value></data>
+  <data name="LoginStatus" xml:space="preserve"><value>Sign-in status</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="StoredCredentials" xml:space="preserve"><value>Stored credentials</value></data>
+  <data name="StoredSecretYesDpapi" xml:space="preserve"><value>Yes (DPAPI-encrypted)</value></data>
+  <data name="StoredSecretNone" xml:space="preserve"><value>None</value></data>
+  <data name="InteractiveSsoModeHint" xml:space="preserve"><value>Interactive SSO mode for enterprise accounts</value></data>
+  <data name="MigrateSharePointCredentials" xml:space="preserve"><value>Migrate SharePoint Credentials</value></data>
+  <data name="MigrateSharePointHint" xml:space="preserve"><value>Move existing encrypted SharePoint credentials without re-entering the secret.</value></data>
+  <data name="OutboxQueueStatus" xml:space="preserve"><value>Outbox Queue Status</value></data>
+  <data name="Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="Delivered" xml:space="preserve"><value>Delivered</value></data>
+  <data name="DeadLetter" xml:space="preserve"><value>Failed (Dead Letter)</value></data>
+  <data name="MicrosoftInvalidIdentity" xml:space="preserve"><value>Microsoft did not provide a valid user identity.</value></data>
+  <data name="AiConfidenceLabel" xml:space="preserve"><value>✦ {0} confidence</value></data>
+  <data name="RateToReporting" xml:space="preserve"><value>Rate to {0}</value></data>
+  <data name="RateSourceNote" xml:space="preserve"><value>Rate source/note</value></data>
+  <data name="RateSourceNotePlaceholder" xml:space="preserve"><value>Frankfurter, invoice, or manual source</value></data>
+  <data name="ReceiptCurrencySaveNote" xml:space="preserve"><value>Values are saved in the receipt currency. Reporting equivalents are reference only.</value></data>
 </root>

@@ -1,6 +1,6 @@
 @model ReportViewModel
 @using Splitbill.Models
-@{ ViewData["Title"] = "Report"; }
+@{ ViewData["Title"] = L["Report"]; }
 <div class="page-heading"><div><span class="eyebrow">@L["Report"]</span><h1>@L["PaymentDetails"]</h1><p>@(Model.IsMember ? L["ReportMemberDescription"] : Model.IsAdmin ? L["ReportAdminDescription"] : L["ReportModeratorDescription"])</p></div><a class="btn btn-primary" asp-action="Export" asp-route-from="@Model.From?.ToString("yyyy-MM-dd")" asp-route-to="@Model.To?.ToString("yyyy-MM-dd")" asp-route-status="@Model.Status" asp-route-uploaderId="@Model.UploaderId">↓ @L["ExportExcel"]</a></div>
 <form method="get" class="filter-card">
     <div><label>@L["FromDate"]</label><input name="from" value="@Model.From?.ToString("yyyy-MM-dd")" type="date" class="form-control" /></div>

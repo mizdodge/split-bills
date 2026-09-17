@@ -167,15 +167,15 @@
             <h2>@L["MicrosoftAccountLink"]</h2>
             <p>@L["MicrosoftAccountLinkHint"]</p>
             <hr />
-            <h3>Status SSO</h3>
+            <h3>@L["SsoStatus"]</h3>
             <ul class="status-list mb-3">
                 <li>
-                    <span>Status login:</span>
-                    <strong>@(Model.Microsoft.MicrosoftLoginEnabled ? "Aktif" : "Nonaktif")</strong>
+                    <span>@L["LoginStatus"]:</span>
+                    <strong>@(Model.Microsoft.MicrosoftLoginEnabled ? L["Active"].Value : L["Inactive"].Value)</strong>
                 </li>
                 <li>
-                    <span>Kredensial tersimpan:</span>
-                    <strong>@(Model.Microsoft.HasStoredClientSecret ? "Ya (Terenkripsi DPAPI)" : "Belum")</strong>
+                    <span>@L["StoredCredentials"]:</span>
+                    <strong>@(Model.Microsoft.HasStoredClientSecret ? L["StoredSecretYesDpapi"].Value : L["StoredSecretNone"].Value)</strong>
                 </li>
             </ul>
 
@@ -183,16 +183,16 @@
             <ul>
                 <li>@L["EncryptedClientSecret"]</li>
                 <li>Tenant ID &amp; Client ID (App Registration)</li>
-                <li>Mode SSO interaktif untuk akun perusahaan</li>
+                <li>@L["InteractiveSsoModeHint"]</li>
             </ul>
 
             @if (!Model.Microsoft.LegacyMigrationCompleted)
             {
                 <hr />
-                <h3>Migrasi Kredensial SharePoint</h3>
-                <p class="text-muted small">Pindahkan kredensial SharePoint terenkripsi yang sudah ada tanpa perlu memasukkan ulang secret.</p>
+                <h3>@L["MigrateSharePointCredentials"]</h3>
+                <p class="text-muted small">@L["MigrateSharePointHint"]</p>
                 <button class="btn btn-sm btn-outline-secondary" type="submit" formaction="@Url.Action("MigrateSharePoint", "AdminMicrosoft")">
-                    Migrasi Kredensial SharePoint
+                    @L["MigrateSharePointCredentials"]
                 </button>
             }
         </aside>
@@ -287,11 +287,11 @@
                 <small id="sharepoint-list-status">@L["ListNotLoaded"]</small>
             </div>
             <hr />
-            <h3>Status Antrean Outbox</h3>
+            <h3>@L["OutboxQueueStatus"]</h3>
             <ul class="status-list mb-3">
-                <li><span>Tertunda:</span> <strong>@Model.OutboxPendingCount</strong></li>
-                <li><span>Terkirim:</span> <strong>@Model.OutboxDeliveredCount</strong></li>
-                <li><span>Gagal (Dead Letter):</span> <strong>@Model.OutboxDeadLetterCount</strong></li>
+                <li><span>@L["Pending"]:</span> <strong>@Model.OutboxPendingCount</strong></li>
+                <li><span>@L["Delivered"]:</span> <strong>@Model.OutboxDeliveredCount</strong></li>
+                <li><span>@L["DeadLetter"]:</span> <strong>@Model.OutboxDeadLetterCount</strong></li>
             </ul>
 
             <hr />
