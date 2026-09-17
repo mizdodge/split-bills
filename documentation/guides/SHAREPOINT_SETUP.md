@@ -6,7 +6,7 @@
 
 1. Open **Microsoft Entra admin center → App registrations → New registration**.
 2. Choose **Accounts in this organizational directory only** (single tenant).
-3. No redirect URI is needed; SplitBill uses an app-only server-to-server connection.
+3. No redirect URI is needed for SharePoint alone; it uses an app-only server-to-server connection. To also enable Microsoft login on this same registration, follow the [SSO step-by-step setup](MICROSOFT_LOGIN_SETUP.md#step-by-step-enable-sso-on-the-existing-entra-registration), including its Web callback, delegated permissions, consent, and user assignment.
 4. Copy the app's **Application (client) ID** and the directory's **Directory (tenant) ID**.
 5. Open **Certificates & secrets → New client secret**. Choose an expiry that matches the organization's rotation policy and copy the **Secret Value** immediately. The value is shown only once.
 
