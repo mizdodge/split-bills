@@ -1,10 +1,26 @@
 @model DashboardViewModel
 @{ ViewData["Title"] = L["Dashboard"]; }
 
+@if (Model.PerspectiveOptions.Count > 0)
+{
+    <nav class="dashboard-perspective-selector" aria-label="@L["Dashboard"]">
+        @foreach (var option in Model.PerspectiveOptions)
+        {
+            var isActive = Model.ActivePerspective == option.Perspective;
+            <a class="perspective-tab @(isActive ? "active" : "")"
+               href="@Url.Action("Index", "Dashboard", new { view = option.QueryValue })"
+               aria-current="@(isActive ? "page" : null)">
+                @L[option.LabelKey]
+            </a>
+        }
+    </nav>
+}
+
 @if (Model.IsMemberDashboard)
 {
     <div class="page-heading">
         <div><span class="eyebrow">@L["PersonalOverview"]</span><h1>@L["HelloUser", User.Identity?.Name ?? string.Empty]</h1><p>@L["MemberDashboardDescription"]</p></div>
+
         <a class="btn btn-primary" asp-controller="MyBills" asp-action="Index">@L["OpenMyBills"]</a>
     </div>
     <div class="stat-grid member-stat-grid">

@@ -21,6 +21,15 @@
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
+  <data name="PerspectiveAllTransactions" xml:space="preserve">
+    <value>All transactions</value>
+  </data>
+  <data name="PerspectiveMyTransactions" xml:space="preserve">
+    <value>Transactions I manage</value>
+  </data>
+  <data name="PerspectiveMySpending" xml:space="preserve">
+    <value>My spending</value>
+  </data>
   <data name="UploadReceipt" xml:space="preserve">
     <value>Upload receipt</value>
   </data>

@@ -17,33 +17,76 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
     ICurrencyCatalog currencyCatalog, ICurrencyFormatter currencyFormatter,
     IStringLocalizer<SharedResource> localizer) : Controller
 {
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? view)
     {
-        var memberOnly = User.IsInRole(DatabaseSeeder.MemberRole) && !User.IsInRole(DatabaseSeeder.ModeratorRole) && !User.IsInRole(DatabaseSeeder.AdminRole);
-        if (memberOnly)
+        var isAdmin = User.IsInRole(DatabaseSeeder.AdminRole);
+        var isModerator = User.IsInRole(DatabaseSeeder.ModeratorRole);
+        var isMemberOnly = User.IsInRole(DatabaseSeeder.MemberRole) && !isModerator && !isAdmin;
+
+        // Determine the allowed perspectives and the effective perspective.
+        if (isMemberOnly)
         {
-            var memberUserId = userManager.GetUserId(User)!;
-            var participants = await db.Set<TransactionParticipant>().AsNoTracking()
-                .Include(x => x.Transaction)
-                .Include(x => x.AccountLink)
-                .Where(x => x.AccountLink != null && x.AccountLink.UserId == memberUserId)
-                .ToListAsync();
-            var memberInsight = analytics.CalculateMember(participants, DateTimeOffset.Now);
-            return View(new DashboardViewModel
-            {
-                IsMemberDashboard = true,
-                MemberCurrentMonthAmount = memberInsight.CurrentMonthAmount,
-                MemberPreviousMonthAmount = memberInsight.PreviousMonthAmount,
-                MemberPaidAmount = memberInsight.PaidAmount,
-                OutstandingAmount = memberInsight.OutstandingAmount,
-                MemberMonthlySpending = memberInsight.MonthlySpending.ToList(),
-                RecentMemberBills = memberInsight.RecentBills.ToList()
-            });
+            // Members always see personal; they cannot request operational view.
+            return await BuildPersonalViewAsync(hasPerspectiveSelector: false, activePerspective: DashboardPerspective.Personal);
         }
+
+        // Admin and Moderator: build the option list and resolve the requested view.
+        var options = BuildPerspectiveOptions(isAdmin);
+        var requestedPersonal = string.Equals(view, "personal", StringComparison.OrdinalIgnoreCase);
+        var requestedOperations = string.Equals(view, "operations", StringComparison.OrdinalIgnoreCase);
+        // Unknown/blank values fall back to the role default (operations).
+        var showPersonal = requestedPersonal && !requestedOperations;
+
+        if (showPersonal)
+            return await BuildPersonalViewAsync(hasPerspectiveSelector: true, activePerspective: DashboardPerspective.Personal, options: options);
+
+        return await BuildOperationalViewAsync(options, isAdmin, isModerator);
+    }
+
+    private static List<DashboardPerspectiveOption> BuildPerspectiveOptions(bool isAdmin)
+    {
+        var operationsKey = isAdmin ? "PerspectiveAllTransactions" : "PerspectiveMyTransactions";
+        return
+        [
+            new(DashboardPerspective.Operations, operationsKey, "operations"),
+            new(DashboardPerspective.Personal, "PerspectiveMySpending", "personal"),
+        ];
+    }
+
+    private async Task<IActionResult> BuildPersonalViewAsync(
+        bool hasPerspectiveSelector,
+        DashboardPerspective activePerspective,
+        List<DashboardPerspectiveOption>? options = null)
+    {
+        var userId = userManager.GetUserId(User)!;
+        var participants = await db.Set<TransactionParticipant>().AsNoTracking()
+            .Include(x => x.Transaction)
+            .Include(x => x.AccountLink)
+            .Where(x => x.AccountLink != null && x.AccountLink.UserId == userId
+                        && x.Transaction!.Status != TransactionStatus.Draft)
+            .ToListAsync();
+        var memberInsight = analytics.CalculateMember(participants, DateTimeOffset.Now);
+        return View(new DashboardViewModel
+        {
+            IsMemberDashboard = true,
+            ActivePerspective = activePerspective,
+            PerspectiveOptions = options ?? [],
+            MemberCurrentMonthAmount = memberInsight.CurrentMonthAmount,
+            MemberPreviousMonthAmount = memberInsight.PreviousMonthAmount,
+            MemberPaidAmount = memberInsight.PaidAmount,
+            OutstandingAmount = memberInsight.OutstandingAmount,
+            MemberMonthlySpending = memberInsight.MonthlySpending.ToList(),
+            RecentMemberBills = memberInsight.RecentBills.ToList()
+        });
+    }
+
+    private async Task<IActionResult> BuildOperationalViewAsync(
+        List<DashboardPerspectiveOption> options, bool isAdmin, bool isModerator)
+    {
         var query = db.Transactions.AsNoTracking()
             .Include(x => x.Participants).ThenInclude(x => x.AccountLink)
             .AsQueryable();
-        if (!User.IsInRole(DatabaseSeeder.AdminRole))
+        if (!isAdmin)
         {
             var userId = userManager.GetUserId(User);
             query = query.Where(x => x.UploadedByUserId == userId);
@@ -64,6 +107,8 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
         var currentCurrencyRates = await BuildCurrentCurrencyRatesAsync(reportingCurrency, cancellationToken: default);
         return View(new DashboardViewModel
         {
+            ActivePerspective = DashboardPerspective.Operations,
+            PerspectiveOptions = options,
             TotalTransactions = transactions.Count,
             UnpaidTransactions = transactions.Count(x => x.Status == TransactionStatus.Unpaid),
             PartialTransactions = transactions.Count(x => x.Status == TransactionStatus.Partial),
@@ -79,6 +124,7 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
             CurrentCurrencyRates = currentCurrencyRates
         });
     }
+
 
     [Authorize(Roles = DatabaseSeeder.AdminRole)]
     [HttpPost, ValidateAntiForgeryToken]

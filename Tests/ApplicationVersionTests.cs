@@ -14,10 +14,10 @@ public sealed class ApplicationVersionTests
         var projectVersion = project.Descendants("Version").Select(x => x.Value).Single();
         var runtime = ApplicationVersionProvider.Read(typeof(Program).Assembly);
 
-        Assert.Equal("1.0.0", projectVersion);
+        Assert.Equal("1.1.0", projectVersion);
         Assert.Equal(projectVersion, runtime.SemanticVersion);
         Assert.Equal($"v{projectVersion}", runtime.DisplayVersion);
-        Assert.Equal("1.0.0.0", runtime.AssemblyVersion);
+        Assert.Equal("1.1.0.0", runtime.AssemblyVersion);
         Assert.True(runtime.SourceRevision is null or { Length: <= 12 });
     }
 

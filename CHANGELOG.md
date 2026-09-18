@@ -12,6 +12,8 @@ All notable public changes to SplitBill are documented here.
 
 ### Added
 
+- Dashboard perspective switch for Admin and Moderator: a compact segmented selector above the heading lets elevated roles toggle between their operational overview (`?view=operations`, default) and their own personal spending view (`?view=personal`). The personal view shows all non-Draft bills linked to the user's `ParticipantAccountLink`, including bills uploaded by others and bills predating any role promotion. Members always see the personal view with no selector. Switching is a bookmarkable `GET` request; no schema change, cookie, or role change is introduced.
+
 - Account settings gear in desktop/mobile navigation, Microsoft connection status and password-confirmed disconnect; passwordless users must obtain a local password before unlinking.
 
 - Unified Microsoft & SharePoint Integration Admin interface (`/admin/microsoft`) providing a consolidated 2-tab layout (`tab=sso` and `tab=sharepoint`), copyable callback URL helper, and live Outbox metrics.

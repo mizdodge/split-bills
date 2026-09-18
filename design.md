@@ -18,7 +18,7 @@ The interface follows five principles:
 
 ## Microsoft Integration, login, and admin settings
 
-- Keep the existing local login as the visually primary fallback; place **Sign in with Microsoft** as a clearly labeled secondary action and never imply that Microsoft login creates a new account.
+- Keep the existing local login as the visually primary fallback; place **Sign in with Microsoft** as a clearly labeled secondary action. Existing users must link explicitly; if the Admin enables optional Microsoft registration, explain that it creates a new passwordless Member only when no linked account exists.
 - The Admin Microsoft Integration page uses one credential section and separate **Sign-in / SSO** and **SharePoint** tabs. Show status, revision, migration result, and safe error text, but never render a client secret or token.
 - Make independent switches explicit. Explain that disabling SSO does not disable SharePoint, and disabling shared SharePoint credentials does not erase the legacy connection.
 - Account linking must identify the currently authenticated local account and the verified Microsoft display identity before confirmation. Long names/emails wrap rather than overflow; cancellation and stale-state errors stay visible and do not discard the local session.
@@ -184,7 +184,11 @@ Inside a card, `.section-head` aligns a title/description pair with an optional 
 
 ### 4.3 Dashboard hierarchy
 
-Admin and Moderator dashboards use this order:
+For Admin and Moderator, a segmented perspective selector (`.dashboard-perspective-selector`) sits directly above the page heading, allowing instant toggle between:
+- **Operational overview** (`?view=operations`, initial default): All transactions for Admin; transactions uploaded by the user for Moderator.
+- **Personal spending overview** (`?view=personal`): Personal six-month spending, paid/outstanding totals, and recent linked bills for the signed-in account across all non-Draft bills (including bills from before role promotion or uploaded by others).
+
+Admin and Moderator operational dashboard uses this order:
 
 1. Greeting and Upload shortcut.
 2. Four operational summary cards.
@@ -194,7 +198,8 @@ Admin and Moderator dashboards use this order:
 6. Recent transactions.
 7. Current currency-rate cards and their inline selection editor at the bottom.
 
-Members receive a private spending dashboard with their current obligation, paid/outstanding summaries, monthly history, and recent bills. Do not expose organization-wide operational statistics in the Member view.
+Members receive only their private spending dashboard without a selector, showing their current obligation, paid/outstanding summaries, monthly history, and recent bills. Operational data is never rendered in personal view.
+
 
 ### 4.4 Dense data
 
@@ -261,12 +266,13 @@ All clickable receipt and payment-proof images use the shared modal:
 
 ### 5.7 Segmented tab controls
 
-For multi-view configuration surfaces such as the unified Microsoft Integration page (`/admin/microsoft`):
+For multi-view configuration surfaces such as the unified Microsoft Integration page (`/admin/microsoft`) and the Dashboard perspective switch (`/Dashboard`):
 
-- **Container (`.integration-tabs-nav`):** Light neutral grey track (`background: #e9ecf2; border: 1px solid rgba(68, 69, 71, 0.12); border-radius: 12px; padding: 4px; gap: 4px;`).
-- **Inactive tab (`.tab-btn`):** Transparent background, muted text (`color: var(--muted)` `#444547`), neutral circular bullet (`#a0a6b5`), smooth hover transition (`background: rgba(255, 255, 255, 0.6)`).
-- **Active tab (`.tab-btn.active`):** SplitBill signature Lime pill (`background: var(--primary)` `#CDFF70`), high-contrast deep emerald text (`color: var(--emerald)` `#003A40`, `font-weight: 800`), dark emerald bullet dot, and subtle elevation shadow (`0 4px 12px rgba(0, 58, 64, 0.14)`).
-- Meaningful `alt` text and accessible button labels.
+- **Container (`.integration-tabs-nav`, `.dashboard-perspective-selector`):** Light neutral grey track (`background: #e9ecf2; border: 1px solid rgba(68, 69, 71, 0.12); border-radius: 12px; padding: 4px; gap: 4px;`). Responsive wrapping ensures zero horizontal overflow down to 360px width.
+- **Inactive tab (`.tab-btn`, `.perspective-tab`):** Transparent background, muted text (`color: var(--muted)` `#444547`), smooth hover transition (`background: rgba(255, 255, 255, 0.6)`).
+- **Active tab (`.tab-btn.active`, `.perspective-tab.active`):** SplitBill signature Lime pill (`background: var(--primary)` `#CDFF70`), high-contrast deep emerald text (`color: var(--emerald)` `#003A40`, `font-weight: 800`), crisp focus outline (`outline: 2px solid var(--emerald); outline-offset: 2px`), and subtle elevation shadow (`0 4px 12px rgba(0, 58, 64, 0.14)`).
+- Perspective tabs convey state via `aria-current="page"` when active and use accessible bookmarkable links (`GET /Dashboard?view=...`).
+
 
 Do not open protected images in a new browser tab as the primary interaction.
 

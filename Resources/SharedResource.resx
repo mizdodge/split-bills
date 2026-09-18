@@ -21,6 +21,15 @@
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
+  <data name="PerspectiveAllTransactions" xml:space="preserve">
+    <value>Semua transaksi</value>
+  </data>
+  <data name="PerspectiveMyTransactions" xml:space="preserve">
+    <value>Transaksi saya kelola</value>
+  </data>
+  <data name="PerspectiveMySpending" xml:space="preserve">
+    <value>Pengeluaran saya</value>
+  </data>
   <data name="UploadReceipt" xml:space="preserve">
     <value>Upload struk</value>
   </data>

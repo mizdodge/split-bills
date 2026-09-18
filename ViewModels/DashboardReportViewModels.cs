@@ -3,9 +3,19 @@ using Splitbill.Services;
 
 namespace Splitbill.ViewModels;
 
+/// <summary>Which dataset the dashboard is currently showing.</summary>
+public enum DashboardPerspective { Operations, Personal }
+
+/// <summary>A selector option shown in the perspective switcher.</summary>
+public sealed record DashboardPerspectiveOption(DashboardPerspective Perspective, string LabelKey, string QueryValue);
+
 public sealed class DashboardViewModel
 {
     public bool IsMemberDashboard { get; set; }
+
+    // Perspective switcher — populated by the controller for Admin/Moderator.
+    public DashboardPerspective ActivePerspective { get; set; } = DashboardPerspective.Operations;
+    public List<DashboardPerspectiveOption> PerspectiveOptions { get; set; } = [];
     public int TotalTransactions { get; set; }
     public int UnpaidTransactions { get; set; }
     public int PartialTransactions { get; set; }

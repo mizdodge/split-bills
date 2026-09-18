@@ -55,7 +55,7 @@ The current login requests `openid profile email`; it does not need `User.Read.A
 1. Open **Entra ID → Enterprise applications → All applications** and find the same application (compare the Application ID).
 2. Open **Properties** and verify sign-in is enabled for users.
 3. Check **Assignment required?** If **Yes**, open **Users and groups → Add user/group**, select the intended users, and assign them. Individual assignment is sufficient; group-based assignment depends on licensing.
-4. If assignment is not required, tenant policy still applies. Microsoft access does not create a SplitBill account or grant a SplitBill role automatically.
+4. If assignment is not required, tenant policy still applies. Microsoft access does not link an existing SplitBill account or grant a SplitBill role automatically. A new local Member is created only when the Admin has explicitly enabled optional automatic registration in SplitBill.
 5. Keep existing MFA and Conditional Access rules; users complete any Microsoft prompts during sign-in.
 
 ### 6. Reuse the client secret and enable SplitBill SSO
@@ -87,7 +87,7 @@ A successful SharePoint connection or saved settings does not prove SSO works. R
 | Invalid/expired client secret | Confirm the secret **Value**, expiry, tenant/client pair, and active server configuration after restart. Do not remove the old valid secret before testing its replacement. |
 | Need admin approval | Tenant admin reviews delegated consent and organizational user-consent policy. |
 | User is not assigned | Check Enterprise application assignment when **Assignment required** is enabled. |
-| Account not registered in SplitBill | Check the local active account and the matching rules below. Entra membership alone does not create a local account. |
+| Account not registered in SplitBill | Check the local active account and the matching rules below. Entra membership alone does not create a local account unless the Admin has enabled optional automatic registration and the identity passes its checks. |
 | Login button missing or login returns immediately | Check the SSO switch and stored shared credentials. |
 | Correlation failure or callback returns to login | Retry from a fresh private window on one HTTPS host; check cookie handling and the approved reverse proxy's scheme/host forwarding. |
 | SharePoint works but SSO fails | Recheck Web callback, delegated consent, user assignment, and local matching; app-only Graph authentication is a different flow. |

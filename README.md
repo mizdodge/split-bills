@@ -11,8 +11,8 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
-![Release](https://img.shields.io/badge/release-v1.0.0-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-205_passing-CDFF70?labelColor=003A40)
+![Release](https://img.shields.io/badge/release-v1.1.0-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-232_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -86,7 +86,7 @@ SplitBill is a self-hosted ASP.NET Core 8 application that turns one or more rec
 | 🔗 | **Guest access** | Account-free read-only personal and whole-transaction links with separate revocation. The Share dialog includes one whole-transaction link, guest-specific links, and the JPG tab for the uploader or Admin, even when every participant is a guest. |
 | 💱 | **Multi-currency** | Bills stay payable in their receipt currency; a saved exchange-rate snapshot powers IDR reporting. Admin configures the provider and up to four current-rate cards on the operational dashboard. |
 | 👥 | **Role and user management** | Admin has global access and user management, Moderator manages owned transactions, and Member sees only linked bills and shared report context. |
-| 📈 | **Two dashboard experiences** | Admin/Moderator operational analytics and a private Member spending dashboard with monthly history, paid totals, and outstanding totals. |
+| 📈 | **Perspective-switchable dashboard** | Admin and Moderator toggle between operational overview and personal spending overview (`?view=personal`); pure Members receive their private spending dashboard. |
 | 📲 | **Installable PWA** | Responsive ID/EN interface, install prompt, static offline shell, and optional HTTPS browser push without caching authenticated pages or private images. |
 | 💾 | **Backup and migration tools** | Password-confirmed Admin backup, checksummed restore packages, same-install validation, rollback support, and migration-mode secret reset. |
 
