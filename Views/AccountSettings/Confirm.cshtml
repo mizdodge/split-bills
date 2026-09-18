@@ -1,0 +1,16 @@
+@model Splitbill.Services.MicrosoftLinkPreview
+@{ ViewData["Title"] = L["ConfirmMicrosoftLink"]; }
+<div class="page-heading"><h1>@L["AccountSettings"]</h1></div>
+<dialog class="account-dialog" data-account-confirm aria-labelledby="confirm-link-title">
+    <h2 id="confirm-link-title">@L["ConfirmMicrosoftLink"]</h2>
+    <div class="account-identity-pair">
+        <div><span class="eyebrow">SplitBill</span><p><strong>@Model.LocalName</strong></p></div>
+        <div><span class="eyebrow">Microsoft</span><p><strong>@Model.MicrosoftName</strong><br /><span class="account-email">@Model.Email</span></p></div>
+    </div>
+    <p>@L["MicrosoftKeepHistory"]</p>
+    <div class="form-actions">
+        <form asp-action="Cancel" method="post" data-account-cancel><input type="hidden" name="intentId" value="@Model.IntentId" /><button class="btn btn-light" type="submit">@L["Cancel"]</button></form>
+        <form asp-action="ConfirmLink" method="post"><input type="hidden" name="intentId" value="@Model.IntentId" /><button class="btn btn-primary" type="submit">@L["ConfirmConnectMicrosoft"]</button></form>
+    </div>
+</dialog>
+@section Scripts { <script src="~/js/account-settings.js" asp-append-version="true"></script> }

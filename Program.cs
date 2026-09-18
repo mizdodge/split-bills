@@ -52,44 +52,16 @@ builder.Services
 builder.Services.AddAuthentication()
     .AddCookie("MicrosoftLinkCookie", options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.Cookie.Name = "SplitBill.MicrosoftLink.v2";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
         options.SlidingExpiration = false;
     })
-    .AddOAuth("MicrosoftLink", options =>
-    {
-        options.SignInScheme = "MicrosoftLinkCookie";
-        options.AuthorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
-        options.TokenEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
-        options.UserInformationEndpoint = "https://graph.microsoft.com/oidc/userinfo";
-        options.CallbackPath = "/account/microsoft/oauth-callback";
-        options.ClientId = "unconfigured";
-        options.ClientSecret = "unconfigured";
-        options.Scope.Add("openid"); options.Scope.Add("profile"); options.Scope.Add("email");
-        options.SaveTokens = true;
-        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.NameIdentifier, "sub");
-        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Name, "name");
-        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Email, "email");
-        options.ClaimActions.MapJsonKey("preferred_username", "preferred_username");
-        options.ClaimActions.MapJsonKey(MicrosoftOAuthClaimsParser.OidClaimType, "oid");
-        options.ClaimActions.MapJsonKey(MicrosoftOAuthClaimsParser.TenantIdClaimType, "tid");
-        options.Events.OnCreatingTicket = context =>
-        {
-            MicrosoftOAuthClaimsParser.PopulateClaimsFromIdToken(context);
-            return Task.CompletedTask;
-        };
-        options.Events.OnRemoteFailure = context =>
-        {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("MicrosoftOAuth");
-            logger.LogWarning(context.Failure, "Microsoft OAuth remote failure: {Message}", context.Failure?.Message);
-            context.Response.Redirect("/account/login?remoteError=" + Uri.EscapeDataString(context.Failure?.Message ?? "Microsoft authentication failed."));
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
-    });
-builder.Services.AddSingleton<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions>, MicrosoftOAuthNamedOptions>();
-
+    .AddOpenIdConnect("MicrosoftLink", MicrosoftOidcConfiguration.Configure);
+builder.Services.AddSingleton<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>, MicrosoftOidcNamedOptions>();
+builder.Services.AddScoped<IMicrosoftAccountService, MicrosoftAccountService>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Events.OnValidatePrincipal = MicrosoftSessionValidator.ValidateAsync;
     options.LoginPath = "/account/login";
     options.AccessDeniedPath = "/account/access-denied";
     options.ExpireTimeSpan = TimeSpan.FromHours(8);

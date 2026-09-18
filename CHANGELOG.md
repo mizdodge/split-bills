@@ -12,10 +12,12 @@ All notable public changes to SplitBill are documented here.
 
 ### Added
 
+- Account settings gear in desktop/mobile navigation, Microsoft connection status and password-confirmed disconnect; passwordless users must obtain a local password before unlinking.
+
 - Unified Microsoft & SharePoint Integration Admin interface (`/admin/microsoft`) providing a consolidated 2-tab layout (`tab=sso` and `tab=sharepoint`), copyable callback URL helper, and live Outbox metrics.
-- Microsoft OAuth JWT `id_token` parsing service (`MicrosoftOAuthClaimsParser`) extracting `oid`, `sub`, `tid`, `name`, `email`, `preferred_username`, and `upn`.
-- Multi-stage user matching on Microsoft sign-in callback: matches by persistent `(tenant, subject)`, exact email, normalized email, username, email prefix (e.g. `mizan` matching `mizan@glmsystems.com`), and `MicrosoftAccountEmail`.
-- Automatic verified account linking and persistent sign-in on first successful Microsoft authentication.
+- Microsoft OpenID Connect code flow with PKCE, standard token validation and no token persistence.
+- Explicit, password-confirmed Microsoft account linking with browser-bound single-use confirmation; no email/username auto-linking.
+- Optional default-off registration of new Microsoft users as Members, with email-prefix usernames and collision rejection; recovery username admin remains local-only.
 - Visual `TempData["ErrorMessage"]` and `TempData["StatusMessage"]` alert banners on `Login.cshtml`.
 - Explicit `Cache-Control` headers for static files in `Program.cs`: `no-cache, no-store, must-revalidate` for `push-service-worker.js` and `public, max-age=31536000, immutable` for fingerprinted assets (`?v=...`).
 

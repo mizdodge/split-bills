@@ -2239,4 +2239,33 @@ Go, hero of hungry bellies! 🛵😆</value>
   <data name="RateSourceNote" xml:space="preserve"><value>Rate source/note</value></data>
   <data name="RateSourceNotePlaceholder" xml:space="preserve"><value>Frankfurter, invoice, or manual source</value></data>
   <data name="ReceiptCurrencySaveNote" xml:space="preserve"><value>Values are saved in the receipt currency. Reporting equivalents are reference only.</value></data>
+  <data name="AccountSettings" xml:space="preserve"><value>Account settings</value></data>
+  <data name="AccountSettingsHelp" xml:space="preserve"><value>Manage your password and sign-in methods.</value></data>
+  <data name="LocalPassword" xml:space="preserve"><value>SplitBill password</value></data>
+  <data name="LocalPasswordHelp" xml:space="preserve"><value>Use your local password to sign in to SplitBill.</value></data>
+  <data name="MicrosoftAccount" xml:space="preserve"><value>Microsoft account</value></data>
+  <data name="AccountConnected" xml:space="preserve"><value>Connected</value></data>
+  <data name="AccountNotConnected" xml:space="preserve"><value>Not connected</value></data>
+  <data name="AccountLinkedOn" xml:space="preserve"><value>Connected since</value></data>
+  <data name="ConnectMicrosoft" xml:space="preserve"><value>Connect Microsoft account</value></data>
+  <data name="ConnectMicrosoftHelp" xml:space="preserve"><value>Connect your work account to sign in to the same SplitBill account.</value></data>
+  <data name="DisconnectMicrosoft" xml:space="preserve"><value>Disconnect account</value></data>
+  <data name="DisconnectMicrosoftHelp" xml:space="preserve"><value>Microsoft sign-in will be disabled for this account. Your bills remain and local password login is still available. Confirm your password to continue.</value></data>
+  <data name="ConfirmLocalPassword" xml:space="preserve"><value>Confirm SplitBill password</value></data>
+  <data name="MicrosoftPasswordHelp" xml:space="preserve"><value>Enter your SplitBill password. Microsoft sign-in takes place on the Microsoft website next.</value></data>
+  <data name="ContinueMicrosoft" xml:space="preserve"><value>Continue to Microsoft</value></data>
+  <data name="ConfirmMicrosoftLink" xml:space="preserve"><value>Connect these accounts?</value></data>
+  <data name="ConfirmConnectMicrosoft" xml:space="preserve"><value>Yes, connect</value></data>
+  <data name="MicrosoftKeepHistory" xml:space="preserve"><value>Your bills, history, and role stay with this SplitBill account.</value></data>
+  <data name="MicrosoftLocalLoginRemains" xml:space="preserve"><value>SplitBill password login remains available.</value></data>
+  <data name="MicrosoftLocalPasswordRequired" xml:space="preserve"><value>This account has no local password. Ask an Admin to set a SplitBill password before disconnecting Microsoft.</value></data>
+  <data name="MicrosoftUnavailable" xml:space="preserve"><value>Microsoft sign-in is unavailable. Check that SSO is enabled and use the HTTPS application address.</value></data>
+  <data name="MicrosoftAccountUnavailable" xml:space="preserve"><value>This Microsoft account cannot be used. Sign in locally or contact an Admin.</value></data>
+  <data name="MicrosoftLinkRequired" xml:space="preserve"><value>Sign in locally first, then connect Microsoft in Account settings. For a new account, contact an Admin.</value></data>
+  <data name="MicrosoftEmailRequired" xml:space="preserve"><value>Microsoft did not provide a valid email address. Contact an Admin.</value></data>
+  <data name="MicrosoftAccountCollision" xml:space="preserve"><value>The email, username, or Microsoft identity is already in use. Connect through your existing account or contact an Admin.</value></data>
+  <data name="MicrosoftLinkExpired" xml:space="preserve"><value>This request has expired or is invalid. Start again from Account settings.</value></data>
+  <data name="MicrosoftUseLocalTwoFactor" xml:space="preserve"><value>This account uses local two-factor authentication. Please sign in with your SplitBill password.</value></data>
+  <data name="MicrosoftAutoRegistration" xml:space="preserve"><value>Allow automatic registration through Microsoft</value></data>
+  <data name="MicrosoftAutoRegistrationHelp" xml:space="preserve"><value>New users are created as Members. Usernames use the email prefix. Existing accounts must be linked explicitly.</value></data>
 </root>

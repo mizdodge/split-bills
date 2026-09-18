@@ -146,6 +146,10 @@
                     </label>
                 </div>
 
+                <div class="form-group">
+                    <label class="toggle-line"><input type="checkbox" name="AllowAutoRegistration" value="true" @(Model.Microsoft.AllowAutoRegistration ? "checked" : "") /><strong>@L["MicrosoftAutoRegistration"]</strong></label>
+                    <small>@L["MicrosoftAutoRegistrationHelp"]</small>
+                </div>
                 <div class="callback-url-box">
                     <label class="form-label mb-1"><strong>@L["MicrosoftCallbackUrl"]</strong></label>
                     <div class="callback-url-row">
@@ -165,7 +169,7 @@
 
         <aside class="content-card">
             <h2>@L["MicrosoftAccountLink"]</h2>
-            <p>@L["MicrosoftAccountLinkHint"]</p>
+            <p>@L["MicrosoftAutoRegistrationHelp"]</p>
             <hr />
             <h3>@L["SsoStatus"]</h3>
             <ul class="status-list mb-3">

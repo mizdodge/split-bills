@@ -491,3 +491,6 @@ Current sanitized references:
 | [![My Bills details](documentation/screenshots/my-bill-details.png)](documentation/screenshots/my-bill-details.png) | [![Report](documentation/screenshots/report-pickup.png)](documentation/screenshots/report-pickup.png) |
 
 The long export reference is [one complete production-rendered JPEG with ten participants](documentation/screenshots/share-transaction-long.jpg).
+
+### Account settings and explicit Microsoft linking
+The desktop profile footer now uses a gear plus Account settings, with the same entry in the mobile header. Keep logout separate. Settings show a local-password card and a Microsoft card with disconnected/connected state, email, linked date and connect/disconnect controls. Username admin sees only the password card. Password confirmation and returned-identity confirmation use focused dialogs; the latter compares local and Microsoft identities before saving. Passwordless Microsoft registrations explain the Admin password-reset requirement before unlinking. The Admin SSO tab adds a default-off automatic Member registration checkbox.

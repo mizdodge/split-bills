@@ -24,6 +24,7 @@ public sealed class MicrosoftIntegrationService(
             ClientId = credentials.ClientId,
             MicrosoftIntegrationEnabled = login.Enabled || !string.IsNullOrWhiteSpace(credentials.ProtectedClientSecret),
             MicrosoftLoginEnabled = login.Enabled,
+            AllowAutoRegistration = login.AllowAutoRegistration,
             HasStoredClientSecret = !string.IsNullOrWhiteSpace(credentials.ProtectedClientSecret),
             LegacyMigrationAttempted = credentials.LegacyMigrationAttempted,
             LegacyMigrationCompleted = credentials.LegacyMigrationCompleted,
@@ -62,6 +63,7 @@ public sealed class MicrosoftIntegrationService(
         credentials.UpdatedAt = now;
         credentials.UpdatedByUserId = actorUserId;
         login.Enabled = model.MicrosoftLoginEnabled;
+        login.AllowAutoRegistration = model.AllowAutoRegistration;
         login.ConfigurationRevision++;
         login.UpdatedAt = now;
         login.UpdatedByUserId = actorUserId;

@@ -4,7 +4,7 @@
 
 SplitBill is a small internal web application for turning receipt photos into trackable split bills. Admin and Moderator users can upload a receipt, review AI-extracted items, assign the bill to participants, and mark each participant as paid. Admin can view and manage every transaction, while a Moderator can only view and manage transactions they uploaded. Admin also manages the unified Microsoft Integration surface and SplitBill user accounts from the Admin section.
 
-Microsoft Integration has one shared encrypted Entra credential record. The **Sign-in / SSO** and **SharePoint** tabs have independent feature switches; local login and existing SharePoint routes remain available. SSO accepts only a verified Microsoft identity already linked to an existing local `ApplicationUser`, preserving the local UserId, bill history, and role. It never creates users from claims or assigns roles from Entra groups. The self-link flow is short-lived, single-use, bound to the local security stamp/browser and credential revision, and does not store Microsoft passwords or plaintext tokens.
+Microsoft Integration has one shared encrypted Entra credential record. The **Sign-in / SSO** and **SharePoint** tabs have independent feature switches; local login and existing SharePoint routes remain available. SSO accepts only a verified Microsoft identity already linked to an existing local `ApplicationUser`, preserving the local UserId, bill history, and role. Optional auto-registration (off by default) creates passwordless Members from validated tenant identities; username is the email prefix and collisions are rejected. Existing accounts require explicit password-confirmed linking; roles never come from Entra groups. Username admin remains local-only. The self-link flow is short-lived, single-use, bound to the local security stamp/browser and credential revision, and does not store Microsoft passwords or plaintext tokens.
 
 Existing protected SharePoint credentials are migrated once at startup: the legacy purpose decrypts the value, then the dedicated Microsoft Integration purpose re-encrypts it. The secret is never sent to the browser. A failed migration records a safe error and leaves the legacy connection usable, so administrators can remediate without data loss.
 
@@ -74,7 +74,7 @@ Splitbill/
 |   |-- AdminSettingsController.cs    AI provider settings and connection test
 |   |-- AdminMicrosoftController.cs   Unified Microsoft & SharePoint Integration (2-tab interface)
 |   |-- AdminSharePointController.cs  SharePoint compatibility controller (redirects to /admin/microsoft?tab=sharepoint)
-|   |-- MicrosoftSignInController.cs  Microsoft Entra interactive OAuth sign-in, auto-matching, and auto-linking
+|   |-- MicrosoftSignInController.cs  Validated OIDC completion, stable identity login, optional Member registration
 |   |-- MicrosoftAccountController.cs Verified profile self-linking
 |   |-- AdminUsersController.cs       Admin user/account management
 |   |-- AdminFoodPickupController.cs  Admin pickup eligibility and draw history
@@ -97,8 +97,8 @@ Splitbill/
 |   |-- TransactionAccessService.cs   Admin/global and Moderator/owner management rule
 |   |-- TransactionStatusService.cs   Draft/Unpaid/Partial/Paid calculation
 |   |-- MicrosoftIntegrationService.cs Shared Microsoft Entra credentials and status resolution
-|   |-- MicrosoftOAuthClaimsParser.cs Base64Url JWT id_token parser for Entra claims
-|   |-- MicrosoftOAuthNamedOptions.cs Dynamic IConfigureNamedOptions for runtime credentials
+|   |-- MicrosoftAccountService.cs Explicit linking, collision checks and Member provisioning
+|   |-- MicrosoftOidcConfiguration.cs Validated OIDC code flow with PKCE and encrypted credentials
 |   |-- MicrosoftSecretProtector.cs   DPAPI encryption for Microsoft client secrets
 |   |-- MicrosoftLinkStateProtector.cs Tamper-evident state tokens for self-linking
 |   |-- MicrosoftGraphIdentityService.cs Microsoft Graph profile verification
@@ -321,10 +321,10 @@ Manage Users uses ASP.NET Core Identity through `IAdminUserService`. Admin can c
 | `/admin/microsoft` (`/AdminMicrosoft`) | Admin | Unified Microsoft & SharePoint Integration page with two tabs: `tab=sso` (Entra credentials, SSO toggle, callback URL with copy button, legacy migration) and `tab=sharepoint` (Site URL, live Graph test connection, dynamic list picker, destination status, outbox metrics) |
 | `POST /admin/microsoft/save` | Admin | Save shared Entra credentials and SSO toggle |
 | `POST /admin/microsoft/migrate-sharepoint` | Admin | Server-side DPAPI migration of legacy SharePoint credentials into shared Microsoft storage |
-| `/account/microsoft` (`/account/microsoft-signin/start`) | Anonymous | Start interactive Microsoft Entra OAuth authorization when SSO is enabled |
-| `/account/microsoft/oauth-callback` | Anonymous | Microsoft OAuth callback: parses JWT `id_token` claims (`oid`, `sub`, `tid`, `name`, `email`, `preferred_username`, `upn`), performs multi-stage user matching, auto-links account, and establishes persistent Identity session |
-| `GET /account/microsoft/link` | Authenticated | Begin short-lived verified linking for the current local user |
-| `GET /account/microsoft/link/callback` | Authenticated | Consume the single-use linking intent and persist the verified tenant/object mapping |
+| `POST /account/microsoft-signin/start` | Anonymous + antiforgery | Begin Microsoft OIDC sign-in over HTTPS; legacy GET /account/microsoft returns to login |
+| `/account/microsoft/oauth-callback` | OIDC middleware | Validate signature, issuer, audience, expiry, nonce and state before issuing a short-lived external cookie; /account/microsoft-signin/callback completes login or prepares link confirmation |
+| `GET /account/settings` and `/account/settings/confirm` | Authenticated | Account security settings and pending identity confirmation |
+| `POST /account/settings/connect`, `/confirm`, `/cancel`, `/disconnect` | Authenticated + antiforgery | Password-confirmed link initiation, single-use confirmation, cancellation and local-password-protected unlink |
 | `/AdminSharePoint` | Admin | Backward compatibility route: issues HTTP 302 redirect to `/admin/microsoft?tab=sharepoint` |
 | `POST /AdminSharePoint/TestConnection` | Admin | Resolve the site through Microsoft Graph and return selectable lists (uses shared credentials fallback) |
 | `POST /AdminSharePoint/Save` | Admin | Persist the tested Site/List IDs and notification destination |

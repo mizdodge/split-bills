@@ -1,0 +1,57 @@
+@model AccountSettingsViewModel
+@using Splitbill.Services
+@{
+    ViewData["Title"] = L["AccountSettings"];
+    var connected = Model.User.MicrosoftSubject is not null && !Model.User.MicrosoftLinkRevoked;
+}
+<div class="page-heading"><div><span class="eyebrow">@Model.User.DisplayName</span><h1>@L["AccountSettings"]</h1><p>@L["AccountSettingsHelp"]</p></div></div>
+@if (TempData["ErrorMessage"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
+<div class="account-settings-grid">
+    <section class="content-card">
+        <div class="section-head"><h2>@L["LocalPassword"]</h2></div>
+        @if (Model.HasPassword)
+        {
+            <p>@L["LocalPasswordHelp"]</p>
+            <a class="btn btn-light" asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a>
+        }
+        else { <p>@L["MicrosoftLocalPasswordRequired"]</p> }
+    </section>
+    @if (!MicrosoftAccountService.IsRecoveryAdmin(Model.User))
+    {
+        <section class="content-card">
+            <div class="section-head"><h2 class="microsoft-account-heading"><partial name="_MicrosoftLogo" /> @L["MicrosoftAccount"]</h2><span class="status @(connected ? "paid" : "draft")">@L[connected ? "AccountConnected" : "AccountNotConnected"]</span></div>
+            @if (connected)
+            {
+                <p class="account-email"><strong>@Model.User.MicrosoftAccountEmail</strong></p>
+                <p class="text-muted">@L["AccountLinkedOn"] @Model.User.MicrosoftLinkedAt?.ToLocalTime().ToString("d")</p>
+                <p>@L[Model.HasPassword ? "MicrosoftLocalLoginRemains" : "MicrosoftLocalPasswordRequired"]</p>
+                @if (Model.HasPassword) { <button type="button" class="btn btn-outline-danger" data-account-dialog="unlink-dialog">@L["DisconnectMicrosoft"]</button> }
+            }
+            else if (Model.SsoEnabled)
+            {
+                <p>@L["ConnectMicrosoftHelp"]</p>
+                <button type="button" class="btn btn-primary" data-account-dialog="connect-dialog"><partial name="_MicrosoftLogo" /> @L["ConnectMicrosoft"]</button>
+            }
+            else { <p>@L["MicrosoftUnavailable"]</p> }
+        </section>
+    }
+</div>
+@if (!MicrosoftAccountService.IsRecoveryAdmin(Model.User) && Model.HasPassword)
+{
+    <dialog id="connect-dialog" class="account-dialog" aria-labelledby="connect-title">
+        <form method="post" asp-action="Connect">
+            <h2 id="connect-title">@L["ConfirmLocalPassword"]</h2><p>@L["MicrosoftPasswordHelp"]</p>
+            <label for="connect-password">@L["CurrentPassword"]</label>
+            <div class="password-wrap"><input id="connect-password" name="password" type="password" required autocomplete="current-password" class="form-control" /><button type="button" class="password-toggle" aria-label='@L["ShowPassword"]'>👁</button></div>
+            <div class="form-actions"><button type="button" class="btn btn-light" data-account-close>@L["Cancel"]</button><button class="btn btn-primary" type="submit">@L["ContinueMicrosoft"]</button></div>
+        </form>
+    </dialog>
+    <dialog id="unlink-dialog" class="account-dialog" aria-labelledby="unlink-title">
+        <form method="post" asp-action="Disconnect">
+            <h2 id="unlink-title">@L["DisconnectMicrosoft"]</h2><p>@L["DisconnectMicrosoftHelp"]</p>
+            <label for="unlink-password">@L["CurrentPassword"]</label><input id="unlink-password" name="password" type="password" required autocomplete="current-password" class="form-control" />
+            <div class="form-actions"><button type="button" class="btn btn-light" data-account-close>@L["Cancel"]</button><button class="btn btn-outline-danger" type="submit">@L["DisconnectMicrosoft"]</button></div>
+        </form>
+    </dialog>
+}
+@section Scripts { <script src="~/js/account-settings.js" asp-append-version="true"></script> }

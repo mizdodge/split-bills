@@ -9,6 +9,7 @@ public sealed class MicrosoftIntegrationSettingsViewModel
     [DataType(DataType.Password)] public string? ClientSecret { get; set; }
     public bool MicrosoftIntegrationEnabled { get; set; }
     public bool MicrosoftLoginEnabled { get; set; }
+    public bool AllowAutoRegistration { get; set; }
     public bool HasStoredClientSecret { get; set; }
     public bool LegacyMigrationAttempted { get; set; }
     public bool LegacyMigrationCompleted { get; set; }
@@ -23,6 +24,7 @@ public sealed class MicrosoftIntegrationSaveViewModel
     [DataType(DataType.Password)] public string? ClientSecret { get; set; }
     public bool MicrosoftIntegrationEnabled { get; set; }
     public bool MicrosoftLoginEnabled { get; set; }
+    public bool AllowAutoRegistration { get; set; }
 }
 
 public sealed record MicrosoftConnectionResult(bool Succeeded, string? Error, string? AccountDisplayName = null);

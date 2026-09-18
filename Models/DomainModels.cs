@@ -61,6 +61,7 @@ public sealed class MicrosoftIntegrationConfiguration
 /// <summary>SSO-only settings. The credential secret is deliberately not duplicated here.</summary>
 public sealed class MicrosoftLoginConfiguration
 {
+    public bool AllowAutoRegistration { get; set; }
     public int Id { get; set; } = 1;
     public bool Enabled { get; set; }
     [MaxLength(500)] public string? CanonicalOrigin { get; set; }

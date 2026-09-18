@@ -57,3 +57,6 @@ OAuth callback activation requires a real HTTPS origin registered in the reused 
 ## Security boundaries
 
 The AI extracts receipt content but does not calculate final monetary allocations. Authorization, money calculations, status changes, protected-file access, and payment approval rules are enforced server-side. A model response or hidden UI control is never treated as an authorization decision.
+
+## Microsoft account linking and registration
+Microsoft sign-in uses framework OpenID Connect validation (code + PKCE, issuer/audience/signature/lifetime/nonce/state), exact configured tenant and object ID. Tokens are not persisted. Email/username do not authorize access to existing users. Self-link requires current local password and an expiring browser-bound single-use confirmation. Optional automatic registration is disabled by default, creates only Member users without default passwords, rejects collisions and excludes username admin. Unlink requires a local password; revoked links are retained and Microsoft sessions are rechecked. Live tenant MFA/consent and callback verification must be completed before treating an installation as SSO-tested.

@@ -2239,4 +2239,33 @@ Semangat, pahlawan perut lapar! 🛵😆</value>
   <data name="RateSourceNote" xml:space="preserve"><value>Sumber kurs/catatan</value></data>
   <data name="RateSourceNotePlaceholder" xml:space="preserve"><value>Frankfurter, faktur, atau sumber manual</value></data>
   <data name="ReceiptCurrencySaveNote" xml:space="preserve"><value>Nilai disimpan dalam mata uang struk. Nilai ekuivalen pelaporan hanya sebagai referensi.</value></data>
+  <data name="AccountSettings" xml:space="preserve"><value>Pengaturan akun</value></data>
+  <data name="AccountSettingsHelp" xml:space="preserve"><value>Kelola password dan cara masuk ke akunmu.</value></data>
+  <data name="LocalPassword" xml:space="preserve"><value>Password SplitBill</value></data>
+  <data name="LocalPasswordHelp" xml:space="preserve"><value>Gunakan password lokal untuk masuk ke SplitBill.</value></data>
+  <data name="MicrosoftAccount" xml:space="preserve"><value>Akun Microsoft</value></data>
+  <data name="AccountConnected" xml:space="preserve"><value>Terhubung</value></data>
+  <data name="AccountNotConnected" xml:space="preserve"><value>Belum terhubung</value></data>
+  <data name="AccountLinkedOn" xml:space="preserve"><value>Terhubung sejak</value></data>
+  <data name="ConnectMicrosoft" xml:space="preserve"><value>Hubungkan akun Microsoft</value></data>
+  <data name="ConnectMicrosoftHelp" xml:space="preserve"><value>Hubungkan akun kantor untuk masuk ke akun SplitBill yang sama.</value></data>
+  <data name="DisconnectMicrosoft" xml:space="preserve"><value>Putuskan hubungan</value></data>
+  <data name="DisconnectMicrosoftHelp" xml:space="preserve"><value>Login Microsoft akan dinonaktifkan untuk akun ini. Tagihan tetap ada dan kamu masih bisa masuk dengan password SplitBill. Konfirmasi password untuk melanjutkan.</value></data>
+  <data name="ConfirmLocalPassword" xml:space="preserve"><value>Konfirmasi password SplitBill</value></data>
+  <data name="MicrosoftPasswordHelp" xml:space="preserve"><value>Masukkan password SplitBill. Setelah ini, login Microsoft dilakukan di halaman Microsoft.</value></data>
+  <data name="ContinueMicrosoft" xml:space="preserve"><value>Lanjut ke Microsoft</value></data>
+  <data name="ConfirmMicrosoftLink" xml:space="preserve"><value>Hubungkan akun ini?</value></data>
+  <data name="ConfirmConnectMicrosoft" xml:space="preserve"><value>Ya, hubungkan</value></data>
+  <data name="MicrosoftKeepHistory" xml:space="preserve"><value>Tagihan, history, dan peran tetap menggunakan akun SplitBill ini.</value></data>
+  <data name="MicrosoftLocalLoginRemains" xml:space="preserve"><value>Login dengan password SplitBill tetap tersedia.</value></data>
+  <data name="MicrosoftLocalPasswordRequired" xml:space="preserve"><value>Akun ini belum memiliki password lokal. Minta Admin mengatur password SplitBill sebelum memutuskan hubungan Microsoft.</value></data>
+  <data name="MicrosoftUnavailable" xml:space="preserve"><value>Login Microsoft belum tersedia. Pastikan SSO aktif dan gunakan alamat HTTPS aplikasi.</value></data>
+  <data name="MicrosoftAccountUnavailable" xml:space="preserve"><value>Akun Microsoft tidak dapat digunakan. Gunakan login lokal atau hubungi Admin.</value></data>
+  <data name="MicrosoftLinkRequired" xml:space="preserve"><value>Login lokal terlebih dahulu, lalu hubungkan Microsoft di Pengaturan akun. Untuk akun baru, hubungi Admin.</value></data>
+  <data name="MicrosoftEmailRequired" xml:space="preserve"><value>Microsoft tidak memberikan email yang valid. Hubungi Admin.</value></data>
+  <data name="MicrosoftAccountCollision" xml:space="preserve"><value>Email, username, atau identitas Microsoft sudah digunakan. Hubungkan melalui akun lama atau hubungi Admin.</value></data>
+  <data name="MicrosoftLinkExpired" xml:space="preserve"><value>Permintaan sudah kedaluwarsa atau tidak valid. Mulai lagi dari Pengaturan akun.</value></data>
+  <data name="MicrosoftUseLocalTwoFactor" xml:space="preserve"><value>Akun ini menggunakan verifikasi dua langkah lokal. Silakan masuk dengan password SplitBill.</value></data>
+  <data name="MicrosoftAutoRegistration" xml:space="preserve"><value>Izinkan pendaftaran otomatis melalui Microsoft</value></data>
+  <data name="MicrosoftAutoRegistrationHelp" xml:space="preserve"><value>User baru dibuat sebagai Member. Username diambil dari depan email. Akun yang sudah ada harus dihubungkan secara manual.</value></data>
 </root>

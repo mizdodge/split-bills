@@ -180,6 +180,9 @@ public static class DatabaseSchemaUpdater
             }
             await ExecuteAsync(db, "CREATE UNIQUE INDEX IF NOT EXISTS \"IX_AspNetUsers_MicrosoftTenantId_MicrosoftSubject\" ON \"AspNetUsers\" (\"MicrosoftTenantId\", \"MicrosoftSubject\") WHERE \"MicrosoftTenantId\" IS NOT NULL AND \"MicrosoftSubject\" IS NOT NULL;", cancellationToken);
 
+            if (!await HasColumnAsync(db, "MicrosoftLoginConfigurations", "AllowAutoRegistration", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE \"MicrosoftLoginConfigurations\" ADD COLUMN \"AllowAutoRegistration\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
+
             foreach (var column in MicrosoftCredentialColumns)
             {
                 var definition = column switch

@@ -55,6 +55,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         builder.Entity<MicrosoftIntegrationConfiguration>().HasKey(x => x.Id);
         builder.Entity<MicrosoftIntegrationConfiguration>().Property(x => x.Id).ValueGeneratedNever();
         builder.Entity<MicrosoftLoginConfiguration>().HasKey(x => x.Id);
+        builder.Entity<ApplicationUser>().HasIndex(x => new { x.MicrosoftTenantId, x.MicrosoftSubject })
+            .IsUnique().HasFilter("\"MicrosoftTenantId\" IS NOT NULL AND \"MicrosoftSubject\" IS NOT NULL");
         builder.Entity<MicrosoftLoginConfiguration>().Property(x => x.Id).ValueGeneratedNever();
         builder.Entity<MicrosoftAccountLinkIntent>().HasKey(x => x.Id);
         builder.Entity<MicrosoftAccountLinkIntent>()

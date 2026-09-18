@@ -65,7 +65,7 @@ The current login requests `openid profile email`; it does not need `User.Read.A
 3. In SplitBill **Microsoft Integration → Sign-in / SSO**, confirm Tenant ID and Client ID. If shared credentials are already stored, leave the secret blank to retain them for the same IDs.
 4. If offered for a legacy installation, use **Migrate existing SharePoint credentials** instead of retyping the secret.
 5. Enable the Microsoft login/SSO switch and save. Follow the application's restart requirement after credential changes; retain a local Admin session until verification is complete.
-6. In **Manage users**, ensure each intended person has an active local SplitBill account with the correct, distinct company email. Existing local roles and bill history remain attached to that account. The current matching rules are documented below; they include username-prefix fallback, so avoid ambiguous usernames/emails.
+6. In **Manage users**, ensure each intended person has an active local SplitBill account with the correct, distinct company email. Existing local roles and bill history remain attached to that account. Existing users must explicitly connect their accounts as described below; email and username are checked only for new-account collisions.
 
 Never paste a secret into documentation, screenshots, chat, or `appsettings.json`. Changing this shared secret affects SharePoint too; verify both services after rotation.
 
@@ -112,17 +112,34 @@ Tenant administrators may need to assign users in the Enterprise application and
 
 Enable SSO only after shared credentials, redirect URI, user assignment, and consent are ready in Azure.
 
-### User Matching and Sign-In Behavior:
-When a user clicks **Login dengan Microsoft**:
-1. **Primary Match (Persistent Link):** The system first checks if the verified Microsoft identity (`tenant ID` + `subject/oid`) is already linked to an existing SplitBill user. If linked, the user is signed in immediately.
-2. **First-Time Match & Auto-Link:** If the user has not yet been linked by `(tenant, object ID)`, the callback service matches the verified Microsoft email (`email`, `preferred_username`, or `upn`) against existing SplitBill accounts using multi-stage matching:
-   - Exact email or normalized email (`u.Email == cleanEmail` / `u.NormalizedEmail`).
-   - Exact username equal to the Microsoft email (`u.UserName == cleanEmail`).
-   - SplitBill username matching the email prefix before the `@` symbol (for example, a SplitBill user with username `mizan` matching `mizan@glmsystems.com`).
-   - Manually designated `MicrosoftAccountEmail` set in Manage Users.
-3. **Auto-Link:** Once matched, SplitBill binds the Microsoft `(tenant ID, object ID, email, display name)` to that local account, creates a persistent cookie session via `SignInManager.SignInAsync`, and redirects to `/Dashboard`. Subsequent logins resolve directly via Priority 1.
-4. **Unregistered Accounts:** If no matching user exists in the SplitBill database, sign-in is rejected with an explicit alert on the login screen: *"Akun Microsoft ({email}) belum terdaftar di SplitBill. Hubungi administrator."* SplitBill never performs just-in-time (JIT) creation of unknown accounts.
-5. **Account Lockout:** If the matched local account is locked out or disabled by an administrator, login is prevented.
+### Existing users: connect explicitly
+
+1. Sign in with the existing local SplitBill username/password.
+2. Select the gear **Account settings / Pengaturan akun** in the desktop profile footer or mobile header.
+3. Under **Microsoft account**, select **Connect Microsoft account**.
+4. Confirm the current **SplitBill password**, then continue to Microsoft's sign-in page. SplitBill never asks for a Microsoft password.
+5. After Microsoft sign-in, compare the displayed local account and Microsoft identity. Select **Yes, connect** to persist the link, or Cancel to leave the account unchanged.
+6. Subsequent Microsoft login resolves only the linked tenant ID + object ID. Existing roles, bills and local passwords are preserved. Email/username matching never signs into or links an existing account automatically.
+
+Link requests expire after five minutes, are single-use, and are bound to the local user, security stamp, browser and credential revision. Changing credentials/password or switching browser invalidates the request. A Microsoft identity already owned by another local account cannot be linked.
+
+The username `admin` (case-insensitive) is a local recovery account: it has password settings only and cannot use Microsoft sign-in, linking or automatic registration. Other users with the Admin role can link normally.
+
+### New employees: optional automatic registration
+
+1. An Admin enables **Allow automatic registration through Microsoft** in **Microsoft Integration → SSO**, then saves. This is off by default and applies only while SSO is enabled.
+2. An employee from the configured tenant signs in through Microsoft. Tenant assignment/consent policies still apply.
+3. If no stable link exists, a valid email is required. A new local account gets the Microsoft display name and full email; the username is the email prefix (`ragil@example.com` becomes `ragil`). Its only initial role is **Member**.
+4. Existing email/username collisions stop registration. No numeric suffix is added, no existing account is overwritten, and no implicit merge happens. The user must connect from the existing local account or contact an Admin. Unsupported username characters also require Admin assistance.
+5. New accounts have **no generated/default local password**. They can use Microsoft sign-in. Before disconnecting Microsoft, ask an Admin to set a local password through the existing password-reset feature, then verify that password at disconnect time.
+
+A missing email, wrong tenant, reserved `admin` username, revoked link or disabled account cannot create a replacement account. Existing links continue to work when automatic registration is switched off. Microsoft groups do not grant SplitBill roles.
+
+### Disconnect and recovery
+
+In Account settings, choose **Disconnect account**, confirm the current SplitBill password, and submit. Local access and bills remain intact. A revoked Microsoft identity is retained as a tombstone so it cannot automatically register a duplicate account. Reconnect explicitly when needed. Users without a local password cannot disconnect until the Admin password-reset step is complete.
+
+Microsoft-origin sessions check the current SSO switch, tenant, link version/revocation and account lockout on requests, in addition to Identity security-stamp validation. Local sessions remain available. Local two-factor accounts are directed to the local login flow rather than bypassing that policy.
 
 ## SharePoint tab
 

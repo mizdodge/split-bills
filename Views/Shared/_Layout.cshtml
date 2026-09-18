@@ -52,14 +52,14 @@
         </nav>
         <div class="sidebar-user">
             <span class="avatar">@User.Identity.Name![0].ToString().ToUpperInvariant()</span>
-            <div class="sidebar-user-info"><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a></small></div>
+            <div class="sidebar-user-info"><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="AccountSettings" asp-action="Index" class="account-settings-link"><partial name="_SettingsIcon" /> @L["AccountSettings"]</a></small></div>
             <form asp-controller="Account" asp-action="Logout" method="post"><button class="sidebar-logout" type="submit" aria-label='@L["Logout"]' title='@L["Logout"]'><partial name="_LogoutIcon" /></button></form>
         </div>
         <div class="sidebar-version" title="@AppVersion.Current.InformationalVersion">@AppVersion.Current.DisplayVersion</div>
     </aside>
     <header class="mobile-header">
         <a class="brand" asp-controller="Dashboard" asp-action="Index"><span class="brand-mark">S</span><span>SplitBill</span><small class="mobile-app-version">@AppVersion.Current.DisplayVersion</small></a>
-        <div class="mobile-account"><partial name="_CultureSwitcher" /><a class="mobile-notification-link" asp-controller="Notifications" asp-action="Index" aria-label='@L["Notifications"]' title='@L["Notifications"]'><partial name="_BellIcon" />@await Component.InvokeAsync("NotificationBadge")</a><a asp-controller="Account" asp-action="ChangePassword" class="avatar" aria-label='@L["ChangePassword"]'>@User.Identity.Name![0].ToString().ToUpperInvariant()</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="mobile-logout" type="submit" aria-label='@L["Logout"]'><span>@L["Logout"]</span> <partial name="_LogoutIcon" /></button></form></div>
+        <div class="mobile-account"><partial name="_CultureSwitcher" /><a class="mobile-notification-link" asp-controller="Notifications" asp-action="Index" aria-label='@L["Notifications"]' title='@L["Notifications"]'><partial name="_BellIcon" />@await Component.InvokeAsync("NotificationBadge")</a><a asp-controller="AccountSettings" asp-action="Index" class="avatar" aria-label='@L["AccountSettings"]'><partial name="_SettingsIcon" /></a><form asp-controller="Account" asp-action="Logout" method="post"><button class="mobile-logout" type="submit" aria-label='@L["Logout"]'><span>@L["Logout"]</span> <partial name="_LogoutIcon" /></button></form></div>
     </header>
     <main class="main-content">
         <div class="pwa-install-banner" data-pwa-install-hint hidden><span>@L["InstallAppHint"]</span><button type="button" class="btn btn-soft" data-pwa-install>@L["InstallApp"]</button></div>

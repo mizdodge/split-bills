@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,13 @@ public sealed class AccountController(SignInManager<ApplicationUser> signInManag
     IStringLocalizer<SharedResource> localizer, IMicrosoftIntegrationService microsoftIntegration) : Controller
 {
     [AllowAnonymous, HttpGet("account/login")]
-    public async Task<IActionResult> Login(string? returnUrl = null, string? remoteError = null)
+    public async Task<IActionResult> Login(string? returnUrl = null, string? remoteError = null, bool microsoftError = false)
     {
         if (User.Identity?.IsAuthenticated == true) return RedirectToLanding();
         if (!userManager.Users.Any()) return RedirectToAction("Index", "Setup");
-        if (!string.IsNullOrWhiteSpace(remoteError))
+        if (microsoftError || !string.IsNullOrWhiteSpace(remoteError))
         {
-            ModelState.AddModelError(string.Empty, remoteError);
+            ModelState.AddModelError(string.Empty, localizer["MicrosoftAccountUnavailable"]);
         }
         ViewBag.ReturnUrl = returnUrl;
         var ms = await microsoftIntegration.GetSettingsAsync();
@@ -56,6 +57,8 @@ public sealed class AccountController(SignInManager<ApplicationUser> signInManag
     public async Task<IActionResult> Logout()
     {
         await signInManager.SignOutAsync();
+        await HttpContext.SignOutAsync("MicrosoftLinkCookie");
+        Response.Cookies.Delete(AccountSettingsController.BindingCookie);
         return RedirectToAction(nameof(Login));
     }
 
@@ -86,7 +89,7 @@ public sealed class AccountController(SignInManager<ApplicationUser> signInManag
 
     [AllowAnonymous, HttpGet("account/microsoft")]
     public IActionResult Microsoft(string? returnUrl = null)
-        => RedirectToAction("Start", "MicrosoftSignIn", new { returnUrl });
+        => RedirectToAction(nameof(Login), new { returnUrl });
 
     [AllowAnonymous, HttpGet("account/access-denied")]
     public IActionResult AccessDenied() => View();

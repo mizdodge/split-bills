@@ -38,6 +38,7 @@ public sealed class AdminMicrosoftController(
             unified.Microsoft.ClientId = model.ClientId;
             unified.Microsoft.MicrosoftIntegrationEnabled = model.MicrosoftIntegrationEnabled;
             unified.Microsoft.MicrosoftLoginEnabled = model.MicrosoftLoginEnabled;
+            unified.Microsoft.AllowAutoRegistration = model.AllowAutoRegistration;
             return View("Index", unified);
         }
 
