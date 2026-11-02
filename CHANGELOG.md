@@ -1,3 +1,7 @@
+## 1.3.1 — 2026-11-02
+
+- Added the signed-in user's own current penalty-points card to every dashboard perspective, including zero balances and retained balances while another pickup method is active. The ID/EN note clarifies that points apply only to Points System pickup mode and are not bill charges. Existing report/detail point displays remain.
+
 ## 1.3.0 — 2026-11-02
 
 - Added personal profile settings, read-only identity/role information, account-wide ID/EN language and Teams/browser delivery preferences while retaining in-app history.

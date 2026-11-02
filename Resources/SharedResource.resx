@@ -2364,4 +2364,6 @@ Poin prioritas kamu direset ke 0. Buka rincian untuk melihat perubahan poin.</va
   <data name="AccountMicrosoftVerified" xml:space="preserve"><value>Identitas Microsoft sudah diverifikasi. Konfirmasi untuk mencabut semua sesi sekarang.</value></data>
   <data name="AccountOverviewHint" xml:space="preserve"><value>Kelola profil, preferensi, password, dan akun Microsoft kamu.</value></data>
   <data name="AccountBrowserOptedOut" xml:space="preserve"><value>Notifikasi browser dimatikan di preferensi akun. Aktifkan kembali di Pengaturan akun sebelum mendaftarkan perangkat.</value></data>
+  <data name="DashboardMyPenaltyPoints" xml:space="preserve"><value>Poin penalti saya</value></data>
+  <data name="DashboardMyPenaltyPointsHint" xml:space="preserve"><value>Berlaku saat pengambilan menggunakan mode Sistem Poin. Ini poin giliran mengambil, bukan biaya tagihan.</value></data>
 </root>

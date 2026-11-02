@@ -11,6 +11,7 @@ public sealed record DashboardPerspectiveOption(DashboardPerspective Perspective
 
 public sealed class DashboardViewModel
 {
+    public int MyPickupPenaltyPoints { get; set; }
     public bool IsMemberDashboard { get; set; }
 
     // Perspective switcher — populated by the controller for Admin/Moderator.

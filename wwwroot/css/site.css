@@ -263,3 +263,11 @@
 .account-security-confirm { max-width:620px; }
 .account-settings-grid .btn { white-space:normal; min-height:44px; }
 @media(max-width:420px) { .account-profile-facts>div { grid-template-columns:80px minmax(0,1fr); gap:8px; } .account-settings-grid .btn { width:100%; } }
+
+.my-pickup-points { display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:14px; margin-bottom:18px; padding:18px 22px; border-color:var(--primary); }
+.my-pickup-points-icon { display:grid; place-items:center; width:44px; height:44px; border-radius:12px; background:var(--primary-soft); color:var(--emerald); }
+.my-pickup-points-copy h2 { margin:0; font-size:1rem; }
+.my-pickup-points-copy p { margin:5px 0 0; font-size:.82rem; color:var(--muted); line-height:1.5; }
+.my-pickup-points-value { min-width:64px; text-align:center; color:var(--emerald); font-size:1.85rem; line-height:1.1; font-variant-numeric:tabular-nums; }
+.my-pickup-points-value small { display:block; margin-top:5px; font-size:.75rem; font-weight:600; color:var(--muted); }
+@media(max-width:420px) { .my-pickup-points { grid-template-columns:minmax(0,1fr) auto; gap:12px; padding:18px; } .my-pickup-points-icon { display:none; } .my-pickup-points-value { min-width:50px; } }

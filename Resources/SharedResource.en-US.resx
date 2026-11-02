@@ -2364,4 +2364,6 @@ Your priority points reset to 0. Open the details to see point changes.</value><
   <data name="AccountMicrosoftVerified" xml:space="preserve"><value>Your Microsoft identity has been verified. Confirm to revoke all sessions now.</value></data>
   <data name="AccountOverviewHint" xml:space="preserve"><value>Manage your profile, preferences, password and Microsoft account.</value></data>
   <data name="AccountBrowserOptedOut" xml:space="preserve"><value>Browser notifications are turned off in your account preferences. Enable them in Account settings before registering a device.</value></data>
+  <data name="DashboardMyPenaltyPoints" xml:space="preserve"><value>My penalty points</value></data>
+  <data name="DashboardMyPenaltyPointsHint" xml:space="preserve"><value>Applies when pickup uses Points System mode. These points determine pickup turns, not bill charges.</value></data>
 </root>

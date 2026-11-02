@@ -15,7 +15,7 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
     IDashboardAnalyticsService analytics, ICurrencyTrendService currencyTrends,
     IDashboardCurrencySelectionService dashboardCurrencySelection, ICurrencyRateService currencyRates,
     ICurrencyCatalog currencyCatalog, ICurrencyFormatter currencyFormatter,
-    IStringLocalizer<SharedResource> localizer) : Controller
+    IStringLocalizer<SharedResource> localizer, IFoodPickupPointsService? pickupPoints = null) : Controller
 {
     public async Task<IActionResult> Index(string? view)
     {
@@ -69,6 +69,7 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
         return View(new DashboardViewModel
         {
             IsMemberDashboard = true,
+            MyPickupPenaltyPoints = await MyPickupPointsAsync(),
             ActivePerspective = activePerspective,
             PerspectiveOptions = options ?? [],
             MemberCurrentMonthAmount = memberInsight.CurrentMonthAmount,
@@ -108,6 +109,7 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
         return View(new DashboardViewModel
         {
             ActivePerspective = DashboardPerspective.Operations,
+            MyPickupPenaltyPoints = await MyPickupPointsAsync(),
             PerspectiveOptions = options,
             TotalTransactions = transactions.Count,
             UnpaidTransactions = transactions.Count(x => x.Status == TransactionStatus.Unpaid),
@@ -125,6 +127,14 @@ public sealed class DashboardController(ApplicationDbContext db, UserManager<App
         });
     }
 
+
+    private async Task<int> MyPickupPointsAsync()
+    {
+        var userId = userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId)) return 0;
+        var balances = await (pickupPoints ?? new FoodPickupPointsService(db)).GetBalancesAsync();
+        return balances.GetValueOrDefault(userId);
+    }
 
     [Authorize(Roles = DatabaseSeeder.AdminRole)]
     [HttpPost, ValidateAntiForgeryToken]

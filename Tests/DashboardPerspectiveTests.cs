@@ -29,6 +29,46 @@ namespace Splitbill.Tests;
 /// </summary>
 public sealed class DashboardPerspectiveTests : IDisposable
 {
+    [Theory]
+    [InlineData(DatabaseSeeder.MemberRole, null, "other", 2)]
+    [InlineData(DatabaseSeeder.ModeratorRole, null, "other", 2)]
+    [InlineData(DatabaseSeeder.ModeratorRole, "personal", "other", 2)]
+    [InlineData(DatabaseSeeder.AdminRole, null, "other", 2)]
+    [InlineData(DatabaseSeeder.AdminRole, "personal", "other", 2)]
+    [InlineData(DatabaseSeeder.MemberRole, null, "viewer", 0)]
+    [InlineData(DatabaseSeeder.ModeratorRole, null, "viewer", 0)]
+    [InlineData(DatabaseSeeder.ModeratorRole, "personal", "viewer", 0)]
+    [InlineData(DatabaseSeeder.AdminRole, null, "viewer", 0)]
+    [InlineData(DatabaseSeeder.AdminRole, "personal", "viewer", 0)]
+    public async Task EveryDashboardPerspectiveShowsOnlySignedInAccountsRetainedPoints(string role, string? view, string winner, int expected)
+    {
+        await SeedUser("viewer"); await SeedUser("other");
+        // Historical Points contributions remain visible even while the active
+        // method is Round Robin, and even when the uploader is another account.
+        for (var index = 0; index < 2; index++)
+        {
+            var transactionId = await SeedTransaction("other", TransactionStatus.Unpaid, 1000);
+            db.FoodPickupPointRounds.Add(new FoodPickupPointRound { TransactionId = transactionId, SelectedUserId = winner,
+                MembersJson = """[{"userId":"viewer","name":"Viewer"},{"userId":"other","name":"Other"}]""",
+                EffectiveAt = DateTimeOffset.UtcNow.AddDays(index - 2) });
+            await db.SaveChangesAsync();
+        }
+        db.FoodPickupConfigurations.Add(new() { Id = 1, Enabled = true, Strategy = FoodPickupSelectionStrategy.RoundRobin });
+        await db.SaveChangesAsync();
+        var model = await GetViewModel(MakeController("viewer", role), view);
+        Assert.Equal(expected, model.MyPickupPenaltyPoints);
+        var otherModel = await GetViewModel(MakeController("other", DatabaseSeeder.MemberRole), null);
+        Assert.Equal(expected == 0 ? 2 : 0, otherModel.MyPickupPenaltyPoints);
+    }
+
+    [Fact]
+    public async Task MemberWithoutAnyPointHistorySeesZero()
+    {
+        await SeedUser("viewer");
+        var model = await GetViewModel(MakeController("viewer", DatabaseSeeder.MemberRole), null);
+        Assert.Equal(0, model.MyPickupPenaltyPoints);
+    }
+
     private readonly SqliteConnection connection = new("Data Source=:memory:;Foreign Keys=True");
     private readonly ApplicationDbContext db;
 

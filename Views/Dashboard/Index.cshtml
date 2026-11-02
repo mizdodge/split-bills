@@ -23,6 +23,7 @@
 
         <a class="btn btn-primary" asp-controller="MyBills" asp-action="Index">@L["OpenMyBills"]</a>
     </div>
+    <partial name="_MyPickupPoints" model="Model.MyPickupPenaltyPoints" />
     <div class="stat-grid member-stat-grid">
         <article class="stat-card accent"><span class="stat-icon">Rp</span><div><small>@L["ThisMonthBills"]</small><strong class="money-small">Rp @Model.MemberCurrentMonthAmount.ToString("N0")</strong></div></article>
         <article class="stat-card"><span class="stat-icon warning">↶</span><div><small>@L["PreviousMonthBills"]</small><strong class="money-small">Rp @Model.MemberPreviousMonthAmount.ToString("N0")</strong></div></article>
@@ -72,6 +73,7 @@ else
         <div><span class="eyebrow">@L["Overview"]</span><h1>@L["HelloUser", User.Identity?.Name ?? string.Empty]</h1><p>@L["MonitorBills"]</p></div>
         <a class="btn btn-primary" asp-controller="Transactions" asp-action="Upload">@L["UploadReceiptButton"]</a>
     </div>
+    <partial name="_MyPickupPoints" model="Model.MyPickupPenaltyPoints" />
     <div class="stat-grid">
         <article class="stat-card accent"><span class="stat-icon">▤</span><div><small>@L["TotalTransactions"]</small><strong>@Model.TotalTransactions</strong></div></article>
         <article class="stat-card"><span class="stat-icon warning">◔</span><div><small>@L["UnpaidBills"]</small><strong>@(Model.UnpaidTransactions + Model.PartialTransactions)</strong></div></article>

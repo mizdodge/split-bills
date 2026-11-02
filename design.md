@@ -517,3 +517,6 @@ The report pickup card repeats the method selector as a segmented Round Robin / 
 
 ### Personal account settings (v1.3.0)
 Profile and preferences occupy the first row of the existing responsive two-column account card grid; password/session security follow, then the Microsoft connection card. The profile shows read-only username/email/roles and a display-name form. Preferences uses a language select plus clearly explained account-wide Teams/browser toggles. Session revocation requires an explicit password or Microsoft verification and states that the current device is included. Verified password creation/session confirmation use focused single-card pages; verification errors remain visible in Account settings. Fields wrap safely at 320px, icons/theme use the shared Emerald/Lime system, all labels/errors are ID/EN and action controls meet 44px minimum height.
+
+### Dashboard own-points card (v1.3.1)
+Place the read-only personal pickup-points card directly after the dashboard heading and before financial stats in both perspectives. Use shared _MyPickupPoints, a Lime-soft SVG accent, clear owner wording, a prominent integer plus localized point unit, and a Points-mode applicability note. At narrow widths hide the decorative icon and retain copy/value columns; zero displays explicitly. The card is personal even in the operational dashboard.

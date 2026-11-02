@@ -1,0 +1,6 @@
+@model int
+<section class="content-card my-pickup-points" aria-labelledby="my-pickup-points-title">
+    <span class="my-pickup-points-icon nav-icon" aria-hidden="true"><partial name="_NavIcon" model='"pickup"' /></span>
+    <div class="my-pickup-points-copy"><h2 id="my-pickup-points-title">@L["DashboardMyPenaltyPoints"]</h2><p>@L["DashboardMyPenaltyPointsHint"]</p></div>
+    <strong class="my-pickup-points-value"><span data-my-pickup-points>@Model.ToString("N0")</span><small>@L["PointsUnit"]</small></strong>
+</section>
