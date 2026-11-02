@@ -437,3 +437,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// Native disclosure navigation remains usable without JavaScript.
+document.addEventListener('click', event => {
+  document.querySelectorAll('.bottom-more[open]').forEach(menu => {
+    if (!menu.contains(event.target) || event.target === menu || event.target.closest('a')) menu.open = false;
+  });
+});
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  document.querySelectorAll('.bottom-more[open]').forEach(menu => {
+    menu.open = false;
+    menu.querySelector('summary')?.focus();
+  });
+});
+window.matchMedia('(min-width: 761px)').addEventListener('change', event => {
+  if (event.matches) document.querySelectorAll('.bottom-more[open]').forEach(menu => { menu.open = false; });
+});

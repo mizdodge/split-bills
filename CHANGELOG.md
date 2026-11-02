@@ -1,3 +1,8 @@
+## 1.2.1 — 2026-11-02
+
+- Aligned navigation format with SplitBill Pro: grouped desktop links, consistent outline SVG icons, pinned profile/settings/logout and independent sidebar scrolling.
+- Replaced the scrolling mobile tab strip with role-scoped primary tabs and a grouped Menu disclosure. Includes active-route highlights, safe-area spacing, scrollable settings, keyboard/outside-click dismissal and a no-JavaScript fallback.
+
 ## 1.2.0 — 2026-11-02
 
 - Added shared pagination across transactions, bills, notifications, approvals, users and reports, preserving filters and full Excel exports. Pickup statistics and histories are isolated by selection method.

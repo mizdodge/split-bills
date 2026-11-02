@@ -2325,4 +2325,8 @@ Transaksi: {2}
 Peserta: {3}
 
 Poin prioritas kamu direset ke 0. Buka rincian untuk melihat perubahan poin.</value></data>
+  <data name="MainNavigation" xml:space="preserve"><value>Navigasi utama</value></data>
+  <data name="Operations" xml:space="preserve"><value>Operasional</value></data>
+  <data name="Personal" xml:space="preserve"><value>Pribadi</value></data>
+  <data name="Administration" xml:space="preserve"><value>Administrasi</value></data>
 </root>

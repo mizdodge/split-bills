@@ -2325,4 +2325,8 @@ Transaction: {2}
 Participants: {3}
 
 Your priority points reset to 0. Open the details to see point changes.</value></data>
+  <data name="MainNavigation" xml:space="preserve"><value>Main navigation</value></data>
+  <data name="Operations" xml:space="preserve"><value>Operations</value></data>
+  <data name="Personal" xml:space="preserve"><value>Personal</value></data>
+  <data name="Administration" xml:space="preserve"><value>Administration</value></data>
 </root>

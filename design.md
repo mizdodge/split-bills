@@ -119,11 +119,11 @@ Use the existing spacing rhythm rather than arbitrary values: `6`, `8`, `10`, `1
 - A fixed `244px` Emerald sidebar constrained to viewport height (`100vh`/`100dvh`) with `overflow: hidden` contains the brand, ID/EN switcher, role-scoped navigation, account controls, and version.
 - The brand, ID/EN language switcher, account footer, and version block are non-shrinking (`flex-shrink: 0`), keeping identity and session controls continuously visible.
 - The navigation region (`.side-nav`) is an independent scroll container (`flex: 1 1 0; min-height: 0; overflow-y: auto`) with a subtle thin Lime scrollbar (`rgba(205, 255, 112, .35)`), ensuring all menu links are reachable without zooming or pushing profile controls below the viewport.
-- At exceptionally short desktop viewports (`@media (min-width: 761px) and (max-height: 520px)`), an explicit fallback enables full-sidebar scrolling (`.sidebar { overflow-y: auto }`, `.side-nav { overflow-y: visible }`) so every control remains reachable without clipping.
+- Short desktop viewports retain the same independent nav scroll and pinned account footer; verified at 500px height.
 - The main region begins after the sidebar with `38px clamp(24px, 4vw, 64px) 70px` padding and a `1640px` maximum width.
 - Active navigation uses a Lime rounded rectangle with Emerald text. When Notifications is active, the unread counter badge inverts to Emerald background with Lime text.
-- Navigation labels are short; an icon or symbol appears in a fixed-width leading slot (`.nav-icon`). Notifications uses a consistent outline bell SVG.
-- The account block (`.sidebar-user`) stays pinned above the version with a subtle white border. Username and role text wrap safely inside `.sidebar-user-info` (`minmax(0, 1fr)`) without horizontal overflow.
+- Navigation groups are Operations, Personal and Admin-only Administration. All menu icons use the shared `_NavIcon` outline SVG partial with a 20px fixed slot and 1.8 stroke. Labels wrap in an independent flexible column.
+- The account block (`.sidebar-user`) stays pinned above the version with a subtle white border. Display name, @username and role use a constrained text column with ellipsis and full-name titles, followed by separate 44px account-settings and logout controls.
 - Desktop logout uses an outline door-and-outward-arrow SVG button (`.sidebar-logout`) with a minimum 44×44px hit target, localized `aria-label` and `title`, and clear Lime hover/focus outlines. The application version sits below it in quiet uppercase metadata.
 
 ### 3.2 Mobile
@@ -135,9 +135,9 @@ At `760px` and below:
 - The mobile notification link uses the outline bell SVG with a 44×44px hit target and clear badge clearance; unread badges (e.g. 1, 15, 50, 110/99+) display without clipping or overlapping adjacent chrome.
 - Mobile logout uses a visible localized text button (`Keluar` / `Logout`) paired with the shared door-and-outward-arrow SVG, meeting a 44px minimum touch target.
 - At very narrow phone widths (`<=380px`), header controls tighten gracefully to guarantee all items remain accessible without crowding.
-- Show a fixed, horizontally scrollable bottom navigation. Each destination occupies a stable `76px` slot.
+- Bottom navigation uses equal-width grid columns without horizontal scrolling: Admin/Moderator get Dashboard, Upload, Transactions, My bills and Menu; Members get Dashboard, My bills, Report and Menu. Menu is a native disclosure with grouped, scrollable, role-scoped secondary links and an active highlight on secondary routes. It closes on outside/backdrop clicks, navigation, Escape (restoring summary focus), or resize to desktop; it works without JavaScript.
 - Keep the active destination Lime or Lime-soft; Upload is not allowed to leave Transactions highlighted.
-- Remove the desktop left margin and use `24px 14px 94px` main padding so content clears the bottom bar.
+- Remove the desktop left margin and reserve `96px + env(safe-area-inset-bottom)` beneath content. The 72px bar and menu position include the bottom safe area.
 - Stack multi-column page layouts and let wide data tables scroll inside their own container.
 
 Additional responsive thresholds are component-specific:

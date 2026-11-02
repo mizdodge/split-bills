@@ -1,3 +1,4 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> LayoutUsers
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
@@ -15,45 +16,68 @@
 {
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var canManage = User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole);
+    var isAdmin = User.IsInRole(DatabaseSeeder.AdminRole);
     var uploadWorkflowActive = currentController == "Transactions" && currentAction is "Upload" or "Review" or "Split";
-    var transactionsActive = currentController == "Transactions" && !uploadWorkflowActive;
-    var isMemberOnly = User.IsInRole(DatabaseSeeder.MemberRole) && !User.IsInRole(DatabaseSeeder.AdminRole) && !User.IsInRole(DatabaseSeeder.ModeratorRole);
-    var roleLabel = User.IsInRole(DatabaseSeeder.AdminRole) ? "Admin" : User.IsInRole(DatabaseSeeder.ModeratorRole) ? "Moderator" : "Member";
+    bool IsActive(string controller, string action) => controller switch
+    {
+        "Transactions" => currentController == controller && (action == "Upload" ? uploadWorkflowActive : !uploadWorkflowActive),
+        "AdminMicrosoft" => currentController is "AdminMicrosoft" or "AdminSharePoint",
+        "AccountSettings" => currentController == controller || (currentController == "Account" && currentAction == "ChangePassword"),
+        _ => currentController == controller
+    };
+    var roleLabel = isAdmin ? "Admin" : canManage ? "Moderator" : "Member";
+    var profileUser = await LayoutUsers.GetUserAsync(User);
+    var profileUsername = profileUser?.UserName ?? User.Identity?.Name ?? string.Empty;
+    var profileName = string.IsNullOrWhiteSpace(profileUser?.DisplayName) ? profileUsername : profileUser.DisplayName;
+    var operations = new List<(string Controller, string Action, string Label, string Icon)> { ("Dashboard", "Index", "Dashboard", "dashboard") };
+    if (canManage)
+    {
+        operations.Add(("Transactions", "Upload", "UploadReceipt", "upload"));
+        operations.Add(("Transactions", "Index", "Transactions", "transactions"));
+    }
+    operations.Add(("Reports", "Index", "Report", "report"));
+    if (canManage) { operations.Add(("Payments", "Approvals", "Approvals", "approvals")); }
+    var personal = new[] { ("MyBills", "Index", "MyBills", "bills"), ("Notifications", "Index", "Notifications", "notifications") };
+    var administration = new[] {
+        ("AdminSettings", "Index", "AISettings", "settings"), ("AdminCurrency", "Index", "CurrencySettings", "currency"),
+        ("AdminMicrosoft", "Index", "MicrosoftIntegration", "microsoft"), ("AdminUsers", "Index", "ManageUsers", "users"),
+        ("AdminFoodPickup", "Index", "FoodPickupRotation", "pickup"), ("AdminSystem", "Index", "SystemTools", "system")
+    };
+    var primaryMobile = canManage
+        ? new[] { ("Dashboard", "Index", "Dashboard", "dashboard"), ("Transactions", "Upload", "UploadReceipt", "upload"), ("Transactions", "Index", "Transactions", "transactions"), ("MyBills", "Index", "MyBills", "bills") }
+        : new[] { ("Dashboard", "Index", "Dashboard", "dashboard"), ("MyBills", "Index", "MyBills", "bills"), ("Reports", "Index", "Report", "report") };
+    var moreActive = !primaryMobile.Any(item => IsActive(item.Item1, item.Item2));
     <aside class="sidebar">
         <a class="brand" asp-controller="Dashboard" asp-action="Index"><span class="brand-mark">S</span><span>SplitBill</span></a>
         <partial name="_CultureSwitcher" />
-        <nav class="side-nav">
-            <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")"><span>⌂</span> @L["Dashboard"]</a>
-            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+        <nav class="side-nav" aria-label='@L["MainNavigation"]'>
+            <div class="nav-label">@L["Operations"]</div>
+            @foreach (var item in operations)
             {
-                <a asp-controller="Transactions" asp-action="Upload" class="@(uploadWorkflowActive ? "active" : "")"><span>＋</span> @L["UploadReceipt"]</a>
+                <a asp-controller="@item.Controller" asp-action="@item.Action" class="@(IsActive(item.Controller, item.Action) ? "active" : "")" aria-current="@(IsActive(item.Controller, item.Action) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Icon" /></span><span class="nav-text">@L[item.Label]</span></a>
             }
-            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+            <div class="nav-label">@L["Personal"]</div>
+            @foreach (var item in personal)
             {
-                <a asp-controller="Transactions" asp-action="Index" class="@(transactionsActive ? "active" : "")"><span>▤</span> @L["Transactions"]</a>
+                <a asp-controller="@item.Item1" asp-action="@item.Item2" class="@(IsActive(item.Item1, item.Item2) ? "active" : "")" aria-current="@(IsActive(item.Item1, item.Item2) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Item4" /></span><span class="nav-text">@L[item.Item3]</span>@if(item.Item1 == "Notifications") { @await Component.InvokeAsync("NotificationBadge") }</a>
             }
-            <a asp-controller="Reports" asp-action="Index" class="@(currentController == "Reports" ? "active" : "")"><span>◫</span> @L["Report"]</a>
-            <a asp-controller="MyBills" asp-action="Index" class="@(currentController == "MyBills" ? "active" : "")"><span>◎</span> @L["MyBills"]</a>
-            @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+            @if (isAdmin)
             {
-                <a asp-controller="Payments" asp-action="Approvals" class="@(currentController == "Payments" ? "active" : "")"><span>✓</span> @L["Approvals"]</a>
-            }
-            <a asp-controller="Notifications" asp-action="Index" class="@(currentController == "Notifications" ? "active" : "")"><span class="nav-icon"><partial name="_BellIcon" /></span> @L["Notifications"] @await Component.InvokeAsync("NotificationBadge")</a>
-            @if (User.IsInRole(DatabaseSeeder.AdminRole))
-            {
-                <div class="nav-label">@L["Admin"]</div>
-                <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span> @L["AISettings"]</a>
-                <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span> @L["CurrencySettings"]</a>
-                <a asp-controller="AdminMicrosoft" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() is "AdminMicrosoft" or "AdminSharePoint" ? "active" : "")"><span>◉</span> @L["MicrosoftIntegration"]</a>
-                <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span> @L["ManageUsers"]</a>
-                <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span> @L["FoodPickupRotation"]</a>
-                <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span> @L["SystemTools"]</a>
+                <div class="nav-label">@L["Administration"]</div>
+                @foreach (var item in administration)
+                {
+                    <a asp-controller="@item.Item1" asp-action="@item.Item2" class="@(IsActive(item.Item1, item.Item2) ? "active" : "")" aria-current="@(IsActive(item.Item1, item.Item2) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Item4" /></span><span class="nav-text">@L[item.Item3]</span></a>
+                }
             }
         </nav>
         <div class="sidebar-user">
-            <span class="avatar">@User.Identity.Name![0].ToString().ToUpperInvariant()</span>
-            <div class="sidebar-user-info"><strong>@User.Identity.Name</strong><small>@L[roleLabel] · <a asp-controller="AccountSettings" asp-action="Index" class="account-settings-link"><partial name="_SettingsIcon" /> @L["AccountSettings"]</a></small></div>
-            <form asp-controller="Account" asp-action="Logout" method="post"><button class="sidebar-logout" type="submit" aria-label='@L["Logout"]' title='@L["Logout"]'><partial name="_LogoutIcon" /></button></form>
+            <span class="avatar">@(profileUsername.Length >= 2 ? profileUsername[..2].ToUpperInvariant() : profileUsername.Length == 1 ? profileUsername.ToUpperInvariant() : "U")</span>
+            <div class="sidebar-user-info"><strong title="@profileName">@profileName</strong><small class="sidebar-username" title="@profileUsername">@@@profileUsername</small><small>@L[roleLabel]</small></div>
+            <div class="sidebar-user-actions">
+                <a asp-controller="AccountSettings" asp-action="Index" class="sidebar-account-settings" aria-label='@L["AccountSettings"]' title='@L["AccountSettings"]'><partial name="_SettingsIcon" /></a>
+                <form asp-controller="Account" asp-action="Logout" method="post"><button class="sidebar-logout" type="submit" aria-label='@L["Logout"]' title='@L["Logout"]'><partial name="_LogoutIcon" /></button></form>
+            </div>
         </div>
         <div class="sidebar-version" title="@AppVersion.Current.InformationalVersion">@AppVersion.Current.DisplayVersion</div>
     </aside>
@@ -74,34 +98,35 @@
         }
         @RenderBody()
     </main>
-    <nav class="bottom-nav">
-        <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")"><span>⌂</span>@L["Dashboard"]</a>
-        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
+    <nav class="bottom-nav" aria-label='@L["MainNavigation"]'>
+        @foreach (var item in primaryMobile)
         {
-            <a asp-controller="Transactions" asp-action="Upload" class="bottom-upload @(uploadWorkflowActive ? "active" : "")"><span>＋</span>@L["UploadReceipt"]</a>
+            <a asp-controller="@item.Item1" asp-action="@item.Item2" class="@(IsActive(item.Item1, item.Item2) ? "active" : "")" aria-current="@(IsActive(item.Item1, item.Item2) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Item4" /></span><span class="nav-text">@L[item.Item3]</span></a>
         }
-        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
-        {
-            <a asp-controller="Transactions" asp-action="Index" class="@(transactionsActive ? "active" : "")"><span>▤</span>@L["Transactions"]</a>
-        }
-        <a asp-controller="Reports" asp-action="Index" class="@(currentController == "Reports" ? "active" : "")"><span>◫</span>@L["Report"]</a>
-        @if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
-        {
-            <a asp-controller="Payments" asp-action="Approvals" class="@(currentController == "Payments" ? "active" : "")"><span>✓</span>@L["Approvals"]</a>
-        }
-        @if (User.IsInRole(DatabaseSeeder.MemberRole))
-        {
-            <a asp-controller="MyBills" asp-action="Index" class="@(currentController == "MyBills" ? "active" : "")"><span>◎</span>@L["MyBills"]</a>
-        }
-        @if (User.IsInRole(DatabaseSeeder.AdminRole))
-        {
-            <a asp-controller="AdminSettings" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")"><span>⚙</span>@L["AISettings"]</a>
-            <a asp-controller="AdminCurrency" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCurrency" ? "active" : "")"><span>¤</span>@L["CurrencySettings"]</a>
-            <a asp-controller="AdminMicrosoft" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() is "AdminMicrosoft" or "AdminSharePoint" ? "active" : "")"><span>◉</span>@L["MicrosoftIntegration"]</a>
-            <a asp-controller="AdminUsers" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminUsers" ? "active" : "")"><span>♙</span>@L["ManageUsers"]</a>
-            <a asp-controller="AdminFoodPickup" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminFoodPickup" ? "active" : "")"><span>★</span>@L["FoodPickupRotation"]</a>
-            <a asp-controller="AdminSystem" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSystem" ? "active" : "")"><span>▣</span>@L["SystemTools"]</a>
-        }
+        <details class="bottom-more @(moreActive ? "active" : "")">
+            <summary aria-controls="mobile-more-menu"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model='"menu"' /></span><span class="nav-text">@L["Menu"]</span></summary>
+            <div id="mobile-more-menu" class="bottom-more-menu">
+                @if (canManage)
+                {
+                    <div class="bottom-more-label">@L["Operations"]</div>
+                    @foreach (var item in operations.Where(item => item.Controller is "Reports" or "Payments"))
+                    {
+                        <a asp-controller="@item.Controller" asp-action="@item.Action" class="@(IsActive(item.Controller, item.Action) ? "active" : "")" aria-current="@(IsActive(item.Controller, item.Action) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Icon" /></span><span>@L[item.Label]</span></a>
+                    }
+                }
+                <div class="bottom-more-label">@L["Personal"]</div>
+                <a asp-controller="Notifications" asp-action="Index" class="@(currentController == "Notifications" ? "active" : "")" aria-current="@(currentController == "Notifications" ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model='"notifications"' /></span><span>@L["Notifications"]</span>@await Component.InvokeAsync("NotificationBadge")</a>
+                <a asp-controller="AccountSettings" asp-action="Index" class="@(IsActive("AccountSettings", "Index") ? "active" : "")" aria-current="@(IsActive("AccountSettings", "Index") ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_SettingsIcon" /></span><span>@L["AccountSettings"]</span></a>
+                @if (isAdmin)
+                {
+                    <div class="bottom-more-label">@L["Administration"]</div>
+                    @foreach (var item in administration)
+                    {
+                        <a asp-controller="@item.Item1" asp-action="@item.Item2" class="@(IsActive(item.Item1, item.Item2) ? "active" : "")" aria-current="@(IsActive(item.Item1, item.Item2) ? "page" : null)"><span class="nav-icon" aria-hidden="true"><partial name="_NavIcon" model="item.Item4" /></span><span>@L[item.Item3]</span></a>
+                    }
+                }
+            </div>
+        </details>
     </nav>
 }
 else
