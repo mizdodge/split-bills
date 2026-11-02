@@ -17,7 +17,7 @@ public enum WebPushDeliveryStatus { Pending = 0, Processing = 1, Sent = 2, DeadL
 public enum SharePointNotificationEventType { BillAssigned = 0, PaymentApprovalRequested = 1, PaymentRejected = 2, FoodPickupSelected = 3 }
 public enum SharePointNotificationStatus { Pending = 0, Processing = 1, Sent = 2, DeadLetter = 3 }
 public enum FoodPickupDrawKind { Initial = 0, AutomaticRedraw = 1, AdminReroll = 2 }
-public enum FoodPickupSelectionStrategy { WeightedRandom = 0, RoundRobin = 1 }
+public enum FoodPickupSelectionStrategy { WeightedRandom = 0, RoundRobin = 1, Points = 2 }
 public enum CurrencyProviderKind { FrankfurterV2 = 0 }
 public enum CurrencyAuthenticationMode { None = 0, Bearer = 1, XApiKey = 2 }
 public enum ExchangeRateCaptureMode { Identity = 0, Automatic = 1, Manual = 2, LegacyIdentity = 3 }

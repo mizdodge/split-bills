@@ -14,7 +14,7 @@
 </form>
 
 <section class="content-card admin-user-list-card">
-    <div class="section-head"><div><h2>@L["UserList"]</h2><p>@L["AdminUserCount", Model.Users.Count]</p></div></div>
+    <div class="section-head"><div><h2>@L["UserList"]</h2><p>@L["AdminUserCount", (ViewData["Pagination:page"] as PaginationViewModel)?.TotalItems ?? Model.Users.Count]</p></div></div>
     @if (Model.Users.Count == 0)
     {
         <div class="empty-inline"><span>♙</span><strong>@L["NoUsersFound"]</strong><p>@L["TryAnotherFilter"]</p></div>
@@ -43,5 +43,8 @@
         }
         </div>
     }
+@if (ViewData["Pagination:page"] is PaginationViewModel pagination) { <partial name="_Pagination" model="pagination" /> }
 </section>
+
+
 @section Scripts { <script src="~/js/admin-users.js" asp-append-version="true"></script> }

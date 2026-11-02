@@ -1,0 +1,29 @@
+@model IReadOnlyList<PickupPointHistory>
+@if (Model.Count == 0)
+{
+    <div class="empty-inline"><strong>@L["PointsNoHistory"]</strong><p>@L["PointsNoHistoryHint"]</p></div>
+}
+@for (var index = 0; index < Model.Count; index++)
+{
+    var entry = Model[index];
+    <details class="point-audit" open="@(index == 0)">
+        <summary><span><strong>@entry.MerchantName</strong><small>@entry.TransactionNumber · @L[$"PointsEvent{entry.Kind}"]</small></span><time>@entry.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</time></summary>
+        @if (entry.Snapshot.SelectedUserId is not null && entry.Kind != "ParticipantsChanged")
+        {
+            <p class="point-selection-reason">@L["PointsSelectionReason", entry.Snapshot.HighestPoints, entry.Snapshot.TiedCandidates]</p>
+        }
+        else { <p class="point-selection-reason">@L["PointsReconciledHint"]</p> }
+        @if (!string.IsNullOrWhiteSpace(entry.Reason)) { <p>@entry.Reason</p> }
+        <div class="point-change-list">
+            @foreach (var change in entry.Snapshot.Changes)
+            {
+                <div class="point-change-row @(change.IsSelected ? "is-selected" : string.Empty)">
+                    <span><strong>@change.Name</strong>@if (change.IsSelected) { <small>@L["FoodPickupWinner"]</small> }</span>
+                    <span class="point-change-values">@change.Before <span aria-hidden="true">→</span> <strong>@change.After @L["PointsUnit"]</strong></span>
+                    <span class="point-change-tag">@(change.IsSelected ? L["PointsReset"].Value : (change.After > change.Before ? "+" : string.Empty) + (change.After - change.Before).ToString())</span>
+                </div>
+            }
+        </div>
+        <small class="text-muted">@L["PointsAbsentUnchanged"]</small>
+    </details>
+}

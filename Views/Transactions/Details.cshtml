@@ -16,13 +16,17 @@
         }
         @if (Model.PickupAssignment is not null && pickupName is not null)
         {
-            <aside class="bill-summary-pickup">
+            <aside class="bill-summary-pickup @(Model.PickupAssignment.Strategy == FoodPickupSelectionStrategy.Points ? "is-points" : string.Empty)">
                 <span class="bill-summary-pickup-icon" aria-hidden="true">🛵</span>
                 <div class="bill-summary-pickup-copy"><span>@L["FoodPickupWinner"]</span><strong>@pickupName</strong><small>@L[$"FoodPickupDraw{Model.PickupAssignment.DrawKind}"] · @Model.PickupAssignment.SelectedAt.ToLocalTime().ToString("dd MMM, HH:mm")</small></div>
                 <div class="bill-summary-pickup-meta">
                     @if (Model.PickupAssignment.Strategy == FoodPickupSelectionStrategy.RoundRobin)
                     {
                         <strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong><small>@L["FoodPickupSelectedByRoundRobin"]</small>
+                    }
+                    else if (Model.PickupAssignment.Strategy == FoodPickupSelectionStrategy.Points)
+                    {
+                        <strong>@L["FoodPickupStrategyPoints"]</strong><small>@L["PointsPriorityRule"]</small>
                     }
                     else
     {
@@ -66,6 +70,14 @@
             }
         </div>
     </section>
+
+    @if (Model.PointHistory.Count > 0)
+    {
+        <section class="content-card point-history-card"><div class="section-head"><div><h2>@L["PointsChanges"]</h2><p>@L["PointsNotMoney"]</p></div></div>
+            <partial name="_PickupPointHistory" model="Model.PointHistory" />
+            @if(ViewData["Pagination:pointHistoryPage"] is PaginationViewModel pointPager){<partial name="_Pagination" model="pointPager" />}
+        </section>
+    }
     <section class="content-card"><div class="section-head"><div><h2>@L["PaymentStatusHeading"]</h2><p>@L["PeopleInTransaction", tx.Participants.Count]</p></div><span class="paid-count">@tx.Participants.Count(x => x.PaymentStatus == ParticipantPaymentStatus.Paid)/@tx.Participants.Count @L["Paid"]</span></div>
         <div class="payment-list">
         @foreach (var person in tx.Participants.OrderBy(x => x.Name))

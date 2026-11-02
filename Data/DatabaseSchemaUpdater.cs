@@ -341,6 +341,31 @@ public static class DatabaseSchemaUpdater
 
             if (!await HasColumnAsync(db, "PaymentHistories", "ActionType", cancellationToken))
                 await ExecuteAsync(db, "ALTER TABLE \"PaymentHistories\" ADD COLUMN \"ActionType\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
+            await ExecuteAsync(db, """
+                CREATE TABLE IF NOT EXISTS "FoodPickupPointRounds" (
+                    "Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "TransactionId" INTEGER NOT NULL,
+                    "SelectedUserId" TEXT NOT NULL,
+                    "MembersJson" TEXT NOT NULL,
+                    "RosterJson" TEXT NOT NULL,
+                    "EffectiveAt" TEXT NOT NULL,
+                    FOREIGN KEY ("TransactionId") REFERENCES "Transactions" ("Id") ON DELETE CASCADE
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "IX_FoodPickupPointRounds_TransactionId" ON "FoodPickupPointRounds" ("TransactionId");
+                CREATE TABLE IF NOT EXISTS "FoodPickupPointAudits" (
+                    "Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "TransactionId" INTEGER NULL,
+                    "TransactionNumber" TEXT NOT NULL,
+                    "MerchantName" TEXT NOT NULL,
+                    "Kind" TEXT NOT NULL,
+                    "ActorUserId" TEXT NULL,
+                    "Reason" TEXT NULL,
+                    "SnapshotJson" TEXT NOT NULL,
+                    "CreatedAt" TEXT NOT NULL,
+                    FOREIGN KEY ("TransactionId") REFERENCES "Transactions" ("Id") ON DELETE SET NULL
+                );
+                CREATE INDEX IF NOT EXISTS "IX_FoodPickupPointAudits_TransactionId" ON "FoodPickupPointAudits" ("TransactionId");
+                """, cancellationToken);
             if (!await HasColumnAsync(db, "FoodPickupConfigurations", "Strategy", cancellationToken))
                 await ExecuteAsync(db, "ALTER TABLE \"FoodPickupConfigurations\" ADD COLUMN \"Strategy\" INTEGER NOT NULL DEFAULT 0;", cancellationToken);
             if (!await HasColumnAsync(db, "FoodPickupAssignments", "Strategy", cancellationToken))

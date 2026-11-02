@@ -29,7 +29,7 @@ public sealed class PaymentsController(ApplicationDbContext db, UserManager<Appl
         var approvals = (await query.ToListAsync(cancellationToken)).OrderBy(x => x.RequestedAt).ToList();
         return View(new PaymentApprovalListViewModel
         {
-            Approvals = approvals.Select(x => new PaymentApprovalRowViewModel
+            Approvals = this.Paginate(approvals.OrderBy(x => x.RequestedAt).ThenBy(x => x.Id).Select(x => new PaymentApprovalRowViewModel
             {
                 ParticipantId = x.ParticipantId,
                 TransactionId = x.Participant!.TransactionId,
@@ -39,7 +39,7 @@ public sealed class PaymentsController(ApplicationDbContext db, UserManager<Appl
                 Amount = x.Participant.Amount,
                 RequestedAt = x.RequestedAt, ProofOriginalFileName = x.ProofOriginalFileName,
                 HasProof = !string.IsNullOrWhiteSpace(x.ProofFileName), ApprovalId = x.Id
-            }).ToList()
+            }))
         });
     }
 

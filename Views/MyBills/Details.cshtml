@@ -38,6 +38,10 @@
             {
                 <small><strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong> · @L["FoodPickupSelectedByRoundRobin"]</small>
             }
+            else if (Model.PickupStrategy == FoodPickupSelectionStrategy.Points)
+            {
+                <small><strong>@L["FoodPickupStrategyPoints"]</strong> · @L["PointsPriorityRule"]</small>
+            }
             else if (Model.PickupProbability.HasValue)
             {
                 <small>@L["FoodPickupDrawProbability"]: <strong>@Model.PickupProbability.Value.ToString("0.##%")</strong></small>
@@ -120,3 +124,11 @@
         </section>
     </aside>
 </div>
+
+@if (Model.PointHistory.Count > 0)
+{
+    <section class="content-card mt-4 point-history-card"><div class="section-head"><div><h2>@L["PointsChanges"]</h2><p>@L["PointsNotMoney"]</p></div></div>
+    <partial name="_PickupPointHistory" model="Model.PointHistory" />
+    @if(ViewData["Pagination:pointHistoryPage"] is PaginationViewModel pointPager){<partial name="_Pagination" model="pointPager" />}
+    </section>
+}

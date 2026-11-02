@@ -120,6 +120,8 @@ public sealed class DashboardRateHistoryPageViewModel
 
 public sealed class ReportViewModel
 {
+    public IReadOnlyList<PickupPointHistory> PointHistory { get; set; } = [];
+    public FoodPickupSelectionStrategy PickupStrategy { get; set; }
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
     public TransactionStatus? Status { get; set; }
@@ -139,6 +141,7 @@ public sealed class ReportViewModel
 
 public sealed class ReportTransactionRowViewModel
 {
+    public FoodPickupSelectionStrategy? PickupStrategy { get; set; }
     public long Id { get; set; }
     public string TransactionNumber { get; set; } = string.Empty;
     public string MerchantName { get; set; } = string.Empty;
@@ -155,6 +158,7 @@ public sealed class ReportTransactionRowViewModel
 
 public sealed class ReportPickupPersonRowViewModel
 {
+    public int PriorityPoints { get; set; }
     public string ParticipantName { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public int ParticipationCount { get; set; }
@@ -167,5 +171,6 @@ public sealed class ReportPickupPersonRowViewModel
 
 public sealed class ReportDetailsViewModel
 {
+    public IReadOnlyList<PickupPointHistory> PointHistory { get; set; } = [];
     public ReportTransactionProjection Transaction { get; set; } = null!;
 }

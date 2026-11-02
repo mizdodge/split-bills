@@ -1,3 +1,11 @@
+## 1.2.0 — 2026-11-02
+
+- Added shared pagination across transactions, bills, notifications, approvals, users and reports, preserving filters and full Excel exports. Pickup statistics and histories are isolated by selection method.
+- Added live receipt-total previews when Review discounts/charges change; calculations remain in the server-side C# calculator, with authorization and payment-lock checks.
+- Added Points as a third food pickup method. Only eligible active registered participants enter the draw; highest points take priority and ties are random. The selected person resets to zero and the other eligible participants gain one point. Absent accounts, guests and other methods do not change the score.
+- Added paginated before/after point history to pickup settings, transaction/member details and scoped reports, plus a typed Points History Excel sheet. Current scores are explicitly labeled as all-history balances.
+- Repeated saves are idempotent. Participant changes, rerolls, pickup removal, review and deletion reconcile contributions without redrawing other saved winners. Existing databases upgrade additively, with existing method values and histories preserved.
+
 ## 2026-09-17
 
 - Added Microsoft Integration with one encrypted shared Microsoft Entra credential source and independent Sign-in/SSO and SharePoint controls.

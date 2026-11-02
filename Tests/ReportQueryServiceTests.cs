@@ -5,6 +5,12 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using ClosedXML.Excel;
+using Splitbill.Controllers;
+using Splitbill.ViewModels;
 using Splitbill.Data;
 using Splitbill.Models;
 using Splitbill.Services;
@@ -159,6 +165,81 @@ public sealed class ReportQueryServiceTests : IDisposable
         var result = await Service().QueryAsync(Principal("other", DatabaseSeeder.ModeratorRole), null, null, null, null);
 
         Assert.Empty(result.Transactions);
+    }
+
+    [Fact]
+    public async Task ReportPagesPreserveFullTotalsAndFullExcelExport()
+    {
+        for (var index = 0; index < 27; index++)
+            db.Transactions.Add(new BillTransaction
+            {
+                TransactionNumber = $"PAGE-{index:00}", MerchantName = "Pagination Cafe", UploadedByUserId = "owner",
+                TransactionDate = new DateOnly(2026, 10, 1), Status = TransactionStatus.Unpaid, GrandTotal = 1000,
+                Participants = [new TransactionParticipant { Name = "Guest", Amount = 1000 }]
+            });
+        await db.SaveChangesAsync();
+        var controller = Controller(Principal("owner", DatabaseSeeder.AdminRole), "?page=2&pageSize=10");
+        var view = Assert.IsType<ViewResult>(await controller.Index(null, null, null, null, default));
+        var model = Assert.IsType<ReportViewModel>(view.Model);
+        Assert.Equal(10, model.Transactions.Count);
+        Assert.Equal(31, model.TotalTransactions);
+        Assert.Equal(267_000, model.TotalAmount);
+        Assert.Equal(2, Assert.IsType<PaginationViewModel>(controller.ViewData["Pagination:page"]).Page);
+        var export = Assert.IsType<FileContentResult>(await controller.Export(null, null, null, null, default));
+        using var workbook = new XLWorkbook(new MemoryStream(export.FileContents));
+        Assert.Equal(267_000, workbook.Worksheet(1).Cell("B6").GetValue<decimal>());
+        Assert.Equal(31, workbook.Worksheet(2).Table("PaymentDetails").DataRange.RowCount());
+
+        var other = Controller(Principal("other", DatabaseSeeder.ModeratorRole), "?page=2");
+        var scoped = Assert.IsType<ReportViewModel>(Assert.IsType<ViewResult>(await other.Index(null, null, null, null, default)).Model);
+        Assert.Empty(scoped.Transactions); Assert.Equal(0, scoped.TotalTransactions);
+    }
+
+    [Fact]
+    public async Task ReportPickupMethodFiltersStatisticsAndExportWithoutFilteringPayments()
+    {
+        db.FoodPickupConfigurations.Add(new FoodPickupConfiguration { Id = 1, Strategy = FoodPickupSelectionStrategy.RoundRobin });
+        var transaction = new BillTransaction
+        {
+            TransactionNumber = "REPORT-ROUND", MerchantName = "Round Cafe", UploadedByUserId = "owner",
+            Status = TransactionStatus.Unpaid, GrandTotal = 100_000,
+            Participants = [new TransactionParticipant { Name = "Member", Amount = 40_000, AccountLink = new ParticipantAccountLink { UserId = "member" } },
+                new TransactionParticipant { Name = "Other", Amount = 60_000, AccountLink = new ParticipantAccountLink { UserId = "other" } }]
+        };
+        db.Transactions.Add(transaction); await db.SaveChangesAsync();
+        db.FoodPickupAssignments.Add(new FoodPickupAssignment { TransactionId = transaction.Id, SelectedUserId = "other",
+            SelectedParticipantId = transaction.Participants[1].Id, Strategy = FoodPickupSelectionStrategy.RoundRobin, SelectedAt = DateTimeOffset.UtcNow });
+        await db.SaveChangesAsync();
+        var controller = Controller(Principal("owner", DatabaseSeeder.AdminRole));
+        var round = Assert.IsType<ReportViewModel>(Assert.IsType<ViewResult>(await controller.Index(null, null, null, null, default)).Model);
+        Assert.Equal(FoodPickupSelectionStrategy.RoundRobin, round.PickupStrategy);
+        Assert.Equal(2, round.PickupPeople.Count);
+        Assert.Equal(1, round.PickupPeople.Single(x => x.Username == "other").PickupCount);
+        Assert.Equal(0, round.PickupPeople.Single(x => x.Username == "member").PickupCount);
+        Assert.All(round.PickupPeople, x => Assert.Equal(1, x.ParticipationCount));
+        var weighted = Assert.IsType<ReportViewModel>(Assert.IsType<ViewResult>(await controller.Index(null, null, null, null, default, FoodPickupSelectionStrategy.WeightedRandom)).Model);
+        Assert.Equal("member", Assert.Single(weighted.PickupPeople).Username);
+        Assert.Equal(round.TotalAmount, weighted.TotalAmount);
+        Assert.Equal(round.Transactions.Count, weighted.Transactions.Count);
+        var export = Assert.IsType<FileContentResult>(await controller.Export(null, null, null, null, default, FoodPickupSelectionStrategy.RoundRobin));
+        using var workbook = new XLWorkbook(new MemoryStream(export.FileContents));
+        var pickup = workbook.Worksheet(4);
+        Assert.Equal("Round Robin", pickup.Cell("B2").GetString());
+        Assert.Equal(2, pickup.Table("PickupRotation").DataRange.RowCount());
+        Assert.Equal(0, pickup.Cell("C5").GetValue<int>());
+        Assert.Equal(1, pickup.Cell("C6").GetValue<int>());
+    }
+
+    private ReportsController Controller(ClaimsPrincipal principal, string query = "") => new(db, users, Service(), new ExcelReportService(), new TestLocalizer())
+    {
+        ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = principal, Request = { QueryString = new QueryString(query) } } }
+    };
+
+    private sealed class TestLocalizer : IStringLocalizer<SharedResource>
+    {
+        public LocalizedString this[string name] => new(name, name);
+        public LocalizedString this[string name, params object[] arguments] => new(name, name);
+        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => [];
     }
 
     private ReportQueryService Service() => new(db, users);

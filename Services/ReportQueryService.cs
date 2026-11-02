@@ -9,6 +9,8 @@ namespace Splitbill.Services;
 
 public sealed class ReportQueryResult
 {
+    public IReadOnlyList<PickupPointHistory> PointHistory { get; init; } = [];
+    public FoodPickupSelectionStrategy PickupStrategy { get; set; }
     public List<ReportTransactionProjection> Transactions { get; init; } = [];
     public IEnumerable<ReportParticipantProjection> Participants => Transactions.SelectMany(x => x.Participants);
     public int TotalTransactions => Transactions.Count;
@@ -51,6 +53,9 @@ public sealed class ReportTransactionProjection
 
 public sealed class ReportParticipantProjection
 {
+    public int CurrentPickupPoints { get; set; }
+    public FoodPickupSelectionStrategy? PickupStrategy { get; init; }
+    public string? AccountUserId { get; init; }
     public long ParticipantId { get; init; }
     public long TransactionId { get; init; }
     public string TransactionNumber { get; init; } = string.Empty;
@@ -115,7 +120,12 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
             .Select(tx => ToProjection(tx, users))
             .Where(tx => (!from.HasValue || tx.EffectiveDate >= from.Value) && (!to.HasValue || tx.EffectiveDate <= to.Value))
             .OrderByDescending(x => x.EffectiveDate).ThenByDescending(x => x.Id).ToList();
-        return new ReportQueryResult { Transactions = projections };
+        var pointsService = new FoodPickupPointsService(db);
+        var balances = await pointsService.GetBalancesAsync(cancellationToken: cancellationToken);
+        foreach (var participant in projections.SelectMany(x => x.Participants))
+            participant.CurrentPickupPoints = participant.AccountUserId is { } userId ? balances.GetValueOrDefault(userId) : 0;
+        return new ReportQueryResult { Transactions = projections,
+            PointHistory = await pointsService.HistoryAsync(projections.Select(x => x.Id).ToArray(), cancellationToken) };
     }
 
     private static ReportTransactionProjection ToProjection(BillTransaction tx, IReadOnlyDictionary<string, ApplicationUser> users)
@@ -155,6 +165,7 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
             MerchantName = tx.MerchantName, EffectiveDate = tx.TransactionDate ?? DateOnly.FromDateTime(tx.UploadDate.ToLocalTime().DateTime),
             UploaderName = tx.UploadedByUser?.DisplayName, ParticipantName = participant.Name,
             Username = participant.AccountLink is not null && users.TryGetValue(participant.AccountLink.UserId, out var user) ? user.UserName : null,
+            AccountUserId = participant.AccountLink?.UserId,
             MenuDetail = ParticipantMenuFormatter.Format(participant, tx.SplitMethod),
             ItemDetails = ParticipantMenuFormatter.GetDetails(participant, tx.SplitMethod), AmountDue = participant.Amount,
             PaidAmount = paid, AwaitingAmount = awaiting, UnpaidAmount = unpaid, PaymentStatus = participant.PaymentStatus,
@@ -167,6 +178,7 @@ public sealed class ReportQueryService(ApplicationDbContext db, UserManager<Appl
             LastAction = latestHistory?.ActionType ?? PaymentActionType.LegacyStatusChange
             ,IsPickupPerson = tx.PickupAssignment is not null && tx.PickupAssignment.SelectedParticipantId == participant.Id,
             PickupPersonName = PickupName(tx),
+            PickupStrategy = tx.PickupAssignment?.Strategy,
             PickupProbability = tx.PickupAssignment is not null && tx.PickupAssignment.SelectedParticipantId == participant.Id ? tx.PickupAssignment.RecordedProbability : null,
             PickupSelectedAt = tx.PickupAssignment is not null && tx.PickupAssignment.SelectedParticipantId == participant.Id ? tx.PickupAssignment.SelectedAt : null
         };

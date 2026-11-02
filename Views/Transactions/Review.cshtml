@@ -6,8 +6,9 @@
 {
     <div class="retry-ai-card"><div><strong>@L["AmountNotRead"]</strong><small>@L["RunAiAgain"]</small></div><form asp-action="Reprocess" method="post" class="m-0"><input type="hidden" name="id" value="@Model.Id" /><button class="btn btn-soft" type="submit">@L["RetryAi"]</button></form></div>
 }
-<form method="post" id="review-form" novalidate>
+<form method="post" id="review-form" novalidate data-total-preview-url="@Url.Action("ReviewTotalPreview")" data-total-updating="@L["ReviewTotalUpdating"]" data-total-updated="@L["ReviewTotalUpdated"]" data-total-failed="@L["ReviewTotalFailed"]" data-total-manual="@L["ReviewTotalManual"]">
     <input asp-for="Id" type="hidden" />
+    <input asp-for="RecalculateGrandTotal" type="hidden" />
     <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
     <div class="review-layout">
         <section class="receipt-preview content-card"><div class="section-head"><h2>@L["ReceiptPhoto"]</h2><span>@Model.ReceiptImageCount @L["Photos"] · @Model.TransactionNumber</span></div><div class="stored-receipt-gallery">@for(var imageIndex = 0; imageIndex < Model.ReceiptImageCount; imageIndex++){<figure><button type="button" class="stored-receipt-button" data-receipt-viewer data-viewer-group="receipt" data-receipt-url="@Url.Action("ReceiptImage", new { id = Model.Id, index = imageIndex })" aria-label='@L["OpenReceiptPhoto"] @(imageIndex + 1)'><img src="@Url.Action("ReceiptImage", new { id = Model.Id, index = imageIndex })" alt='@L["PhotoNumber", imageIndex + 1]' loading="@(imageIndex == 0 ? "eager" : "lazy")" /></button><figcaption>@L["PhotoNumber", imageIndex + 1]</figcaption></figure>}</div></section>
@@ -31,6 +32,7 @@
                 }
             </div>
             <div class="totals-editor"><label class="grand-total">@L["GrandTotal"] <span>Rp</span><input asp-for="GrandTotal" type="number" step="0.01" /></label></div>
+            <small id="review-total-status" class="text-muted d-block mt-2" role="status" aria-live="polite">@L["ReviewTotalHint"]</small>
         </section>
     </div>
     <div class="form-actions"><a class="btn btn-light" asp-action="Index">@L["SaveLater"]</a><button class="btn btn-primary" type="submit">@L["ContinueSplit"]</button></div>

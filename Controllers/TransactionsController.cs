@@ -30,8 +30,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
 
     public async Task<IActionResult> Index() => View(new TransactionListViewModel
     {
-        Transactions = (await ScopedTransactions().AsNoTracking().Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals).Include(x => x.Participants).ThenInclude(x => x.PaymentHistories).ToListAsync())
-            .OrderByDescending(x => x.UploadDate).ToList()
+        Transactions = this.Paginate((await ScopedTransactions().AsNoTracking().Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals).Include(x => x.Participants).ThenInclude(x => x.PaymentHistories).ToListAsync())
+            .OrderByDescending(x => x.UploadDate).ThenByDescending(x => x.Id))
     });
 
     [HttpGet]
@@ -164,6 +164,34 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
     }
 
     [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReviewTotalPreview(ReviewTotalPreviewInput input)
+    {
+        Response.Headers.CacheControl = "no-store";
+        var transaction = await ManageableTransaction(input.Id).AsNoTracking()
+            .Include(x => x.Participants).ThenInclude(x => x.PaymentApprovals)
+            .Include(x => x.Participants).ThenInclude(x => x.PaymentHistories).SingleOrDefaultAsync();
+        if (transaction is null) return NotFound();
+        if (!TransactionEditPolicy.Evaluate(transaction).Allowed) return Conflict();
+        if (!ModelState.IsValid) return BadRequest();
+        try
+        {
+            var total = calculator.CalculateReceiptTotal(input.Subtotal ?? 0, input.Charges.Select(x =>
+                new TransactionCharge { Amount = x.Amount ?? 0, Operation = x.Operation }).ToList());
+            return Json(new
+            {
+                grandTotal = total.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture),
+                rates = input.Charges.Select(x => ReceiptReviewNormalizer.CalculateEffectivePercentage(x.Amount ?? 0, input.Subtotal ?? 0) is { } rate
+                    ? Text("EffectiveRate", "≈ {0}% dari subtotal", rate.ToString("0.##"))
+                    : Text("RateFromAmount", "Persentase ditampilkan dari nominal")).ToArray()
+            });
+        }
+        catch (Exception exception) when (exception is ArgumentException or OverflowException)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Review(ReviewTransactionViewModel model)
     {
         var transaction = await ManageableTransaction(model.Id).Include(x => x.Items).Include(x => x.Charges)
@@ -181,9 +209,15 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             model.Items.Any(item => item.UnitPrice < 0 || item.TotalPrice < 0) ||
             model.Charges.Any(charge => charge.Amount < 0))
             ModelState.AddModelError(string.Empty, Text("NegativeAmount", "Nominal tidak boleh negatif. Masukkan potongan harga di kolom Diskon."));
+        if (model.Charges.Any(charge => !Enum.IsDefined(charge.Operation)))
+            ModelState.AddModelError(nameof(model.Charges), Text("InvalidChargeOperation", "Pilih jenis penyesuaian yang valid."));
         if (ModelState.IsValid)
         {
+            if (model.RecalculateGrandTotal) model.GrandTotal = null;
             ReceiptReviewNormalizer.Normalize(model);
+            if (model.RecalculateGrandTotal)
+                model.GrandTotal = calculator.CalculateReceiptTotal(model.Subtotal ?? 0, model.Charges.Select(x =>
+                    new TransactionCharge { Amount = x.Amount ?? 0, Operation = x.Operation }).ToList());
             ModelState.Clear();
             if (model.GrandTotal <= 0)
                 ModelState.AddModelError(string.Empty, Text("MissingReceiptTotals", "Isi Grand total, Subtotal, atau minimal satu nominal item untuk melanjutkan."));
@@ -224,6 +258,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         transaction.ExchangeRateSource = string.IsNullOrWhiteSpace(model.ExchangeRateSource) ? (transaction.ExchangeRateCaptureMode == ExchangeRateCaptureMode.Manual ? "Manual" : "Review") : model.ExchangeRateSource.Trim();
         transaction.ExchangeRateManualNote = model.ExchangeRateManualNote?.Trim();
         transaction.AiNeedsReview = false; transaction.UpdatedAt = DateTimeOffset.UtcNow;
+        await new FoodPickupPointsService(db).ReconcileAsync(transaction, null, userManager.GetUserId(User), removalKind: "Review", cancellationToken: HttpContext.RequestAborted);
         db.TransactionParticipants.RemoveRange(transaction.Participants);
         db.TransactionItems.RemoveRange(transaction.Items);
         db.TransactionCharges.RemoveRange(transaction.Charges);
@@ -342,12 +377,13 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             }
         }).ToList();
         await db.SaveChangesAsync();
+        FoodPickupAssignment? preservedPickup = null;
         if (keepExistingWhileDisabled && previousPickup is not null)
         {
             var preservedParticipant = transaction.Participants.FirstOrDefault(x =>
                 string.Equals(x.AccountLink?.UserId, previousPickup.SelectedUserId, StringComparison.Ordinal));
             if (preservedParticipant is not null)
-                db.FoodPickupAssignments.Add(new FoodPickupAssignment
+                db.FoodPickupAssignments.Add(preservedPickup = new FoodPickupAssignment
                 {
                     TransactionId = transaction.Id,
                     SelectedUserId = previousPickup.SelectedUserId,
@@ -362,6 +398,8 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         else if (transaction.RequiresFoodPickup && pickupRotationService is not null)
             pickupOperation = await pickupRotationService.AssignOrReconcileAsync(transaction, userManager.GetUserId(User),
                 previousPickup?.SelectedUserId, previousPickup, HttpContext.RequestAborted);
+        if (keepExistingWhileDisabled || !transaction.RequiresFoodPickup || pickupRotationService is null)
+            await new FoodPickupPointsService(db).ReconcileAsync(transaction, preservedPickup, userManager.GetUserId(User), cancellationToken: HttpContext.RequestAborted);
         if (model.SplitMethod == SplitMethod.ByItem)
         {
             var indexToParticipant = transaction.Participants.Select((participant, index) => (participant, index)).ToDictionary(x => x.index, x => x.participant);
@@ -620,6 +658,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
         {
             Transaction = transaction, ReceiptImageCount = StoredReceiptImages(transaction).Count,
             PickupAssignment = transaction.PickupAssignment,
+            PointHistory = this.Paginate(await new FoodPickupPointsService(db).HistoryAsync([id]), "pointHistoryPage"),
             PickupHistory = transaction.PickupDrawHistories.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id).ToList(),
             Charges = ToChargeViewModels(transaction), ParticipantBreakdowns = participantBreakdowns
         });
@@ -922,6 +961,7 @@ public sealed class TransactionsController(ApplicationDbContext db, UserManager<
             proofFileNames = transaction.Participants.SelectMany(x => x.PaymentApprovals).Select(x => x.ProofFileName)
                 .Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!).Distinct(StringComparer.Ordinal).ToList();
             transactionNumber = transaction.TransactionNumber;
+            await new FoodPickupPointsService(db).ReconcileAsync(transaction, null, userManager.GetUserId(User), removalKind: "TransactionDeleted");
             db.ReceiptProcessingLogs.RemoveRange(transaction.ProcessingLogs);
             db.Transactions.Remove(transaction);
             await db.SaveChangesAsync();

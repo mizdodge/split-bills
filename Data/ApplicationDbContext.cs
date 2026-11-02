@@ -17,6 +17,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<FoodPickupEligibleUser> FoodPickupEligibleUsers => Set<FoodPickupEligibleUser>();
     public DbSet<FoodPickupAssignment> FoodPickupAssignments => Set<FoodPickupAssignment>();
     public DbSet<FoodPickupDrawHistory> FoodPickupDrawHistories => Set<FoodPickupDrawHistory>();
+    public DbSet<FoodPickupPointRound> FoodPickupPointRounds => Set<FoodPickupPointRound>();
+    public DbSet<FoodPickupPointAudit> FoodPickupPointAudits => Set<FoodPickupPointAudit>();
     public DbSet<AdminUserAuditLog> AdminUserAuditLogs => Set<AdminUserAuditLog>();
     public DbSet<BillTransaction> Transactions => Set<BillTransaction>();
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
@@ -147,6 +149,12 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
         builder.Entity<AdminUserAuditLog>()
             .HasIndex(x => new { x.TargetUserId, x.CreatedAt });
+        builder.Entity<FoodPickupPointRound>().HasIndex(x => x.TransactionId).IsUnique();
+        builder.Entity<FoodPickupPointRound>().HasOne(x => x.Transaction).WithMany()
+            .HasForeignKey(x => x.TransactionId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<FoodPickupPointAudit>().HasIndex(x => x.TransactionId);
+        builder.Entity<FoodPickupPointAudit>().HasOne(x => x.Transaction).WithMany()
+            .HasForeignKey(x => x.TransactionId).OnDelete(DeleteBehavior.SetNull);
 
         builder.Entity<AdminUserAuditLog>()
             .HasIndex(x => new { x.ActorUserId, x.CreatedAt });

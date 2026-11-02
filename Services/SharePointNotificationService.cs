@@ -86,7 +86,9 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
             await db.SharePointNotificationOutbox.AnyAsync(x => x.EventId == eventId, cancellationToken)) return;
         var recipient = Name(user);
         var actor = await DisplayNameAsync(actorUserId, cancellationToken);
-        var body = assignment.Strategy == FoodPickupSelectionStrategy.RoundRobin
+        var body = assignment.Strategy == FoodPickupSelectionStrategy.Points
+            ? Text("SharePointFoodPickupPointsBody", recipient, transaction.MerchantName, transaction.TransactionNumber, transaction.Participants.Count)
+            : assignment.Strategy == FoodPickupSelectionStrategy.RoundRobin
             ? Text("SharePointFoodPickupRoundRobinBody", recipient, transaction.MerchantName,
                 transaction.TransactionNumber, transaction.Participants.Count)
             : Text("SharePointFoodPickupBody", recipient, transaction.MerchantName,

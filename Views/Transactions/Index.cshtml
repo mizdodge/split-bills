@@ -24,4 +24,5 @@ else { <div class="table-responsive"><table class="app-table"><thead><tr><th>@L[
     </tr>
 }
 </tbody></table></div>}
+@if (ViewData["Pagination:page"] is PaginationViewModel pagination) { <partial name="_Pagination" model="pagination" /> }
 </section>

@@ -2277,4 +2277,52 @@ Go, hero of hungry bellies! 🛵😆</value>
   <data name="MicrosoftUseLocalTwoFactor" xml:space="preserve"><value>This account uses local two-factor authentication. Please sign in with your SplitBill password.</value></data>
   <data name="MicrosoftAutoRegistration" xml:space="preserve"><value>Allow automatic registration through Microsoft</value></data>
   <data name="MicrosoftAutoRegistrationHelp" xml:space="preserve"><value>New users are created as Members. Usernames use the email prefix. Existing accounts must be linked explicitly.</value></data>
+  <data name="ReviewTotalUpdating" xml:space="preserve"><value>Calculating total…</value></data>
+  <data name="ReviewTotalUpdated" xml:space="preserve"><value>Total updated automatically.</value></data>
+  <data name="ReviewTotalFailed" xml:space="preserve"><value>Total has not updated. Check the numbers or connection; it is recalculated when you continue.</value></data>
+  <data name="ReviewTotalManual" xml:space="preserve"><value>Total entered manually. Changing charges, discounts, or subtotal recalculates it.</value></data>
+  <data name="ReviewTotalHint" xml:space="preserve"><value>Charges and discounts automatically update the total. You can still adjust it manually.</value></data>
+  <data name="InvalidChargeOperation" xml:space="preserve"><value>Choose a valid adjustment operation.</value></data>
+  <data name="PaginationLabel" xml:space="preserve"><value>List page navigation</value></data>
+  <data name="PaginationSummary" xml:space="preserve"><value>Showing {0}–{1} of {2}</value></data>
+  <data name="RowsPerPage" xml:space="preserve"><value>Rows per page</value></data>
+  <data name="PreviousPage" xml:space="preserve"><value>Previous page</value></data>
+  <data name="NextPage" xml:space="preserve"><value>Next page</value></data>
+  <data name="FoodPickupSeparateHistoryHint" xml:space="preserve"><value>Each method has separate statistics and history. Save changes to see the selected method's statistics. Other methods' history remains saved.</value></data>
+  <data name="FoodPickupReportStrategy" xml:space="preserve"><value>Pickup method (statistics)</value></data>
+  <data name="FoodPickupReportStrategyHint" xml:space="preserve"><value>Counts, participation, and last pickup apply only to the selected method within the filtered results. The payment list and totals still include all methods.</value></data>
+  <data name="FoodPickupStrategyPoints" xml:space="preserve"><value>Points System</value></data>
+  <data name="FoodPickupStrategyPointsHint" xml:space="preserve"><value>Prioritize the highest score among participants; break ties randomly.</value></data>
+  <data name="PointsPriorityRule" xml:space="preserve"><value>Highest points take priority. Ties are drawn randomly among participants with the highest points.</value></data>
+  <data name="PointsNotMoney" xml:space="preserve"><value>Points affect pickup turns only, not bill amounts.</value></data>
+  <data name="PointsStartZero" xml:space="preserve"><value>All members start at 0 points.</value></data>
+  <data name="PointsParticipantRule" xml:space="preserve"><value>Eligible participant, not selected: +1 point.</value></data>
+  <data name="PointsWinnerRule" xml:space="preserve"><value>Selected for pickup: reset to 0 when the split is saved.</value></data>
+  <data name="PointsAbsentUnchanged" xml:space="preserve"><value>Absent or ineligible members gain no points from this order.</value></data>
+  <data name="PointsIdempotentHint" xml:space="preserve"><value>Repeated saves do not double-count points. Edits, rerolls and deletion are reconciled; other transactions keep their selected collectors.</value></data>
+  <data name="PointsBalance" xml:space="preserve"><value>{0} priority points</value></data>
+  <data name="PointsCurrent" xml:space="preserve"><value>Current points (all history)</value></data>
+  <data name="PointsHistory" xml:space="preserve"><value>Points System history</value></data>
+  <data name="PointsHistoryHint" xml:space="preserve"><value>Before → after audit, selection reasons and reconciliation. History is separate from other methods.</value></data>
+  <data name="PointsNoHistory" xml:space="preserve"><value>No Points System history yet</value></data>
+  <data name="PointsNoHistoryHint" xml:space="preserve"><value>Choose Points System and save a split with pickup enabled to start recording points.</value></data>
+  <data name="PointsChanges" xml:space="preserve"><value>Point changes for this transaction</value></data>
+  <data name="PointsUnit" xml:space="preserve"><value>points</value></data>
+  <data name="PointsReset" xml:space="preserve"><value>Reset · pickup person</value></data>
+  <data name="PointsSelectionReason" xml:space="preserve"><value>Highest points at selection: {0}. Random selection among {1} priority candidates.</value></data>
+  <data name="PointsReconciledHint" xml:space="preserve"><value>The old contribution was replaced or removed. Balances replay active rounds while preserving other transactions' selected collectors.</value></data>
+  <data name="PointsEventInitial" xml:space="preserve"><value>Initial selection</value></data>
+  <data name="PointsEventAutomaticRedraw" xml:space="preserve"><value>Redraw after participant changes</value></data>
+  <data name="PointsEventAdminReroll" xml:space="preserve"><value>Admin reroll</value></data>
+  <data name="PointsEventParticipantsChanged" xml:space="preserve"><value>Participant reconciliation</value></data>
+  <data name="PointsEventRemoved" xml:space="preserve"><value>Pickup removed / method changed</value></data>
+  <data name="PointsEventReview" xml:space="preserve"><value>Returned to receipt review</value></data>
+  <data name="PointsEventTransactionDeleted" xml:space="preserve"><value>Transaction deleted</value></data>
+  <data name="SharePointFoodPickupPointsBody" xml:space="preserve"><value>Congratulations {0}! You have been selected to collect the food at {1}.
+
+Method: Points System
+Transaction: {2}
+Participants: {3}
+
+Your priority points reset to 0. Open the details to see point changes.</value></data>
 </root>

@@ -7,6 +7,18 @@ public sealed class SplitBillCalculatorTests
 {
     private readonly SplitBillCalculator _calculator = new();
 
+    [Theory]
+    [InlineData(100, 20, 5, 85)]
+    [InlineData(100, 200, 5, 0)]
+    [InlineData(100.125, 0, 0, 100.13)]
+    public void ReceiptTotalAppliesAdjustmentsRoundsAndClamps(double subtotal, double discount, double charge, double expected)
+    {
+        var result = _calculator.CalculateReceiptTotal((decimal)subtotal,
+            [new() { Amount = (decimal)discount, Operation = ChargeOperation.Subtract },
+             new() { Amount = (decimal)charge, Operation = ChargeOperation.Add }]);
+        Assert.Equal((decimal)expected, result);
+    }
+
     [Fact]
     public void SplitEqual_AssignsRemainderAndPreservesExactTotal()
     {

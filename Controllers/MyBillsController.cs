@@ -33,7 +33,7 @@ public sealed class MyBillsController(ApplicationDbContext db, UserManager<Appli
             UnpaidAmount = participants.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Unpaid).Sum(x => x.Amount),
             AwaitingAmount = participants.Where(x => x.PaymentStatus == ParticipantPaymentStatus.AwaitingConfirmation).Sum(x => x.Amount),
             PaidAmount = participants.Where(x => x.PaymentStatus == ParticipantPaymentStatus.Paid).Sum(x => x.Amount),
-            Bills = participants.OrderByDescending(x => x.Transaction?.TransactionDate ?? DateOnly.FromDateTime(x.Transaction?.UploadDate.LocalDateTime ?? DateTime.MinValue)).Select(ToRow).ToList()
+            Bills = this.Paginate(participants.OrderByDescending(x => x.Transaction?.TransactionDate ?? DateOnly.FromDateTime(x.Transaction?.UploadDate.LocalDateTime ?? DateTime.MinValue)).ThenByDescending(x => x.Id).Select(ToRow))
         });
     }
 
@@ -53,7 +53,10 @@ public sealed class MyBillsController(ApplicationDbContext db, UserManager<Appli
         if (participant is null || participant.Transaction is null) return NotFound();
         var breakdown = calculator.BuildParticipantBreakdowns(participant.Transaction)
             .SingleOrDefault(x => x.ParticipantId == participant.Id);
-        return breakdown is null ? NotFound() : View(ToDetails(participant, breakdown));
+        if (breakdown is null) return NotFound();
+        var model = ToDetails(participant, breakdown);
+        model.PointHistory = this.Paginate(await new FoodPickupPointsService(db).HistoryAsync([participant.TransactionId], cancellationToken), "pointHistoryPage");
+        return View(model);
     }
 
     [HttpGet]

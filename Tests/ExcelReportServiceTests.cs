@@ -18,7 +18,7 @@ public sealed class ExcelReportServiceTests
                     Id = 1, TransactionNumber = "TRX-1", MerchantName = "Cafe", EffectiveDate = new DateOnly(2026, 9, 4),
                     GrandTotal = 150_000, Participants =
                     [
-                        new ReportParticipantProjection { ParticipantId = 1, TransactionId = 1, TransactionNumber = "TRX-1", MerchantName = "Cafe", EffectiveDate = new DateOnly(2026, 9, 4), ParticipantName = "Mizan", Username = "mizan", MenuDetail = "Nasi", AmountDue = 100_000, PaidAmount = 100_000, PaymentStatus = ParticipantPaymentStatus.Paid, IsPickupPerson = true, PickupPersonName = "Mizan", PickupProbability = 1m, PickupSelectedAt = new DateTimeOffset(2026, 9, 4, 12, 0, 0, TimeSpan.Zero) },
+                        new ReportParticipantProjection { ParticipantId = 1, TransactionId = 1, TransactionNumber = "TRX-1", MerchantName = "Cafe", EffectiveDate = new DateOnly(2026, 9, 4), ParticipantName = "Mizan", Username = "mizan", MenuDetail = "Nasi", AmountDue = 100_000, PaidAmount = 100_000, PaymentStatus = ParticipantPaymentStatus.Paid, PickupStrategy = FoodPickupSelectionStrategy.WeightedRandom, IsPickupPerson = true, PickupPersonName = "Mizan", PickupProbability = 1m, PickupSelectedAt = new DateTimeOffset(2026, 9, 4, 12, 0, 0, TimeSpan.Zero) },
                         new ReportParticipantProjection { ParticipantId = 2, TransactionId = 1, TransactionNumber = "TRX-1", MerchantName = "Cafe", EffectiveDate = new DateOnly(2026, 9, 4), ParticipantName = "Ragil", MenuDetail = "Teh", AmountDue = 50_000, UnpaidAmount = 50_000, PaymentStatus = ParticipantPaymentStatus.Unpaid }
                     ]
                 }

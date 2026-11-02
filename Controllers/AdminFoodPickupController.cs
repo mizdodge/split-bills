@@ -80,7 +80,7 @@ public sealed class AdminFoodPickupController(
         CancellationToken cancellationToken)
     {
         var users = await adminUserService.ListAsync(new AdminUserListQuery(), cancellationToken);
-        var statistics = await rotationService.GetStatisticsAsync(cancellationToken);
+        var statistics = await rotationService.GetStatisticsAsync(cancellationToken, strategy);
         var statById = statistics.Users.ToDictionary(x => x.UserId, StringComparer.Ordinal);
         var displayById = users.ToDictionary(x => x.Id, x => x.DisplayName, StringComparer.Ordinal);
         return new FoodPickupSettingsViewModel
@@ -94,13 +94,15 @@ public sealed class AdminFoodPickupController(
                     user.Id, user.Username, user.DisplayName, user.Role,
                     stat?.IsEligible ?? false, user.IsDisabled,
                     stat?.ParticipationCount ?? 0, stat?.PickupCount ?? 0,
-                    stat?.PickupRatio ?? 0m, stat?.LastPickupAt, stat?.LastPickupMerchant);
+                    stat?.PickupRatio ?? 0m, stat?.LastPickupAt, stat?.LastPickupMerchant, stat?.PriorityPoints ?? 0);
             }).ToArray(),
-            History = statistics.History.Select(row => new FoodPickupHistoryRowViewModel(
+            PointHistory = strategy == FoodPickupSelectionStrategy.Points
+                ? this.Paginate(await new FoodPickupPointsService(db).HistoryAsync(cancellationToken: cancellationToken), "pointHistoryPage") : [],
+            History = this.Paginate(statistics.History.Select(row => new FoodPickupHistoryRowViewModel(
                 row.TransactionId, row.TransactionNumber, row.MerchantName,
                 row.PreviousSelectedUserId is { } previous ? displayById.GetValueOrDefault(previous, previous) : null,
                 displayById.GetValueOrDefault(row.SelectedUserId, row.SelectedUserId),
-                row.Strategy, row.DrawKind, row.Reason, row.CreatedAt)).ToArray()
+                row.Strategy, row.DrawKind, row.Reason, row.CreatedAt)), "historyPage").ToArray()
         };
     }
 

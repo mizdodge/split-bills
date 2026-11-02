@@ -33,6 +33,8 @@ appsettings.Local.json
 DataProtection-Keys/
 .codex-remote-attachments/
 .codex-deploy-stage.txt
+.playwright-cli/
+.codebase-memory/
 
 # Local agent workflow and private operational history
 AGENTS.md

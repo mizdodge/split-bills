@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[data-pagination-size]").forEach(select => {
+    select.addEventListener("change", () => select.closest("form").requestSubmit());
+  });
   const t = window.splitBillStrings || {};
   const format = (template, value) => String(template || "").replace("{0}", value ?? "");
   const passwordToggle = document.querySelector(".password-toggle");
@@ -102,18 +105,49 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   };
+  const reviewForm = document.getElementById("review-form");
+  const totalStatus = document.getElementById("review-total-status");
+  const autoTotal = document.getElementById("RecalculateGrandTotal");
+  let previewTimer, previewRequest, previewRevision = 0;
   function updateChargeRates() {
-    const subtotal = Number(document.getElementById("Subtotal")?.value) || 0;
-    chargeEditor?.querySelectorAll(".charge-row").forEach(row => {
-      const amount = Number(row.querySelector(".charge-amount")?.value) || 0;
-      const helper = row.querySelector(".charge-rate");
-      if (!helper) return;
-      helper.textContent = subtotal > 0 && amount > 0
-        ? format(t.effectiveRate || "≈ {0}% of subtotal", new Intl.NumberFormat(document.documentElement.lang === "en" ? "en-US" : "id-ID", { maximumFractionDigits: 2 }).format(amount / subtotal * 100))
-        : (t.rateFromAmount || "Percentage will be shown from the amount");
-    });
+    if (!reviewForm?.dataset.totalPreviewUrl) return;
+    clearTimeout(previewTimer); previewRequest?.abort();
+    const revision = ++previewRevision;
+    if (autoTotal) autoTotal.value = "true";
+    if (totalStatus) totalStatus.textContent = reviewForm.dataset.totalUpdating;
+    previewTimer = setTimeout(async () => {
+      reindexCharges();
+      const data = new FormData();
+      data.set("__RequestVerificationToken", reviewForm.querySelector('[name="__RequestVerificationToken"]').value);
+      data.set("Id", document.getElementById("Id").value);
+      data.set("Subtotal", document.getElementById("Subtotal").value);
+      chargeEditor?.querySelectorAll(".charge-row").forEach((row, index) => {
+        data.set(`Charges[${index}].Amount`, row.querySelector(".charge-amount").value);
+        data.set(`Charges[${index}].Operation`, row.querySelector(".charge-operation").value);
+      });
+      const request = new AbortController(); previewRequest = request;
+      const timeout = setTimeout(() => request.abort(), 10000);
+      try {
+        const response = await fetch(reviewForm.dataset.totalPreviewUrl, {
+          method: "POST", body: data, signal: request.signal, credentials: "same-origin", redirect: "error"
+        });
+        if (!response.ok) throw new Error("preview-failed");
+        const result = await response.json();
+        if (revision !== previewRevision) return;
+        document.getElementById("GrandTotal").value = result.grandTotal;
+        chargeEditor?.querySelectorAll(".charge-rate").forEach((helper, index) => { helper.textContent = result.rates[index]; });
+        if (totalStatus) totalStatus.textContent = reviewForm.dataset.totalUpdated;
+      } catch (_) {
+        if (revision === previewRevision && totalStatus) totalStatus.textContent = reviewForm.dataset.totalFailed;
+      } finally { clearTimeout(timeout); }
+    }, 250);
   }
-  chargeEditor?.addEventListener("input", updateChargeRates);
+  chargeEditor?.addEventListener("input", event => {
+    if (event.target.matches(".charge-amount,.charge-operation")) updateChargeRates();
+  });
+  chargeEditor?.addEventListener("change", event => {
+    if (event.target.matches(".charge-operation")) updateChargeRates();
+  });
   chargeEditor?.addEventListener("click", event => {
     if (!event.target.closest(".remove-charge")) return;
     event.target.closest(".charge-row").remove(); reindexCharges(); updateChargeRates();
@@ -125,7 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
     chargeEditor.appendChild(template.content.cloneNode(true)); reindexCharges(); updateChargeRates();
     chargeEditor.lastElementChild?.querySelector(".charge-label")?.focus();
   });
-  updateChargeRates();
+  document.getElementById("GrandTotal")?.addEventListener("input", () => {
+    clearTimeout(previewTimer); ++previewRevision; previewRequest?.abort();
+    if (autoTotal) autoTotal.value = "false";
+    if (totalStatus) totalStatus.textContent = reviewForm.dataset.totalManual;
+  });
   document.getElementById("review-form")?.addEventListener("submit", () => { reindexItems(); reindexCharges(); });
 
   const participantInput = document.getElementById("ParticipantNames");

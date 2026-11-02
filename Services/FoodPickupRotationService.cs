@@ -14,7 +14,8 @@ public sealed record FoodPickupCandidate(
     decimal RawWeight,
     decimal Probability,
     DateTimeOffset? LastPickupAt = null,
-    bool Excluded = false);
+    bool Excluded = false,
+    int PriorityPoints = 0);
 
 public sealed record FoodPickupPreview(
     IReadOnlyList<FoodPickupCandidate> Candidates,
@@ -31,7 +32,8 @@ public sealed record FoodPickupUserStatistic(
     int PickupCount,
     decimal PickupRatio,
     DateTimeOffset? LastPickupAt,
-    string? LastPickupMerchant);
+    string? LastPickupMerchant,
+    int PriorityPoints = 0);
 
 public sealed record FoodPickupHistoryRow(
     long Id,
@@ -84,7 +86,7 @@ public interface IFoodPickupRotationService
         string reason,
         CancellationToken cancellationToken = default);
 
-    Task<FoodPickupRotationStatistics> GetStatisticsAsync(CancellationToken cancellationToken = default);
+    Task<FoodPickupRotationStatistics> GetStatisticsAsync(CancellationToken cancellationToken = default, FoodPickupSelectionStrategy? strategy = null);
 }
 
 /// <summary>
@@ -93,10 +95,12 @@ public interface IFoodPickupRotationService
 /// </summary>
 public sealed class FoodPickupRotationService(
     ApplicationDbContext db,
-    IFoodPickupRandomSource? randomSource = null) : IFoodPickupRotationService
+    IFoodPickupRandomSource? randomSource = null,
+    IFoodPickupPointsService? pointsService = null) : IFoodPickupRotationService
 {
     private static readonly JsonSerializerOptions SnapshotJsonOptions = new(JsonSerializerDefaults.Web);
     private readonly IFoodPickupRandomSource random = randomSource ?? new SecureFoodPickupRandomSource();
+    private readonly IFoodPickupPointsService points = pointsService ?? new FoodPickupPointsService(db);
 
     public async Task<FoodPickupPreview> PreviewAsync(
         IReadOnlyCollection<string> participantUserIds,
@@ -122,6 +126,15 @@ public sealed class FoodPickupRotationService(
         string? previousSelectedUserId = null,
         FoodPickupAssignment? previousAssignmentSnapshot = null,
         CancellationToken cancellationToken = default)
+    {
+        var result = await AssignCoreAsync(transaction, actorUserId, previousSelectedUserId, previousAssignmentSnapshot, cancellationToken);
+        await points.ReconcileAsync(transaction, result.Assignment, actorUserId, result.History, cancellationToken: cancellationToken);
+        return result;
+    }
+
+    private async Task<FoodPickupDrawOperation> AssignCoreAsync(
+        BillTransaction transaction, string? actorUserId, string? previousSelectedUserId,
+        FoodPickupAssignment? previousAssignmentSnapshot, CancellationToken cancellationToken)
     {
         var existing = await db.FoodPickupAssignments
             .SingleOrDefaultAsync(x => x.TransactionId == transaction.Id, cancellationToken);
@@ -239,11 +252,14 @@ public sealed class FoodPickupRotationService(
         existing.SelectedAt = result.Assignment.SelectedAt;
         existing.SelectedByUserId = result.Assignment.SelectedByUserId;
         result = result with { Assignment = existing };
+        await points.ReconcileAsync(transaction, existing, adminUserId, result.History, cancellationToken: cancellationToken);
         return result;
     }
 
-    public async Task<FoodPickupRotationStatistics> GetStatisticsAsync(CancellationToken cancellationToken = default)
+    public async Task<FoodPickupRotationStatistics> GetStatisticsAsync(CancellationToken cancellationToken = default, FoodPickupSelectionStrategy? strategy = null)
     {
+        var selectedStrategy = strategy ?? (await GetConfigurationAsync(cancellationToken)).Strategy;
+        var balances = selectedStrategy == FoodPickupSelectionStrategy.Points ? await points.GetBalancesAsync(cancellationToken: cancellationToken) : [];
         var now = DateTimeOffset.UtcNow;
         var eligibleIds = (await db.FoodPickupEligibleUsers.AsNoTracking()
             .Select(x => x.UserId).ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
@@ -257,6 +273,7 @@ public sealed class FoodPickupRotationService(
         var participantRows = await db.TransactionParticipants.AsNoTracking()
             .Where(x => x.Transaction != null &&
                         x.Transaction.Status != TransactionStatus.Draft &&
+                        x.Transaction.PickupAssignment != null && x.Transaction.PickupAssignment.Strategy == selectedStrategy &&
                         x.AccountLink != null)
             .Select(x => new
             {
@@ -270,7 +287,7 @@ public sealed class FoodPickupRotationService(
 
         var assignments = await db.FoodPickupAssignments.AsNoTracking()
             .Include(x => x.Transaction)
-            .Where(x => x.Transaction != null && x.Transaction.Status != TransactionStatus.Draft)
+            .Where(x => x.Strategy == selectedStrategy && x.Transaction != null && x.Transaction.Status != TransactionStatus.Draft)
             .ToListAsync(cancellationToken);
         var pickupGroups = assignments.GroupBy(x => x.SelectedUserId, StringComparer.Ordinal)
             .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.SelectedAt).ToList(), StringComparer.Ordinal);
@@ -287,19 +304,18 @@ public sealed class FoodPickupRotationService(
                     pickups.Count,
                     participantCount == 0 ? 0m : (decimal)pickups.Count / participantCount,
                     pickups.FirstOrDefault()?.SelectedAt,
-                    pickups.FirstOrDefault()?.Transaction?.MerchantName);
+                    pickups.FirstOrDefault()?.Transaction?.MerchantName, balances.GetValueOrDefault(user.Id));
             }).ToList();
 
         // SQLite cannot order DateTimeOffset values in SQL. Materialize first,
         // then apply the recent-history ordering in memory.
         var historyEntities = await db.FoodPickupDrawHistories.AsNoTracking()
             .Include(x => x.Transaction)
-            .Where(x => x.Transaction != null)
+            .Where(x => x.Strategy == selectedStrategy && x.Transaction != null)
             .ToListAsync(cancellationToken);
         var histories = historyEntities
             .OrderByDescending(x => x.CreatedAt)
             .ThenByDescending(x => x.Id)
-            .Take(100)
             .Select(x => new FoodPickupHistoryRow(
                 x.Id, x.TransactionId, x.Transaction!.TransactionNumber, x.Transaction.MerchantName,
                 x.PreviousSelectedUserId, x.SelectedUserId, x.Strategy, x.DrawKind, x.Reason, x.CreatedAt))
@@ -383,7 +399,7 @@ public sealed class FoodPickupRotationService(
         if (users.Count == 0) return [];
 
         var assignments = await db.FoodPickupAssignments.AsNoTracking()
-            .Where(x => users.Select(u => u.Id).Contains(x.SelectedUserId) &&
+            .Where(x => x.Strategy == strategy && users.Select(u => u.Id).Contains(x.SelectedUserId) &&
                         (!excludingTransactionId.HasValue || x.TransactionId != excludingTransactionId.Value))
             .Select(x => new { x.SelectedUserId, x.TransactionId, x.SelectedAt })
             .ToListAsync(cancellationToken);
@@ -404,6 +420,19 @@ public sealed class FoodPickupRotationService(
             !string.IsNullOrWhiteSpace(excludedUserId) && string.Equals(user.Id, excludedUserId, StringComparison.Ordinal))).ToList();
         var selectable = candidates.Where(x => !x.Excluded).ToList();
         if (selectable.Count == 0) return candidates;
+
+        if (strategy == FoodPickupSelectionStrategy.Points)
+        {
+            var balances = await points.GetBalancesAsync(excludingTransactionId, cancellationToken);
+            var highest = selectable.Max(x => balances.GetValueOrDefault(x.UserId));
+            var tied = selectable.Count(x => balances.GetValueOrDefault(x.UserId) == highest);
+            return candidates.Select(x => x with
+            {
+                PriorityPoints = balances.GetValueOrDefault(x.UserId),
+                RawWeight = !x.Excluded && balances.GetValueOrDefault(x.UserId) == highest ? 1m : 0m,
+                Probability = !x.Excluded && balances.GetValueOrDefault(x.UserId) == highest ? 1m / tied : 0m
+            }).ToList();
+        }
 
         if (strategy == FoodPickupSelectionStrategy.RoundRobin)
         {

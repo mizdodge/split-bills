@@ -137,6 +137,7 @@ builder.Services.AddScoped<IMicrosoftGraphIdentityService, MicrosoftGraphIdentit
 builder.Services.AddScoped<IMicrosoftIntegrationService, MicrosoftIntegrationService>();
 builder.Services.AddScoped<ISharePointNotificationOutboxService, SharePointNotificationOutboxService>();
 builder.Services.AddScoped<IFoodPickupRotationService, FoodPickupRotationService>();
+builder.Services.AddScoped<IFoodPickupPointsService, FoodPickupPointsService>();
 builder.Services.AddSingleton<IFoodPickupRandomSource, SecureFoodPickupRandomSource>();
 builder.Services.AddScoped<SharePointNotificationProcessor>();
 builder.Services.AddHostedService<SharePointNotificationDispatcher>();

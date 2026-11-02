@@ -500,3 +500,17 @@ The long export reference is [one complete production-rendered JPEG with ten par
 
 ### Account settings and explicit Microsoft linking
 The desktop profile footer now uses a gear plus Account settings, with the same entry in the mobile header. Keep logout separate. Settings show a local-password card and a Microsoft card with disconnected/connected state, email, linked date and connect/disconnect controls. Username admin sees only the password card. Password confirmation and returned-identity confirmation use focused dialogs; the latter compares local and Microsoft identities before saving. Passwordless Microsoft registrations explain the Admin password-reset requirement before unlinking. The Admin SSO tab adds a default-off automatic Member registration checkbox.
+
+
+### List pagination and pickup-method history (2026-10-30)
+
+Full list pages show a shared pager with the visible range, total count, 10/25/50/100 rows per page, previous/next buttons and a bounded numeric page window. The pager is inside the corresponding card footer, separated by a thin border. Desktop aligns count, row selector and navigation on one row when space permits; mobile has two rows. The row selector applies immediately, with a no-JavaScript submit fallback; previous/next stay visible and disabled at boundaries. A five-slot numeric window retains the current and boundary pages. Buttons have 44px targets and the selector is at least 76px wide. Navigation preserves current query filters and uses localized labels with aria-current for the active page. Report transactions and pickup statistics page independently; Excel exports all filtered rows. Eligibility multi-selects stay unpaged to preserve selections.
+
+Pickup settings show counts and audit history for the saved strategy, with the strategy named in the history heading. Saving a different strategy switches its statistics and history; returning restores the previous method's records. Reports offer a pickup-method selector for the pickup section only, with a clear hint that payment totals and transaction rows are unaffected. Each transaction's pickup cell and Excel payment row identify the actual strategy.
+
+The report pickup card repeats the method selector as a segmented Round Robin / Weighted Random GET switch, preserving payment filters and resetting pickup pagination only. Small mobile headers use an icon-only logout button with its localized accessible label, hide the version label, and retain language, notifications and account controls without horizontal overflow.
+
+### Points rotation surfaces (v1.2.0)
+- AdminFoodPickup uses three method cards. Selecting Points reveals a lime rules panel; saved Points settings show current-score pills in the existing member cards. No manual reset/edit or reminder controls.
+- A shared `_PickupPointHistory` section shows expandable event cards with before/after scores, winner/reset highlight, highest-priority/tie explanation, reason and date. It uses the existing responsive, independently paginated card footer and localized ID/EN resources.
+- Transaction and member pickup cards show the Points method instead of a probability. Point audit sections are distinct from receipt/payment amounts. Reports keep pickup summaries/history at the bottom, with all-history current-score labels and scoped audit entries.

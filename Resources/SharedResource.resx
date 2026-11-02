@@ -2277,4 +2277,52 @@ Semangat, pahlawan perut lapar! 🛵😆</value>
   <data name="MicrosoftUseLocalTwoFactor" xml:space="preserve"><value>Akun ini menggunakan verifikasi dua langkah lokal. Silakan masuk dengan password SplitBill.</value></data>
   <data name="MicrosoftAutoRegistration" xml:space="preserve"><value>Izinkan pendaftaran otomatis melalui Microsoft</value></data>
   <data name="MicrosoftAutoRegistrationHelp" xml:space="preserve"><value>User baru dibuat sebagai Member. Username diambil dari depan email. Akun yang sudah ada harus dihubungkan secara manual.</value></data>
+  <data name="ReviewTotalUpdating" xml:space="preserve"><value>Menghitung total…</value></data>
+  <data name="ReviewTotalUpdated" xml:space="preserve"><value>Total diperbarui otomatis.</value></data>
+  <data name="ReviewTotalFailed" xml:space="preserve"><value>Total belum diperbarui. Periksa angka atau koneksi; total dihitung ulang saat melanjutkan.</value></data>
+  <data name="ReviewTotalManual" xml:space="preserve"><value>Total diisi manual. Mengubah biaya, diskon, atau subtotal akan menghitung ulang.</value></data>
+  <data name="ReviewTotalHint" xml:space="preserve"><value>Biaya dan diskon otomatis memperbarui total. Total tetap bisa disesuaikan manual.</value></data>
+  <data name="InvalidChargeOperation" xml:space="preserve"><value>Pilih jenis penyesuaian yang valid.</value></data>
+  <data name="PaginationLabel" xml:space="preserve"><value>Navigasi halaman daftar</value></data>
+  <data name="PaginationSummary" xml:space="preserve"><value>Menampilkan {0}–{1} dari {2}</value></data>
+  <data name="RowsPerPage" xml:space="preserve"><value>Baris per halaman</value></data>
+  <data name="PreviousPage" xml:space="preserve"><value>Halaman sebelumnya</value></data>
+  <data name="NextPage" xml:space="preserve"><value>Halaman berikutnya</value></data>
+  <data name="FoodPickupSeparateHistoryHint" xml:space="preserve"><value>Statistik dan riwayat terpisah untuk tiap metode. Simpan perubahan untuk melihat statistik metode yang dipilih. Riwayat metode lain tetap tersimpan.</value></data>
+  <data name="FoodPickupReportStrategy" xml:space="preserve"><value>Metode pickup (statistik)</value></data>
+  <data name="FoodPickupReportStrategyHint" xml:space="preserve"><value>Jumlah, partisipasi, dan pickup terakhir hanya untuk metode terpilih dalam hasil filter. Daftar dan total pembayaran tetap mencakup semua metode.</value></data>
+  <data name="FoodPickupStrategyPoints" xml:space="preserve"><value>Sistem Poin</value></data>
+  <data name="FoodPickupStrategyPointsHint" xml:space="preserve"><value>Poin tertinggi di antara peserta diprioritaskan; jika seri, dipilih acak.</value></data>
+  <data name="PointsPriorityRule" xml:space="preserve"><value>Poin tertinggi diprioritaskan. Jika seri, pengambil diacak di antara peserta dengan poin tertinggi.</value></data>
+  <data name="PointsNotMoney" xml:space="preserve"><value>Poin hanya memengaruhi giliran, bukan nominal tagihan.</value></data>
+  <data name="PointsStartZero" xml:space="preserve"><value>Semua anggota mulai dari 0 poin.</value></data>
+  <data name="PointsParticipantRule" xml:space="preserve"><value>Ikut pesan dan eligible, tidak mengambil: +1 poin.</value></data>
+  <data name="PointsWinnerRule" xml:space="preserve"><value>Terpilih mengambil: reset ke 0 saat pembagian disimpan.</value></data>
+  <data name="PointsAbsentUnchanged" xml:space="preserve"><value>Anggota yang tidak ikut atau tidak eligible tidak mendapat tambahan poin dari pesanan ini.</value></data>
+  <data name="PointsIdempotentHint" xml:space="preserve"><value>Simpan ulang tidak menambah poin dua kali. Edit, reroll, dan penghapusan direkonsiliasi; pengambil transaksi lain tetap.</value></data>
+  <data name="PointsBalance" xml:space="preserve"><value>{0} poin prioritas</value></data>
+  <data name="PointsCurrent" xml:space="preserve"><value>Poin saat ini (seluruh riwayat)</value></data>
+  <data name="PointsHistory" xml:space="preserve"><value>Riwayat Sistem Poin</value></data>
+  <data name="PointsHistoryHint" xml:space="preserve"><value>Audit sebelum → sesudah, alasan pemilihan, dan rekonsiliasi. Riwayat terpisah dari metode lain.</value></data>
+  <data name="PointsNoHistory" xml:space="preserve"><value>Belum ada riwayat Sistem Poin</value></data>
+  <data name="PointsNoHistoryHint" xml:space="preserve"><value>Pilih Sistem Poin dan simpan pembagian dengan pickup aktif untuk mulai mencatat poin.</value></data>
+  <data name="PointsChanges" xml:space="preserve"><value>Perubahan poin transaksi ini</value></data>
+  <data name="PointsUnit" xml:space="preserve"><value>poin</value></data>
+  <data name="PointsReset" xml:space="preserve"><value>Direset · pengambil</value></data>
+  <data name="PointsSelectionReason" xml:space="preserve"><value>Poin tertinggi saat pemilihan: {0}. Pemilihan acak di antara {1} kandidat prioritas.</value></data>
+  <data name="PointsReconciledHint" xml:space="preserve"><value>Kontribusi lama diganti atau dibatalkan. Saldo dihitung ulang dari ronde aktif dengan hasil pemilihan transaksi lain tetap dipertahankan.</value></data>
+  <data name="PointsEventInitial" xml:space="preserve"><value>Pemilihan awal</value></data>
+  <data name="PointsEventAutomaticRedraw" xml:space="preserve"><value>Pemilihan ulang setelah peserta berubah</value></data>
+  <data name="PointsEventAdminReroll" xml:space="preserve"><value>Reroll oleh Admin</value></data>
+  <data name="PointsEventParticipantsChanged" xml:space="preserve"><value>Rekonsiliasi peserta</value></data>
+  <data name="PointsEventRemoved" xml:space="preserve"><value>Pickup dibatalkan / metode diganti</value></data>
+  <data name="PointsEventReview" xml:space="preserve"><value>Kembali ke review struk</value></data>
+  <data name="PointsEventTransactionDeleted" xml:space="preserve"><value>Transaksi dihapus</value></data>
+  <data name="SharePointFoodPickupPointsBody" xml:space="preserve"><value>Selamat {0}! Kamu terpilih mengambil makanan di {1}.
+
+Metode: Sistem Poin
+Transaksi: {2}
+Peserta: {3}
+
+Poin prioritas kamu direset ke 0. Buka rincian untuk melihat perubahan poin.</value></data>
 </root>

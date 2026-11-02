@@ -5,6 +5,7 @@ namespace Splitbill.ViewModels;
 
 public sealed class FoodPickupSettingsViewModel
 {
+    public IReadOnlyList<Splitbill.Services.PickupPointHistory> PointHistory { get; set; } = [];
     public bool Enabled { get; set; }
     public FoodPickupSelectionStrategy Strategy { get; set; }
     public IReadOnlyList<FoodPickupUserRowViewModel> Users { get; set; } = [];
@@ -29,7 +30,8 @@ public sealed record FoodPickupUserRowViewModel(
     int PickupCount,
     decimal PickupRatio,
     DateTimeOffset? LastPickupAt,
-    string? LastPickupMerchant);
+    string? LastPickupMerchant,
+    int PriorityPoints = 0);
 
 public sealed record FoodPickupHistoryRowViewModel(
     long TransactionId,

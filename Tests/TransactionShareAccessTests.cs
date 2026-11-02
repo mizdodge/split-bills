@@ -15,6 +15,8 @@ using Splitbill.Controllers;
 using Splitbill.Data;
 using Splitbill.Models;
 using Splitbill.Services;
+using Splitbill.ViewModels;
+using System.Text.Json;
 
 namespace Splitbill.Tests;
 
@@ -68,6 +70,90 @@ public sealed class TransactionShareAccessTests : IDisposable
         Assert.Equal(["Guest A", "Guest B"], export.Participants.Select(x => x.DisplayName).ToArray());
     }
 
+    [Theory]
+    [InlineData(true, "admin", true)]
+    [InlineData(false, "owner", true)]
+    [InlineData(false, "other-moderator", false)]
+    public async Task ReviewPreviewIsScopedAndDoesNotPersist(bool isAdmin, string userId, bool allowed)
+    {
+        var result = await Controller(isAdmin, userId).ReviewTotalPreview(new ReviewTotalPreviewInput
+        {
+            Id = transactionId, Subtotal = 10_000,
+            Charges = [new() { Amount = 1_000, Operation = ChargeOperation.Subtract },
+                new() { Amount = 500, Operation = ChargeOperation.Add }]
+        });
+        if (!allowed) { Assert.IsType<NotFoundResult>(result); return; }
+        var payload = JsonSerializer.SerializeToElement(Assert.IsType<JsonResult>(result).Value);
+        Assert.Equal("9500", payload.GetProperty("grandTotal").GetString());
+        Assert.Equal(2, payload.GetProperty("rates").GetArrayLength());
+        Assert.Equal(10_000m, (await db.Transactions.AsNoTracking().SingleAsync()).GrandTotal);
+        Assert.Empty(await db.TransactionCharges.ToListAsync());
+    }
+
+    [Fact]
+    public async Task ReviewPreviewRejectsPaymentLockedTransaction()
+    {
+        var participant = await db.TransactionParticipants.FirstAsync();
+        participant.PaymentStatus = ParticipantPaymentStatus.Paid;
+        await db.SaveChangesAsync();
+        Assert.IsType<ConflictResult>(await Controller(true, "admin").ReviewTotalPreview(
+            new ReviewTotalPreviewInput { Id = transactionId, Subtotal = 10_000 }));
+    }
+
+    [Theory]
+    [InlineData(-1, ChargeOperation.Add)]
+    [InlineData(1, (ChargeOperation)99)]
+    public async Task ReviewPreviewRejectsInvalidCharge(int amount, ChargeOperation operation)
+    {
+        Assert.IsType<BadRequestResult>(await Controller(true, "admin").ReviewTotalPreview(
+            new ReviewTotalPreviewInput { Id = transactionId, Subtotal = 10_000,
+                Charges = [new() { Amount = amount, Operation = operation }] }));
+    }
+
+    [Fact]
+    public async Task ReviewPreviewRejectsBindingErrors()
+    {
+        var controller = Controller(true, "admin");
+        controller.ModelState.AddModelError("Subtotal", "Invalid number");
+        Assert.IsType<BadRequestResult>(await controller.ReviewTotalPreview(
+            new ReviewTotalPreviewInput { Id = transactionId }));
+    }
+
+    [Theory]
+    [InlineData(true, 9500)]
+    [InlineData(false, 8888)]
+    public async Task ReviewSaveRecalculatesPendingAutoTotalButPreservesManualTotal(bool automatic, int expected)
+    {
+        var result = await Controller(true, "admin").Review(new ReviewTransactionViewModel
+        {
+            Id = transactionId, MerchantName = "Cafe", TransactionDate = new DateTime(2026, 10, 1),
+            Subtotal = 10_000, GrandTotal = 8888, RecalculateGrandTotal = automatic,
+            Items = [new() { Name = "Meal", Quantity = 1, UnitPrice = 10_000, TotalPrice = 10_000 }],
+            Charges = [new() { Label = "Voucher", Amount = 1_000, Operation = ChargeOperation.Subtract },
+                new() { Label = "Delivery", Amount = 500, Operation = ChargeOperation.Add }]
+        });
+        Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal(expected, (await db.Transactions.AsNoTracking().SingleAsync()).GrandTotal);
+    }
+
+    [Fact]
+    public async Task TransactionPagesKeepModeratorOwnershipScope()
+    {
+        db.Users.Add(new ApplicationUser { Id = "other", UserName = "other", DisplayName = "Other" });
+        for (var index = 0; index < 24; index++)
+            db.Transactions.Add(new BillTransaction { TransactionNumber = $"TX-PAGE-{index}", MerchantName = "Cafe", UploadedByUserId = index < 12 ? "owner" : "other" });
+        await db.SaveChangesAsync();
+        var controller = Controller(false, "owner");
+        controller.Request.QueryString = new QueryString("?page=2");
+        var model = Assert.IsType<TransactionListViewModel>(Assert.IsType<ViewResult>(await controller.Index()).Model);
+        Assert.Equal(3, model.Transactions.Count);
+        Assert.All(model.Transactions, x => Assert.Equal("owner", x.UploadedByUserId));
+        Assert.Equal(13, Assert.IsType<PaginationViewModel>(controller.ViewData["Pagination:page"]).TotalItems);
+        var admin = Controller(true, "admin");
+        await admin.Index();
+        Assert.Equal(25, Assert.IsType<PaginationViewModel>(admin.ViewData["Pagination:page"]).TotalItems);
+    }
+
     private TransactionsController Controller(bool isAdmin, string userId)
     {
         var users = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db),
@@ -83,7 +169,7 @@ public sealed class TransactionShareAccessTests : IDisposable
             ], "Test"))
         };
         return new TransactionsController(db, users, null!, new SplitBillCalculator(), new TestEnvironment(),
-            shareExportService: new TransactionShareExportService(new TestLocalizer()))
+            shareExportService: new TransactionShareExportService(new TestLocalizer()), currencyCatalog: new CurrencyCatalog())
         {
             ControllerContext = new ControllerContext { HttpContext = context }
         };

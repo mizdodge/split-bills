@@ -24,6 +24,7 @@ public sealed class ReviewTransactionViewModel
     [BindNever, ValidateNever] public decimal? Tax { get; set; }
     [BindNever, ValidateNever] public decimal? ServiceCharge { get; set; }
     public decimal? GrandTotal { get; set; }
+    public bool RecalculateGrandTotal { get; set; }
     public string CurrencyCode { get; set; } = "IDR";
     [BindNever, ValidateNever] public string ReportingCurrencyCode { get; set; } = "IDR";
     public decimal ExchangeRateToReporting { get; set; } = 1m;
@@ -57,6 +58,13 @@ public sealed class ReviewChargeViewModel
     public ChargeOperation Operation { get; set; } = ChargeOperation.Add;
 }
 
+public sealed class ReviewTotalPreviewInput
+{
+    public long Id { get; set; }
+    public decimal? Subtotal { get; set; }
+    public List<ReviewChargeViewModel> Charges { get; set; } = [];
+}
+
 public sealed class SplitTransactionViewModel
 {
     public long TransactionId { get; set; }
@@ -86,6 +94,7 @@ public sealed class TransactionListViewModel
 
 public sealed class TransactionDetailsViewModel
 {
+    public IReadOnlyList<PickupPointHistory> PointHistory { get; set; } = [];
     public BillTransaction Transaction { get; set; } = null!;
     public int ReceiptImageCount { get; set; } = 1;
     public FoodPickupAssignment? PickupAssignment { get; set; }

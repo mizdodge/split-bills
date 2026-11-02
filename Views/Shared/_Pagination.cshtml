@@ -1,0 +1,32 @@
+@model PaginationViewModel
+@if (Model.TotalItems > 0)
+{
+    <nav class="list-pagination" aria-label="@L["PaginationLabel"]">
+        <span class="pagination-summary">@L["PaginationSummary", Model.FirstItem, Model.LastItem, Model.TotalItems]</span>
+        <form method="get" action="@(Context.Request.PathBase + Context.Request.Path)" class="pagination-size">
+            @foreach (var query in Context.Request.Query.Where(x => x.Key != Model.PageParameter && x.Key != Model.SizeParameter))
+            {
+                @foreach (var value in query.Value) { <input type="hidden" name="@query.Key" value="@value" /> }
+            }
+            <label for="@(Model.PageParameter)-size">@L["RowsPerPage"]</label>
+            <select id="@(Model.PageParameter)-size" name="@Model.SizeParameter" class="form-select" data-pagination-size>
+                @foreach (var size in new[] { 10, 25, 50, 100 }) { <option value="@size" selected="@(Model.PageSize == size)">@size</option> }
+            </select>
+            <noscript><button class="btn btn-light btn-sm" type="submit">@L["Apply"]</button></noscript>
+        </form>
+        <div class="pagination-links">
+            @if (Model.Page > 1) { <a class="btn btn-light btn-sm" href="@Model.PageUrl(Context.Request, Model.Page - 1)" aria-label="@L["PreviousPage"]">‹</a> }
+            else { <button type="button" class="btn btn-light btn-sm" disabled aria-label="@L["PreviousPage"]">‹</button> }
+            @foreach (var pageNumber in Model.VisiblePages)
+            {
+                if (pageNumber.HasValue)
+                {
+                    <a class="btn btn-sm @(pageNumber == Model.Page ? "btn-primary" : "btn-light")" href="@Model.PageUrl(Context.Request, pageNumber.Value)" aria-current="@(pageNumber == Model.Page ? "page" : null)">@pageNumber</a>
+                }
+                else { <span class="pagination-ellipsis" aria-hidden="true">…</span> }
+            }
+            @if (Model.Page < Model.TotalPages) { <a class="btn btn-light btn-sm" href="@Model.PageUrl(Context.Request, Model.Page + 1)" aria-label="@L["NextPage"]">›</a> }
+            else { <button type="button" class="btn btn-light btn-sm" disabled aria-label="@L["NextPage"]">›</button> }
+        </div>
+    </nav>
+}

@@ -16,7 +16,14 @@
         <legend>@L["FoodPickupStrategy"]</legend>
         <label><input type="radio" name="Strategy" value="WeightedRandom" checked="@(Model.Strategy == FoodPickupSelectionStrategy.WeightedRandom ? "checked" : null)" /><span><strong>⚖ @L["FoodPickupStrategyWeightedRandom"]</strong><small>@L["FoodPickupStrategyWeightedRandomHint"]</small></span></label>
         <label><input type="radio" name="Strategy" value="RoundRobin" checked="@(Model.Strategy == FoodPickupSelectionStrategy.RoundRobin ? "checked" : null)" /><span><strong>↻ @L["FoodPickupStrategyRoundRobin"]</strong><small>@L["FoodPickupStrategyRoundRobinHint"]</small></span></label>
+        <label><input type="radio" name="Strategy" value="Points" checked="@(Model.Strategy == FoodPickupSelectionStrategy.Points ? "checked" : null)" /><span><strong>@L["FoodPickupStrategyPoints"]</strong><small>@L["FoodPickupStrategyPointsHint"]</small></span></label>
     </fieldset>
+    <div class="points-rules">
+        <strong>@L["PointsPriorityRule"]</strong><p>@L["PointsNotMoney"]</p>
+        <div class="points-rule-grid"><span>@L["PointsStartZero"]</span><span>@L["PointsParticipantRule"]</span><span>@L["PointsWinnerRule"]</span><span>@L["PointsAbsentUnchanged"]</span></div>
+        <small>@L["PointsIdempotentHint"]</small>
+    </div>
+    <p class="text-muted">@L["FoodPickupSeparateHistoryHint"]</p>
     <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
     <div class="food-pickup-account-grid">
         @foreach (var user in Model.Users)
@@ -24,7 +31,7 @@
             <label class="food-pickup-account-card @(user.IsDisabled ? "is-disabled" : string.Empty)">
                 <input type="checkbox" name="EligibleUserIds" value="@user.Id" checked="@(user.IsEligible ? "checked" : null)" disabled="@(user.IsDisabled ? "disabled" : null)" />
                 <span class="avatar">@user.DisplayName[..1].ToUpperInvariant()</span>
-                <span class="food-pickup-account-main"><strong>@user.DisplayName</strong><small>@@@user.Username · @L[user.Role]</small></span>
+                <span class="food-pickup-account-main"><strong>@user.DisplayName</strong><small>@@@user.Username · @L[user.Role]</small>@if(Model.Strategy == FoodPickupSelectionStrategy.Points){<span class="point-balance">@L["PointsBalance", user.PriorityPoints]</span>}</span>
                 <span class="food-pickup-account-stats"><span><b>@user.PickupCount</b><small>@L["FoodPickupTimes"]</small></span><span><b>@user.ParticipationCount</b><small>@L["FoodPickupParticipations"]</small></span></span>
                 <span class="food-pickup-account-last"><span>@L["FoodPickupLastPickup"]</span><b>@(user.LastPickupAt.HasValue ? user.LastPickupAt.Value.ToLocalTime().ToString("dd MMM yyyy") : L["FoodPickupNever"].Value)</b><small>@(user.LastPickupMerchant ?? L["FoodPickupNoMerchant"].Value)</small></span>
                 @if (user.IsDisabled) { <span class="status unpaid">@L["Disabled"]</span> }
@@ -39,7 +46,7 @@
 </form>
 
 <section class="content-card mt-4">
-    <div class="section-head"><div><h2>@L["FoodPickupHistory"]</h2><p>@L["FoodPickupHistoryHint"]</p></div></div>
+    <div class="section-head"><div><h2>@L["FoodPickupHistory"] · @L[$"FoodPickupStrategy{Model.Strategy}"]</h2><p>@L["FoodPickupHistoryHint"]</p></div></div>
     @if (Model.History.Count == 0)
     {
         <div class="empty-inline"><span>↻</span><strong>@L["FoodPickupNoHistory"]</strong><p>@L["FoodPickupNoHistoryHint"]</p></div>
@@ -65,4 +72,15 @@
             </table>
         </div>
     }
+@if (ViewData["Pagination:historyPage"] is PaginationViewModel pagination) { <partial name="_Pagination" model="pagination" /> }
 </section>
+
+
+
+@if (Model.Strategy == FoodPickupSelectionStrategy.Points)
+{
+    <section class="content-card mt-4 point-history-card"><div class="section-head"><div><h2>@L["PointsHistory"]</h2><p>@L["PointsHistoryHint"]</p></div></div>
+        <partial name="_PickupPointHistory" model="Model.PointHistory" />
+        @if(ViewData["Pagination:pointHistoryPage"] is PaginationViewModel pointPager){<partial name="_Pagination" model="pointPager" />}
+    </section>
+}

@@ -75,6 +75,7 @@ public sealed class MyBillRowViewModel
 
 public sealed class MyBillDetailsViewModel
 {
+    public IReadOnlyList<PickupPointHistory> PointHistory { get; set; } = [];
     public long ParticipantId { get; set; }
     public long TransactionId { get; set; }
     public string TransactionNumber { get; set; } = string.Empty;

@@ -110,6 +110,29 @@ public sealed class MyBillsReceiptAccessTests : IDisposable
         Assert.Equal(FoodPickupDrawKind.Initial, model.PickupDrawKind);
     }
 
+    [Fact]
+    public async Task BillPaginationIsUserScopedAndRetainsFullSummaryAmounts()
+    {
+        for (var index = 0; index < 24; index++)
+            db.Transactions.Add(new BillTransaction
+            {
+                TransactionNumber = $"MY-PAGE-{index}", MerchantName = "Cafe", UploadedByUserId = "member", Status = TransactionStatus.Unpaid,
+                TransactionDate = new DateOnly(2026, 10, 1),
+                Participants = [new TransactionParticipant { Name = "Member", Amount = 1000, AccountLink = new ParticipantAccountLink { UserId = "member" } },
+                    new TransactionParticipant { Name = "Other", Amount = 9000, AccountLink = new ParticipantAccountLink { UserId = "other" } }]
+            });
+        await db.SaveChangesAsync();
+        var controller = Controller("member");
+        controller.Request.QueryString = new QueryString("?page=2");
+        var view = Assert.IsType<ViewResult>(await controller.Index(default));
+        var model = Assert.IsType<Splitbill.ViewModels.MyBillsViewModel>(view.Model);
+        Assert.Equal(10, model.Bills.Count);
+        Assert.All(model.Bills, x => Assert.Equal(1000, x.Amount));
+        Assert.Equal(24_000, model.UnpaidAmount);
+        var page = Assert.IsType<Splitbill.ViewModels.PaginationViewModel>(controller.ViewData["Pagination:page"]);
+        Assert.Equal(24, page.TotalItems); Assert.Equal(2, page.Page);
+    }
+
     private MyBillsController Controller(string userId)
     {
         var context = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId)], "test")) };

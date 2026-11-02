@@ -25,7 +25,7 @@ public sealed class AdminUsersController(
             Search = search,
             Role = role,
             Status = status,
-            Users = users.Select(x => new AdminUserRowViewModel(x.Id, x.Username, x.DisplayName, x.Email, x.Role, x.IsDisabled, x.CreatedAt)).ToArray()
+            Users = this.Paginate(users.OrderBy(x => x.DisplayName).ThenBy(x => x.Id).Select(x => new AdminUserRowViewModel(x.Id, x.Username, x.DisplayName, x.Email, x.Role, x.IsDisabled, x.CreatedAt))).ToArray()
         });
     }
 

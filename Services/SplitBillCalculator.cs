@@ -43,6 +43,7 @@ public sealed record ParticipantBillBreakdown(
 
 public interface ISplitBillCalculator
 {
+    decimal CalculateReceiptTotal(decimal subtotal, IReadOnlyList<TransactionCharge> charges);
     IReadOnlyList<ParticipantShare> SplitEqual(decimal total, IReadOnlyList<string> names);
     IReadOnlyList<ParticipantShare> SplitByItem(
         decimal grandTotal,
@@ -59,6 +60,14 @@ public interface ISplitBillCalculator
 
 public sealed class SplitBillCalculator : ISplitBillCalculator
 {
+    public decimal CalculateReceiptTotal(decimal subtotal, IReadOnlyList<TransactionCharge> charges)
+    {
+        if (subtotal < 0 || charges.Any(x => x.Amount < 0 || !Enum.IsDefined(x.Operation)))
+            throw new ArgumentException("Invalid receipt amounts or charge operation.");
+        return Math.Round(Math.Max(0, subtotal + charges.Sum(x =>
+            x.Operation == ChargeOperation.Subtract ? -x.Amount : x.Amount)), 2, MidpointRounding.AwayFromZero);
+    }
+
     public IReadOnlyList<ParticipantBillBreakdown> BuildParticipantBreakdowns(BillTransaction transaction)
     {
         ArgumentNullException.ThrowIfNull(transaction);

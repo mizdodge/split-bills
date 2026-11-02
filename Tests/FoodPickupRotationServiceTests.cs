@@ -180,6 +180,47 @@ public sealed class FoodPickupRotationServiceTests : IDisposable
         Assert.NotEqual("ragil", result.Assignment.SelectedUserId);
     }
 
+    [Fact]
+    public async Task SwitchingMethodsKeepsIndependentWeightsHistoryAndStatistics()
+    {
+        var configuration = await db.FoodPickupConfigurations.SingleAsync();
+        configuration.Strategy = FoodPickupSelectionStrategy.RoundRobin;
+        await db.SaveChangesAsync();
+        var round = await AddParticipantTransactionAsync("METHOD-ROUND", ["mizan"]);
+        round.Status = TransactionStatus.Unpaid;
+        await Service().AssignOrReconcileAsync(round, "owner");
+        await db.SaveChangesAsync();
+
+        configuration.Strategy = FoodPickupSelectionStrategy.WeightedRandom;
+        await db.SaveChangesAsync();
+        var empty = await Service().GetStatisticsAsync();
+        Assert.Empty(empty.History);
+        Assert.All(empty.Users, x => { Assert.Equal(0, x.PickupCount); Assert.Equal(0, x.ParticipationCount); Assert.Null(x.LastPickupAt); });
+        var weightedPreview = await Service().PreviewAsync(["mizan", "agi"]);
+        Assert.All(weightedPreview.Candidates, x => { Assert.Equal(0, x.PriorPickupCount); Assert.Equal(.5m, x.Probability); });
+
+        var weighted = await AddParticipantTransactionAsync("METHOD-WEIGHTED", ["agi"]);
+        weighted.Status = TransactionStatus.Unpaid;
+        await Service().AssignOrReconcileAsync(weighted, "owner");
+        await db.SaveChangesAsync();
+        var weightedStats = await Service().GetStatisticsAsync();
+        Assert.Equal("METHOD-WEIGHTED", Assert.Single(weightedStats.History).TransactionNumber);
+        Assert.Equal(1, weightedStats.Users.Single(x => x.UserId == "agi").PickupCount);
+        Assert.Equal(0, weightedStats.Users.Single(x => x.UserId == "mizan").PickupCount);
+
+        configuration.Strategy = FoodPickupSelectionStrategy.RoundRobin;
+        await db.SaveChangesAsync();
+        var restored = await Service().GetStatisticsAsync();
+        Assert.Equal("METHOD-ROUND", Assert.Single(restored.History).TransactionNumber);
+        Assert.Equal(1, restored.Users.Single(x => x.UserId == "mizan").PickupCount);
+        Assert.Equal(0, restored.Users.Single(x => x.UserId == "agi").PickupCount);
+        var roundPreview = await Service().PreviewAsync(["mizan", "agi"]);
+        Assert.Equal("agi", Assert.Single(roundPreview.Candidates, x => x.Probability == 1).UserId);
+        var otherMode = await Service().GetStatisticsAsync(strategy: FoodPickupSelectionStrategy.WeightedRandom);
+        Assert.Equal("METHOD-WEIGHTED", Assert.Single(otherMode.History).TransactionNumber);
+        Assert.Equal(2, await db.FoodPickupDrawHistories.CountAsync());
+    }
+
     private FoodPickupRotationService Service(double roll = 0.25d)
         => new(db, new FixedRandomSource(roll));
 
@@ -208,6 +249,7 @@ public sealed class FoodPickupRotationServiceTests : IDisposable
             TransactionId = transaction.Id, SelectedUserId = userId,
             SelectedParticipantId = transaction.Participants[0].Id,
             RecordedProbability = 1m, DrawKind = FoodPickupDrawKind.Initial,
+            Strategy = (await db.FoodPickupConfigurations.SingleAsync()).Strategy,
             SelectedAt = DateTimeOffset.UtcNow
         });
         await db.SaveChangesAsync();

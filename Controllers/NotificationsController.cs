@@ -23,7 +23,7 @@ public sealed class NotificationsController(
             .Include(x => x.Participant).ThenInclude(x => x!.Transaction)
             .Include(x => x.PaymentApproval)
             .ToListAsync(cancellationToken);
-        notifications = notifications.OrderByDescending(x => x.CreatedAt).Take(100).ToList();
+        notifications = this.Paginate(notifications.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id));
         WebPushStatusViewModel? pushStatus = null;
         if (User.IsInRole(DatabaseSeeder.AdminRole) || User.IsInRole(DatabaseSeeder.ModeratorRole))
         {

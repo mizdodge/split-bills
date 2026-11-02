@@ -11,8 +11,8 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
-![Release](https://img.shields.io/badge/release-v1.1.0-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-232_passing-CDFF70?labelColor=003A40)
+![Release](https://img.shields.io/badge/release-v1.2.0-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-271_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -78,8 +78,9 @@ SplitBill is a self-hosted ASP.NET Core 8 application that turns one or more rec
 | 🧮 | **Flexible splitting** | Equal split or per-item assignment using whole-quantity groups, multi-item people, shared portions, guests, registered accounts, and promo bundles such as B1G1. |
 | 🔎 | **Transparent math** | Members see their item shares, each allocated discount/fee, effective percentages, rounding, final amount, and receipt gallery with modal zoom. |
 | ✅ | **Two-step payment** | Members upload proof and select **I've paid**; Admin or the owning Moderator approves, rejects with a reason, reopens, or marks payment directly. |
-| 📊 | **Reports and Excel** | Role-scoped date/status filters, all payment states, per-person order detail, and four Excel sheets: Summary, Payment Details, Pivot by Person, and Pickup Rotation. |
-| 🛵 | **Food pickup rotation** | Admin-managed eligibility, secure weighted random or deterministic Round Robin, participant-only candidates, stable winners, reasoned rerolls, and auditable history. |
+| 📊 | **Reports and Excel** | Role-scoped date/status filters, all payment states, per-person order detail, and four standard Excel sheets. Points exports add a fifth Points History sheet with before/after scores and reasons. |
+| 🛵 | **Food pickup rotation** | Weighted Random, Round Robin, or Points: highest points get priority, ties are random, the winner resets to zero and other eligible participants gain one point. Independent histories, before/after audits, reports and Excel. |
+| 📑 | **Paginated lists** | Transactions, bills, reports, approvals, notifications, users, and pickup history; filters and full Excel exports stay intact. |
 | 🔑 | **Microsoft Entra SSO** | Unified 2-tab Admin integration (`/admin/microsoft`), shared DPAPI-encrypted credentials, validated Microsoft OIDC login, explicit account linking, and optional Member registration using the email prefix as username. |
 | 💬 | **SharePoint + Teams** | Durable outbox events for bill assignment, payment approval, rejection, and pickup winner; Power Automate sends localized Teams messages with deep links. |
 | 🖼️ | **One long share image** | Uploader or Admin shares all, selected, or one participant in a single readable 1000px JPEG; Members can share only their own bill. “Shared with” appears for fractional item shares below one unit, with HTTP download fallback. |
