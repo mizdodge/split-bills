@@ -38,6 +38,7 @@ public sealed class NotificationsController(
 
         return View(new NotificationListViewModel
         {
+            BrowserNotificationsEnabled = await db.Users.AsNoTracking().Where(x => x.Id == userId).Select(x => x.BrowserNotificationsEnabled).SingleOrDefaultAsync(cancellationToken),
             WebPush = pushStatus,
             Notifications = notifications.Select(x => new NotificationRowViewModel
             {

@@ -30,12 +30,12 @@ public static class MicrosoftOidcConfiguration
         {
             if (context.Options.ClientId == "unconfigured")
             {
-                context.Response.Redirect("/account/login?microsoftError=true");
+                context.Response.Redirect(context.Properties.Items.ContainsKey("security-intent") ? "/account/settings?verificationError=true" : "/account/login?microsoftError=true");
                 context.HandleResponse();
                 return Task.CompletedTask;
             }
-            context.ProtocolMessage.Prompt = "select_account";
-            if (context.Properties.Items.ContainsKey("link-intent"))
+            context.ProtocolMessage.Prompt = context.Properties.Items.ContainsKey("security-intent") ? "login" : "select_account";
+            if (context.Properties.Items.ContainsKey("link-intent") || context.Properties.Items.ContainsKey("security-intent"))
                 context.ProtocolMessage.MaxAge = "0";
             return Task.CompletedTask;
         };
@@ -50,7 +50,7 @@ public static class MicrosoftOidcConfiguration
         options.Events.OnRemoteFailure = context =>
         {
             // Provider errors may contain personal data or protocol details. Keep them off the URL.
-            context.Response.Redirect("/account/login?microsoftError=true");
+            context.Response.Redirect(context.Properties?.Items.ContainsKey("security-intent") == true ? "/account/settings?verificationError=true" : "/account/login?microsoftError=true");
             context.HandleResponse();
             return Task.CompletedTask;
         };

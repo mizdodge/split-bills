@@ -10,7 +10,7 @@ namespace Splitbill.Controllers;
 [AllowAnonymous, Route("account/microsoft-signin")]
 public sealed class MicrosoftSignInController(IMicrosoftIntegrationService integration,
     IMicrosoftAccountService accounts, SignInManager<ApplicationUser> signInManager,
-    UserManager<ApplicationUser> userManager, IStringLocalizer<SharedResource> localizer) : Controller
+    UserManager<ApplicationUser> userManager, IStringLocalizer<SharedResource> localizer, IAccountSelfService? selfService = null) : Controller
 {
     [HttpPost("start"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Start(string? returnUrl = null)
@@ -33,7 +33,20 @@ public sealed class MicrosoftSignInController(IMicrosoftIntegrationService integ
         await HttpContext.SignOutAsync("MicrosoftLinkCookie");
         var settings = await integration.GetSettingsAsync();
         var identity = auth.Succeeded ? MicrosoftIdentity.Read(auth.Principal, settings.TenantId) : null;
-        if (identity is null || !settings.MicrosoftLoginEnabled) return Failure("MicrosoftAccountUnavailable");
+        if (identity is null || !settings.MicrosoftLoginEnabled)
+            return auth.Properties?.Items.ContainsKey("security-intent") == true ? SecurityFailure() : Failure("MicrosoftAccountUnavailable");
+        if (auth.Properties?.Items.TryGetValue("security-intent", out var securityId) == true && securityId is not null)
+        {
+            var local = await userManager.GetUserAsync(User);
+            auth.Properties.Items.TryGetValue("security-purpose", out var purpose);
+            DateTimeOffset? authenticatedAt = long.TryParse(auth.Principal?.FindFirst("auth_time")?.Value, out var seconds) && seconds is >= 0 and <= 253402300799
+                ? DateTimeOffset.FromUnixTimeSeconds(seconds) : null;
+            if (local is null || selfService is null || !await selfService.VerifyAsync(securityId, local,
+                Request.Cookies[AccountSettingsController.SecurityBindingCookie] ?? "", identity, authenticatedAt) ||
+                !await selfService.IsVerifiedAsync(securityId, local, Request.Cookies[AccountSettingsController.SecurityBindingCookie] ?? "", purpose ?? ""))
+                return SecurityFailure();
+            return RedirectToAction(purpose == AccountSelfService.PasswordPurpose ? "CreatePassword" : "ConfirmSessions", "AccountSettings", new { requestId = securityId });
+        }
         if (auth.Properties?.Items.TryGetValue("link-intent", out var intentId) == true && intentId is not null)
         {
             var local = await userManager.GetUserAsync(User);
@@ -51,6 +64,12 @@ public sealed class MicrosoftSignInController(IMicrosoftIntegrationService integ
             new System.Security.Claims.Claim("splitbill:microsoft", result.User.MicrosoftLinkVersion.ToString(System.Globalization.CultureInfo.InvariantCulture))
         });
         return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/Dashboard");
+    }
+
+    private IActionResult SecurityFailure()
+    {
+        TempData["ErrorMessage"] = localizer["AccountVerificationExpired"].Value;
+        return RedirectToAction("Index", "AccountSettings");
     }
 
     private IActionResult Failure(string key)

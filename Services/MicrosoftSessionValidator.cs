@@ -12,11 +12,19 @@ public static class MicrosoftSessionValidator
     public static async Task ValidateAsync(CookieValidatePrincipalContext context)
     {
         var marker = context.Principal?.FindFirstValue("splitbill:microsoft");
+        var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+        var id = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
+        var stampType = context.HttpContext.RequestServices.GetRequiredService<Microsoft.Extensions.Options.IOptions<IdentityOptions>>().Value.ClaimsIdentity.SecurityStampClaimType;
+        if (user is null || user.LockoutEnd > DateTimeOffset.UtcNow ||
+            context.Principal?.FindFirstValue(stampType) != user.SecurityStamp)
+        {
+            context.RejectPrincipal();
+            await context.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return;
+        }
         if (marker is not null)
         {
-            var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
-            var id = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
             var login = await db.MicrosoftLoginConfigurations.AsNoTracking().SingleOrDefaultAsync(x => x.Id == 1);
             var config = await db.MicrosoftIntegrationConfigurations.AsNoTracking().SingleOrDefaultAsync(x => x.Id == 1);
             if (user is null || login?.Enabled != true || MicrosoftAccountService.IsRecoveryAdmin(user) ||

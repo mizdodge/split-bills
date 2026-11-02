@@ -2329,4 +2329,39 @@ Poin prioritas kamu direset ke 0. Buka rincian untuk melihat perubahan poin.</va
   <data name="Operations" xml:space="preserve"><value>Operasional</value></data>
   <data name="Personal" xml:space="preserve"><value>Pribadi</value></data>
   <data name="Administration" xml:space="preserve"><value>Administrasi</value></data>
+  <data name="AccountProfile" xml:space="preserve"><value>Profil akun</value></data>
+  <data name="AccountProfileHint" xml:space="preserve"><value>Perbarui nama yang tampil tanpa mengubah hubungan ke tagihan.</value></data>
+  <data name="AccountNoEmail" xml:space="preserve"><value>Belum diisi</value></data>
+  <data name="AccountReadOnlyHint" xml:space="preserve"><value>Username, email untuk notifikasi, dan role dikelola oleh Admin.</value></data>
+  <data name="AccountDisplayName" xml:space="preserve"><value>Nama tampilan</value></data>
+  <data name="AccountSaveProfile" xml:space="preserve"><value>Simpan profil</value></data>
+  <data name="AccountProfileSaved" xml:space="preserve"><value>Profil berhasil diperbarui.</value></data>
+  <data name="AccountNameInvalid" xml:space="preserve"><value>Nama tampilan wajib diisi, maksimal 100 karakter, tanpa karakter kontrol.</value></data>
+  <data name="AccountPreferences" xml:space="preserve"><value>Preferensi pribadi</value></data>
+  <data name="AccountPreferencesHint" xml:space="preserve"><value>Pengaturan ini tersimpan pada akun dan berlaku di perangkat lain.</value></data>
+  <data name="AccountLanguage" xml:space="preserve"><value>Bahasa default</value></data>
+  <data name="AccountLanguageInvalid" xml:space="preserve"><value>Pilih Bahasa Indonesia atau English.</value></data>
+  <data name="AccountTeamsNotifications" xml:space="preserve"><value>Notifikasi Teams</value></data>
+  <data name="AccountTeamsNotificationsHint" xml:space="preserve"><value>Pesan melalui integrasi SharePoint/Power Automate, jika diaktifkan Admin.</value></data>
+  <data name="AccountBrowserNotifications" xml:space="preserve"><value>Notifikasi browser</value></data>
+  <data name="AccountBrowserNotificationsHint" xml:space="preserve"><value>Izinkan pengiriman pop-up. Perangkat tetap memerlukan izin browser dan HTTPS.</value></data>
+  <data name="AccountInAppAlwaysOn" xml:space="preserve"><value>Notifikasi dalam aplikasi dan riwayat tagihan tetap tersedia. Mematikan channel membatalkan antrean yang belum terkirim; pesan yang sudah dikirim tidak dapat ditarik kembali.</value></data>
+  <data name="AccountSavePreferences" xml:space="preserve"><value>Simpan preferensi</value></data>
+  <data name="AccountPreferencesSaved" xml:space="preserve"><value>Preferensi berhasil disimpan.</value></data>
+  <data name="AccountSessions" xml:space="preserve"><value>Keamanan sesi</value></data>
+  <data name="AccountSessionsHint" xml:space="preserve"><value>Keluar dari semua perangkat, termasuk perangkat ini. Kamu harus login lagi. Langganan notifikasi browser juga dinonaktifkan sampai didaftarkan ulang.</value></data>
+  <data name="AccountSignOutEverywhere" xml:space="preserve"><value>Keluar semua perangkat</value></data>
+  <data name="AccountSessionsRevoked" xml:space="preserve"><value>Semua sesi telah dicabut. Silakan login lagi.</value></data>
+  <data name="AccountVerificationExpired" xml:space="preserve"><value>Verifikasi tidak berlaku atau sudah kedaluwarsa. Mulai lagi dari pengaturan akun.</value></data>
+  <data name="AccountCreatePassword" xml:space="preserve"><value>Buat password lokal</value></data>
+  <data name="AccountCreatePasswordHint" xml:space="preserve"><value>Verifikasi ulang akun Microsoft yang terhubung untuk membuat password lokal. Password ini menjadi metode login tambahan.</value></data>
+  <data name="AccountVerifyCreatePassword" xml:space="preserve"><value>Verifikasi Microsoft &amp; buat password</value></data>
+  <data name="AccountVerifySignOut" xml:space="preserve"><value>Verifikasi Microsoft &amp; keluar semua</value></data>
+  <data name="AccountVerificationUnavailable" xml:space="preserve"><value>Verifikasi Microsoft memerlukan HTTPS dan SSO yang aktif. Hubungi Admin jika belum tersedia.</value></data>
+  <data name="AccountPasswordsMismatch" xml:space="preserve"><value>Isi password baru dan pastikan konfirmasinya sama.</value></data>
+  <data name="AccountPasswordPolicy" xml:space="preserve"><value>Gunakan minimal 6 karakter, huruf kecil, dan angka. Jangan gunakan password yang sama dengan layanan lain.</value></data>
+  <data name="AccountPasswordCreated" xml:space="preserve"><value>Password lokal berhasil dibuat. Login Microsoft tetap terhubung.</value></data>
+  <data name="AccountMicrosoftVerified" xml:space="preserve"><value>Identitas Microsoft sudah diverifikasi. Konfirmasi untuk mencabut semua sesi sekarang.</value></data>
+  <data name="AccountOverviewHint" xml:space="preserve"><value>Kelola profil, preferensi, password, dan akun Microsoft kamu.</value></data>
+  <data name="AccountBrowserOptedOut" xml:space="preserve"><value>Notifikasi browser dimatikan di preferensi akun. Aktifkan kembali di Pengaturan akun sebelum mendaftarkan perangkat.</value></data>
 </root>

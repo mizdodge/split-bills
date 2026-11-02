@@ -31,12 +31,12 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
         var now = DateTimeOffset.UtcNow;
         foreach (var participant in linked)
         {
-            if (!users.TryGetValue(participant.AccountLink!.UserId, out var user) || string.IsNullOrWhiteSpace(user.Email)) continue;
+            if (!users.TryGetValue(participant.AccountLink!.UserId, out var user) || string.IsNullOrWhiteSpace(user.Email) || !user.TeamsNotificationsEnabled) continue;
             Add(SharePointNotificationEventType.BillAssigned, user.Email, user.DisplayName, actor,
                 Text("SharePointBillAssignedTitle", actor),
                 TeamsHtml(Text("SharePointBillAssignedBody", user.DisplayName, transaction.MerchantName, Money(participant.Amount), actor),
                     BuildParticipantUrl(transaction, participant.Id), Text("SharePointOpenBillDetails")),
-                transaction, participant, null, now);
+                transaction, participant, null, now, recipientUserId: user.Id);
         }
     }
 
@@ -46,14 +46,14 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
         EnsureTransactionOrigin(participant.Transaction);
         var actor = await DisplayNameAsync(actorUserId, cancellationToken);
         var owner = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == participant.Transaction.UploadedByUserId, cancellationToken);
-        if (owner is null || string.IsNullOrWhiteSpace(owner.Email)) return;
+        if (owner is null || string.IsNullOrWhiteSpace(owner.Email) || !owner.TeamsNotificationsEnabled) return;
         var ownerName = Name(owner);
         Add(SharePointNotificationEventType.PaymentApprovalRequested, owner.Email, ownerName, actor,
             Text("SharePointPaymentRequestedTitle", actor),
             TeamsHtml(Text("SharePointPaymentRequestedBody", ownerName, actor, participant.Transaction.MerchantName,
                 participant.Transaction.TransactionNumber, Money(participant.Amount)),
                 BuildApprovalsUrl(participant.Transaction), Text("SharePointOpenApprovals")),
-            participant.Transaction, participant, approval, DateTimeOffset.UtcNow);
+            participant.Transaction, participant, approval, DateTimeOffset.UtcNow, recipientUserId: owner.Id);
     }
 
     public async Task EnqueuePaymentRejectedAsync(TransactionParticipant participant, PaymentApproval approval, string actorUserId, CancellationToken cancellationToken = default)
@@ -62,7 +62,7 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
         EnsureTransactionOrigin(participant.Transaction);
         var actor = await DisplayNameAsync(actorUserId, cancellationToken);
         var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == participant.AccountLink.UserId, cancellationToken);
-        if (user is null || string.IsNullOrWhiteSpace(user.Email)) return;
+        if (user is null || string.IsNullOrWhiteSpace(user.Email) || !user.TeamsNotificationsEnabled) return;
         var recipient = Name(user);
         var reason = string.IsNullOrWhiteSpace(approval.Note) ? Text("SharePointNoRejectionReason") : approval.Note;
         Add(SharePointNotificationEventType.PaymentRejected, user.Email, recipient, actor,
@@ -70,7 +70,7 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
             TeamsHtml(Text("SharePointPaymentRejectedBody", recipient, participant.Transaction.MerchantName,
                 participant.Transaction.TransactionNumber, Money(participant.Amount), actor, reason),
                 BuildParticipantUrl(participant.Transaction, participant.Id), Text("SharePointOpenBillDetails")),
-            participant.Transaction, participant, approval, DateTimeOffset.UtcNow);
+            participant.Transaction, participant, approval, DateTimeOffset.UtcNow, recipientUserId: user.Id);
     }
 
     public async Task EnqueueFoodPickupSelectedAsync(BillTransaction transaction, FoodPickupAssignment assignment, FoodPickupDrawHistory history, string actorUserId, CancellationToken cancellationToken = default)
@@ -80,7 +80,7 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
         if (participant is null) return;
         EnsureTransactionOrigin(transaction);
         var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == assignment.SelectedUserId, cancellationToken);
-        if (user is null || string.IsNullOrWhiteSpace(user.Email)) return;
+        if (user is null || string.IsNullOrWhiteSpace(user.Email) || !user.TeamsNotificationsEnabled) return;
         var eventId = $"food-pickup:{history.Id}";
         if (db.SharePointNotificationOutbox.Local.Any(x => x.EventId == eventId) ||
             await db.SharePointNotificationOutbox.AnyAsync(x => x.EventId == eventId, cancellationToken)) return;
@@ -97,16 +97,16 @@ public sealed class SharePointNotificationOutboxService(ApplicationDbContext db,
         Add(SharePointNotificationEventType.FoodPickupSelected, user.Email, recipient, actor,
             Text("SharePointFoodPickupTitle", recipient),
             TeamsHtml(body, BuildParticipantUrl(transaction, participant.Id), Text("SharePointOpenBillDetails")),
-            transaction, participant, null, DateTimeOffset.UtcNow, eventId);
+            transaction, participant, null, DateTimeOffset.UtcNow, eventId, user.Id);
     }
 
     private void Add(SharePointNotificationEventType type, string email, string recipient, string actor,
         string title, string description, BillTransaction transaction, TransactionParticipant participant,
-        PaymentApproval? approval, DateTimeOffset now, string? eventId = null)
+        PaymentApproval? approval, DateTimeOffset now, string? eventId = null, string? recipientUserId = null)
     {
         db.SharePointNotificationOutbox.Add(new SharePointNotificationOutbox
         {
-            EventId = eventId ?? $"{type}-{Guid.NewGuid():N}", EventType = type,
+            EventId = eventId ?? $"{type}-{Guid.NewGuid():N}", EventType = type, RecipientUserId = recipientUserId,
             RecipientEmail = email.Trim(), RecipientName = recipient, ActorName = actor,
             Title = title, Description = description, TransactionId = transaction.Id,
             TransactionNumber = transaction.TransactionNumber, MerchantName = transaction.MerchantName,
@@ -217,6 +217,12 @@ public sealed class SharePointNotificationProcessor(
 
         foreach (var item in due)
         {
+            if (await db.Users.AsNoTracking().AnyAsync(x => !x.TeamsNotificationsEnabled &&
+                (item.RecipientUserId != null ? x.Id == item.RecipientUserId : x.Email == item.RecipientEmail), cancellationToken))
+            {
+                item.Status = SharePointNotificationStatus.Cancelled; item.LockedUntil = null; item.LastErrorCode = "USER_PREFERENCE";
+                await db.SaveChangesAsync(cancellationToken); continue;
+            }
             item.Status = SharePointNotificationStatus.Processing;
             item.LockedUntil = now.AddMinutes(2);
             await db.SaveChangesAsync(cancellationToken);

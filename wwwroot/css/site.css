@@ -248,3 +248,18 @@
  .bottom-more-menu a>span:not(.nav-icon):not(.notification-badge) { font-size:inherit; overflow-wrap:anywhere; }
  .bottom-more-menu .notification-badge { width:auto; height:22px; min-width:22px; font-size:.7rem; }
 }
+
+.account-profile-facts { display:grid; gap:12px; margin:0 0 16px; }
+.account-profile-facts>div { display:grid; grid-template-columns:100px minmax(0,1fr); gap:12px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+.account-profile-facts dt { color:var(--muted); font-size:.8rem; font-weight:600; }
+.account-profile-facts dd { margin:0; font-size:.85rem; font-weight:700; overflow-wrap:anywhere; }
+.account-section-note { font-size:.8rem; line-height:1.6; margin:14px 0 18px; }
+.account-preference-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px solid var(--line); cursor:pointer; }
+.account-preference-row>span { min-width:0; }
+.account-preference-row strong,.account-preference-row small { display:block; }
+.account-preference-row strong { font-size:.85rem; }
+.account-preference-row small { color:var(--muted); font-size:.78rem; line-height:1.5; margin-top:4px; }
+.account-preference-row input { width:22px; height:22px; flex-shrink:0; accent-color:var(--emerald); }
+.account-security-confirm { max-width:620px; }
+.account-settings-grid .btn { white-space:normal; min-height:44px; }
+@media(max-width:420px) { .account-profile-facts>div { grid-template-columns:80px minmax(0,1fr); gap:8px; } .account-settings-grid .btn { width:100%; } }

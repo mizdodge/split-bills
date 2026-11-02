@@ -2,7 +2,11 @@
 @using Splitbill.Models
 @{ ViewData["Title"] = L["Notifications"]; }
 <div class="page-heading"><div><span class="eyebrow">@L["Notifications"]</span><h1>@L["Notifications"]</h1><p>@L["BillUpdates"]</p></div><form asp-action="ReadAll" method="post" class="m-0"><button class="btn btn-light" type="submit">@L["MarkAllRead"]</button></form></div>
-@if (Model.WebPush is not null)
+@if (!Model.BrowserNotificationsEnabled)
+{
+    <section class="content-card mb-3"><p>@L["AccountBrowserOptedOut"]</p><a class="btn btn-light" asp-controller="AccountSettings" asp-action="Index">@L["AccountSettings"]</a></section>
+}
+@if (Model.WebPush is not null && Model.BrowserNotificationsEnabled)
 {
     <section class="content-card push-settings-card" data-push-panel>
         @Html.AntiForgeryToken()

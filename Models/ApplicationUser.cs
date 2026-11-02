@@ -11,6 +11,9 @@ public sealed class ApplicationUser : IdentityUser
     public string DisplayName { get; set; } = string.Empty;
 
     public DateTimeOffset CreatedAt { get; set; }
+    [MaxLength(10)] public string? PreferredCulture { get; set; }
+    public bool TeamsNotificationsEnabled { get; set; } = true;
+    public bool BrowserNotificationsEnabled { get; set; } = true;
 
     // Microsoft identity is link-only; it is never used as an implicit account selector.
     [MaxLength(200)] public string? MicrosoftSubject { get; set; }

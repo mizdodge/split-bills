@@ -124,6 +124,7 @@ public sealed class PaymentApprovalRowViewModel
 
 public sealed class NotificationListViewModel
 {
+    public bool BrowserNotificationsEnabled { get; set; } = true;
     public List<NotificationRowViewModel> Notifications { get; set; } = [];
     public WebPushStatusViewModel? WebPush { get; set; }
 }

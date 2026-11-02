@@ -21,7 +21,7 @@ public sealed class WebPushDeliveryProcessor(
         if (configuration is null || !configuration.Enabled || string.IsNullOrWhiteSpace(configuration.PublicKey)) return 0;
 
         var candidates = await db.WebPushDeliveries
-            .Include(x => x.WebPushSubscription)
+            .Include(x => x.WebPushSubscription).ThenInclude(x => x!.User)
             .Include(x => x.UserNotification).ThenInclude(x => x!.Participant).ThenInclude(x => x!.Transaction)
             .Include(x => x.UserNotification).ThenInclude(x => x!.PaymentApproval)
             .Where(x => x.Status == WebPushDeliveryStatus.Pending || x.Status == WebPushDeliveryStatus.Processing)
@@ -54,7 +54,7 @@ public sealed class WebPushDeliveryProcessor(
         var subscription = delivery.WebPushSubscription;
         var notification = delivery.UserNotification;
         if (subscription is null || notification is null ||
-            subscription.DisabledAt is not null || subscription.ExpiresAt <= now ||
+            subscription.DisabledAt is not null || subscription.ExpiresAt <= now || subscription.User?.BrowserNotificationsEnabled == false ||
             notification.Type is not (NotificationType.PaymentSubmitted or NotificationType.PushTest))
         {
             delivery.Status = WebPushDeliveryStatus.Cancelled;

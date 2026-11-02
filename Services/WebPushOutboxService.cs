@@ -18,6 +18,7 @@ public sealed class WebPushOutboxService(ApplicationDbContext db) : IWebPushOutb
         long? onlySubscriptionId = null)
     {
         if (notification.Type is not (NotificationType.PaymentSubmitted or NotificationType.PushTest) || string.IsNullOrWhiteSpace(notification.UserId)) return;
+        if (!await db.Users.AsNoTracking().AnyAsync(x => x.Id == notification.UserId && x.BrowserNotificationsEnabled, cancellationToken)) return;
 
         // DateTimeOffset filtering is applied after the indexed user slice is
         // materialized because SQLite cannot translate it reliably.

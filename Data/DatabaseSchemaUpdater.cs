@@ -22,6 +22,21 @@ public static class DatabaseSchemaUpdater
         try
         {
             await ExecuteAsync(db, "PRAGMA foreign_keys = ON;", cancellationToken);
+            if (!await HasColumnAsync(db, "AspNetUsers", "PreferredCulture", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE AspNetUsers ADD COLUMN PreferredCulture TEXT NULL;", cancellationToken);
+            foreach (var column in new[] { "TeamsNotificationsEnabled", "BrowserNotificationsEnabled" })
+                if (!await HasColumnAsync(db, "AspNetUsers", column, cancellationToken))
+                    await ExecuteAsync(db, $"ALTER TABLE AspNetUsers ADD COLUMN {column} INTEGER NOT NULL DEFAULT 1;", cancellationToken);
+            await ExecuteAsync(db, """
+                CREATE TABLE IF NOT EXISTS "AccountSecurityRequests" (
+                    "Id" TEXT NOT NULL PRIMARY KEY, "UserId" TEXT NOT NULL,
+                    "Purpose" TEXT NOT NULL, "BindingHash" TEXT NOT NULL, "StampHash" TEXT NOT NULL,
+                    "CredentialRevision" INTEGER NOT NULL, "LinkVersion" INTEGER NOT NULL,
+                    "CreatedAt" TEXT NOT NULL, "ExpiresAt" TEXT NOT NULL, "VerifiedAt" TEXT NULL, "UsedAt" TEXT NULL,
+                    FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+                );
+                CREATE INDEX IF NOT EXISTS "IX_AccountSecurityRequests_UserId" ON "AccountSecurityRequests" ("UserId");
+                """, cancellationToken);
 
             // ApplicationUser inherits Email and NormalizedEmail from ASP.NET Identity.
             // EnsureCreated includes both columns for new databases; these guards keep
@@ -476,6 +491,8 @@ public static class DatabaseSchemaUpdater
                     ON "WebPushDeliveries" ("Status", "NextAttemptAt");
                 """, cancellationToken);
 
+            if (!await HasColumnAsync(db, "SharePointNotificationOutbox", "RecipientUserId", cancellationToken))
+                await ExecuteAsync(db, "ALTER TABLE SharePointNotificationOutbox ADD COLUMN RecipientUserId TEXT NULL;", cancellationToken);
             await ExecuteAsync(db, "PRAGMA foreign_key_check;", cancellationToken);
         }
         finally

@@ -123,7 +123,7 @@ Enable SSO only after shared credentials, redirect URI, user assignment, and con
 
 Link requests expire after five minutes, are single-use, and are bound to the local user, security stamp, browser and credential revision. Changing credentials/password or switching browser invalidates the request. A Microsoft identity already owned by another local account cannot be linked.
 
-The username `admin` (case-insensitive) is a local recovery account: it has password settings only and cannot use Microsoft sign-in, linking or automatic registration. Other users with the Admin role can link normally.
+The username `admin` (case-insensitive) is a local recovery account: it can use local profile/preferences/password/session settings but cannot use Microsoft sign-in, linking or automatic registration. Other users with the Admin role can link normally.
 
 ### New employees: optional automatic registration
 
@@ -131,13 +131,13 @@ The username `admin` (case-insensitive) is a local recovery account: it has pass
 2. An employee from the configured tenant signs in through Microsoft. Tenant assignment/consent policies still apply.
 3. If no stable link exists, a valid email is required. A new local account gets the Microsoft display name and full email; the username is the email prefix (`ragil@example.com` becomes `ragil`). Its only initial role is **Member**.
 4. Existing email/username collisions stop registration. No numeric suffix is added, no existing account is overwritten, and no implicit merge happens. The user must connect from the existing local account or contact an Admin. Unsupported username characters also require Admin assistance.
-5. New accounts have **no generated/default local password**. They can use Microsoft sign-in. Before disconnecting Microsoft, ask an Admin to set a local password through the existing password-reset feature, then verify that password at disconnect time.
+5. New accounts have **no generated/default local password**. They can use Microsoft sign-in. Before disconnecting Microsoft, open Account settings and create a local password after freshly verifying the same linked Microsoft identity over HTTPS. An Admin password reset remains a recovery alternative; verify the local password at disconnect time.
 
 A missing email, wrong tenant, reserved `admin` username, revoked link or disabled account cannot create a replacement account. Existing links continue to work when automatic registration is switched off. Microsoft groups do not grant SplitBill roles.
 
 ### Disconnect and recovery
 
-In Account settings, choose **Disconnect account**, confirm the current SplitBill password, and submit. Local access and bills remain intact. A revoked Microsoft identity is retained as a tombstone so it cannot automatically register a duplicate account. Reconnect explicitly when needed. Users without a local password cannot disconnect until the Admin password-reset step is complete.
+In Account settings, choose **Disconnect account**, confirm the current SplitBill password, and submit. Local access and bills remain intact. A revoked Microsoft identity is retained as a tombstone so it cannot automatically register a duplicate account. Reconnect explicitly when needed. Users without a local password cannot disconnect until they create one through fresh Microsoft verification or receive an Admin password reset.
 
 Microsoft-origin sessions check the current SSO switch, tenant, link version/revocation and account lockout on requests, in addition to Identity security-stamp validation. Local sessions remain available. Local two-factor accounts are directed to the local login flow rather than bypassing that policy.
 
@@ -154,3 +154,13 @@ Local login remains available during provider failure, disabled SSO, HTTPS setup
 ## Verification status
 
 Automated schema, protector, SharePoint compatibility, authorization, build, and full test coverage are part of the repository release gate. A real Microsoft round trip is **not** considered verified by a credential or Graph connectivity check. Live SSO remains unverified until an approved HTTPS host, configured existing tenant registration, consent/assignment, and a real test account complete local linking and later Microsoft-only sign-in without changing production data.
+
+## Account security verification (v1.3.0)
+
+Account settings now supports self-service creation of a local password for a passwordless Microsoft-linked account and Microsoft verification before signing out everywhere. These flows reuse the same Entra app, Web callback, scopes and shared secret. They require the authenticated local session and the same linked tenant/object identity; email matching never authorizes them.
+
+The application requests `prompt=login` and `max_age=0`. The validated ID token must contain a recent `auth_time`; a token without it fails closed. In the reused Entra App Registration, verify **Token configuration → Add optional claim → ID → auth_time** if the tenant does not emit it. Do not substitute `iat` for actual authentication time. Microsoft documents [optional claim configuration](https://learn.microsoft.com/en-us/entra/identity-platform/optional-claims) and the [auth_time claim](https://learn.microsoft.com/en-us/entra/identity-platform/optional-claims-reference). The OpenID Connect [max_age requirement](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) requires authentication-time evidence.
+
+On the real HTTPS application origin, verify a full round trip: sign in as an existing passwordless linked Member, start Create a local password, reauthenticate the same Microsoft identity, enter and confirm a compliant local password, and test local sign-in. Repeat with a wrong Microsoft account and with an expired request; both must fail. Signing out everywhere on a passwordless account uses its own fresh proof and final confirmation. No fresh-proof flow is offered on raw HTTP; an Admin can use the established local-password recovery process instead.
+
+Offline tests cover identity, binding, ownership, purpose, expiry, freshness, replay and configuration-change rejection. Browser completion tests use a synthetic verified proof in an isolated fixture; they are not evidence of a live tenant handshake. See [Account settings](ACCOUNT_SETTINGS.md) for user-facing behavior.

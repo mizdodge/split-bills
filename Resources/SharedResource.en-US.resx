@@ -2329,4 +2329,39 @@ Your priority points reset to 0. Open the details to see point changes.</value><
   <data name="Operations" xml:space="preserve"><value>Operations</value></data>
   <data name="Personal" xml:space="preserve"><value>Personal</value></data>
   <data name="Administration" xml:space="preserve"><value>Administration</value></data>
+  <data name="AccountProfile" xml:space="preserve"><value>Account profile</value></data>
+  <data name="AccountProfileHint" xml:space="preserve"><value>Update your display name while keeping existing bill links.</value></data>
+  <data name="AccountNoEmail" xml:space="preserve"><value>Not provided</value></data>
+  <data name="AccountReadOnlyHint" xml:space="preserve"><value>Your username, notification email and role are managed by an Admin.</value></data>
+  <data name="AccountDisplayName" xml:space="preserve"><value>Display name</value></data>
+  <data name="AccountSaveProfile" xml:space="preserve"><value>Save profile</value></data>
+  <data name="AccountProfileSaved" xml:space="preserve"><value>Your profile has been updated.</value></data>
+  <data name="AccountNameInvalid" xml:space="preserve"><value>Enter a display name of up to 100 characters without control characters.</value></data>
+  <data name="AccountPreferences" xml:space="preserve"><value>Personal preferences</value></data>
+  <data name="AccountPreferencesHint" xml:space="preserve"><value>These settings belong to your account and apply across devices.</value></data>
+  <data name="AccountLanguage" xml:space="preserve"><value>Default language</value></data>
+  <data name="AccountLanguageInvalid" xml:space="preserve"><value>Choose Bahasa Indonesia or English.</value></data>
+  <data name="AccountTeamsNotifications" xml:space="preserve"><value>Teams notifications</value></data>
+  <data name="AccountTeamsNotificationsHint" xml:space="preserve"><value>Messages through SharePoint/Power Automate when enabled by an Admin.</value></data>
+  <data name="AccountBrowserNotifications" xml:space="preserve"><value>Browser notifications</value></data>
+  <data name="AccountBrowserNotificationsHint" xml:space="preserve"><value>Allow pop-up delivery. Devices still need browser permission and HTTPS.</value></data>
+  <data name="AccountInAppAlwaysOn" xml:space="preserve"><value>In-app notifications and bill history remain available. Disabling a channel cancels unsent queued messages; delivered messages cannot be recalled.</value></data>
+  <data name="AccountSavePreferences" xml:space="preserve"><value>Save preferences</value></data>
+  <data name="AccountPreferencesSaved" xml:space="preserve"><value>Your preferences have been saved.</value></data>
+  <data name="AccountSessions" xml:space="preserve"><value>Session security</value></data>
+  <data name="AccountSessionsHint" xml:space="preserve"><value>Sign out of every device, including this one. You will need to sign in again. Browser subscriptions are disabled until registered again.</value></data>
+  <data name="AccountSignOutEverywhere" xml:space="preserve"><value>Sign out everywhere</value></data>
+  <data name="AccountSessionsRevoked" xml:space="preserve"><value>All sessions have been revoked. Please sign in again.</value></data>
+  <data name="AccountVerificationExpired" xml:space="preserve"><value>Verification is invalid or expired. Start again from account settings.</value></data>
+  <data name="AccountCreatePassword" xml:space="preserve"><value>Create a local password</value></data>
+  <data name="AccountCreatePasswordHint" xml:space="preserve"><value>Verify your linked Microsoft account again to create a local password as an additional sign-in method.</value></data>
+  <data name="AccountVerifyCreatePassword" xml:space="preserve"><value>Verify Microsoft &amp; create password</value></data>
+  <data name="AccountVerifySignOut" xml:space="preserve"><value>Verify Microsoft &amp; sign out everywhere</value></data>
+  <data name="AccountVerificationUnavailable" xml:space="preserve"><value>Microsoft verification requires HTTPS and enabled SSO. Contact an Admin if unavailable.</value></data>
+  <data name="AccountPasswordsMismatch" xml:space="preserve"><value>Enter a new password and a matching confirmation.</value></data>
+  <data name="AccountPasswordPolicy" xml:space="preserve"><value>Use at least 6 characters, a lowercase letter and a digit. Avoid reusing a password from another service.</value></data>
+  <data name="AccountPasswordCreated" xml:space="preserve"><value>Your local password has been created. Microsoft sign-in remains linked.</value></data>
+  <data name="AccountMicrosoftVerified" xml:space="preserve"><value>Your Microsoft identity has been verified. Confirm to revoke all sessions now.</value></data>
+  <data name="AccountOverviewHint" xml:space="preserve"><value>Manage your profile, preferences, password and Microsoft account.</value></data>
+  <data name="AccountBrowserOptedOut" xml:space="preserve"><value>Browser notifications are turned off in your account preferences. Enable them in Account settings before registering a device.</value></data>
 </root>

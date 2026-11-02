@@ -11,8 +11,8 @@ AI extraction · Quantity-based splitting · Payment approval · Guest links · 
 ![SQLite](https://img.shields.io/badge/SQLite-zero_config-003B57?logo=sqlite&logoColor=white)
 ![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows&logoColor=white)
 ![Languages](https://img.shields.io/badge/UI-ID_%7C_EN-CDFF70?labelColor=003A40)
-![Release](https://img.shields.io/badge/release-v1.2.1-CDFF70?labelColor=003A40)
-![Tests](https://img.shields.io/badge/tests-271_passing-CDFF70?labelColor=003A40)
+![Release](https://img.shields.io/badge/release-v1.3.0-CDFF70?labelColor=003A40)
+![Tests](https://img.shields.io/badge/tests-292_passing-CDFF70?labelColor=003A40)
 
 </div>
 
@@ -86,6 +86,7 @@ SplitBill is a self-hosted ASP.NET Core 8 application that turns one or more rec
 | 🖼️ | **One long share image** | Uploader or Admin shares all, selected, or one participant in a single readable 1000px JPEG; Members can share only their own bill. “Shared with” appears for fractional item shares below one unit, with HTTP download fallback. |
 | 🔗 | **Guest access** | Account-free read-only personal and whole-transaction links with separate revocation. The Share dialog includes one whole-transaction link, guest-specific links, and the JPG tab for the uploader or Admin, even when every participant is a guest. |
 | 💱 | **Multi-currency** | Bills stay payable in their receipt currency; a saved exchange-rate snapshot powers IDR reporting. Admin configures the provider and up to four current-rate cards on the operational dashboard. |
+| ⚙️ | **Personal account settings** | Edit your display name, keep language preferences across devices, control Teams/browser notifications, revoke all sessions, and create a local password after fresh linked-Microsoft verification. |
 | 👥 | **Role and user management** | Admin has global access and user management, Moderator manages owned transactions, and Member sees only linked bills and shared report context. |
 | 📈 | **Perspective-switchable dashboard** | Admin and Moderator toggle between operational overview and personal spending overview (`?view=personal`); pure Members receive their private spending dashboard. |
 | 📲 | **Installable PWA** | Responsive ID/EN interface with grouped SVG sidebar and compact mobile Menu, install prompt, static offline shell, and optional HTTPS browser push without caching authenticated pages or private images. |

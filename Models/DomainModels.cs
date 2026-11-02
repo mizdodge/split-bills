@@ -15,7 +15,7 @@ public enum PaymentApprovalStatus { Pending = 0, Approved = 1, Rejected = 2 }
 public enum NotificationType { BillAssigned = 0, PaymentSubmitted = 1, PaymentApproved = 2, PaymentRejected = 3, PaymentReopened = 4, PushTest = 5 }
 public enum WebPushDeliveryStatus { Pending = 0, Processing = 1, Sent = 2, DeadLetter = 3, Cancelled = 4 }
 public enum SharePointNotificationEventType { BillAssigned = 0, PaymentApprovalRequested = 1, PaymentRejected = 2, FoodPickupSelected = 3 }
-public enum SharePointNotificationStatus { Pending = 0, Processing = 1, Sent = 2, DeadLetter = 3 }
+public enum SharePointNotificationStatus { Pending = 0, Processing = 1, Sent = 2, DeadLetter = 3, Cancelled = 4 }
 public enum FoodPickupDrawKind { Initial = 0, AutomaticRedraw = 1, AdminReroll = 2 }
 public enum FoodPickupSelectionStrategy { WeightedRandom = 0, RoundRobin = 1, Points = 2 }
 public enum CurrencyProviderKind { FrankfurterV2 = 0 }
@@ -33,7 +33,11 @@ public enum AdminUserAuditAction
     Enabled = 5,
     MicrosoftLinked = 6,
     MicrosoftUnlinked = 7,
-    MicrosoftAdminPrelinked = 8
+    MicrosoftAdminPrelinked = 8,
+    SelfProfileUpdated = 9,
+    SelfPreferencesUpdated = 10,
+    SelfSessionsRevoked = 11,
+    SelfLocalPasswordCreated = 12
 }
 
 /// <summary>Authoritative shared Entra credentials for Microsoft Integration.</summary>
@@ -186,6 +190,7 @@ public sealed class SharePointNotificationOutbox
     [MaxLength(100)] public string EventId { get; set; } = string.Empty;
     public SharePointNotificationEventType EventType { get; set; }
     [MaxLength(320)] public string RecipientEmail { get; set; } = string.Empty;
+    [MaxLength(450)] public string? RecipientUserId { get; set; }
     [MaxLength(100)] public string RecipientName { get; set; } = string.Empty;
     [MaxLength(100)] public string ActorName { get; set; } = string.Empty;
     [MaxLength(200)] public string Title { get; set; } = string.Empty;

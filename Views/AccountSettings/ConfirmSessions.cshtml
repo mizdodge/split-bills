@@ -1,0 +1,4 @@
+@model string
+@{ ViewData["Title"] = L["AccountSignOutEverywhere"]; }
+<div class="page-heading compact"><div><h1>@L["AccountSignOutEverywhere"]</h1><p>@L["AccountSessionsHint"]</p></div></div>
+<section class="content-card account-security-confirm"><form asp-action="RevokeSessions" method="post"><input type="hidden" name="requestId" value="@Model" /><p>@L["AccountMicrosoftVerified"]</p><div class="form-actions"><a class="btn btn-light" asp-action="Index">@L["Cancel"]</a><button type="submit" class="btn btn-outline-danger">@L["AccountSignOutEverywhere"]</button></div></form></section>

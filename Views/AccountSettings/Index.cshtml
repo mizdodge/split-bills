@@ -3,10 +3,37 @@
 @{
     ViewData["Title"] = L["AccountSettings"];
     var connected = Model.User.MicrosoftSubject is not null && !Model.User.MicrosoftLinkRevoked;
+    var canVerifyMicrosoft = connected && Model.SsoEnabled && Context.Request.IsHttps;
 }
-<div class="page-heading"><div><span class="eyebrow">@Model.User.DisplayName</span><h1>@L["AccountSettings"]</h1><p>@L["AccountSettingsHelp"]</p></div></div>
+<div class="page-heading"><div><span class="eyebrow">@Model.User.DisplayName</span><h1>@L["AccountSettings"]</h1><p>@L["AccountOverviewHint"]</p></div></div>
 @if (TempData["ErrorMessage"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
 <div class="account-settings-grid">
+    <section class="content-card account-profile-card">
+        <div class="section-head"><div><h2>@L["AccountProfile"]</h2><p>@L["AccountProfileHint"]</p></div></div>
+        <dl class="account-profile-facts">
+            <div><dt>@L["Username"]</dt><dd>@@@Model.User.UserName</dd></div>
+            <div><dt>@L["Email"]</dt><dd>@(string.IsNullOrWhiteSpace(Model.User.Email) ? L["AccountNoEmail"].Value : Model.User.Email)</dd></div>
+            <div><dt>@L["UserRole"]</dt><dd>@string.Join(", ", Model.Roles.Select(role => L[role].Value))</dd></div>
+        </dl>
+        <p class="text-muted account-section-note">@L["AccountReadOnlyHint"]</p>
+        <form method="post" asp-action="Profile">
+            <div class="form-group"><label for="profile-name">@L["AccountDisplayName"]</label><input id="profile-name" name="DisplayName" value="@Model.User.DisplayName" class="form-control" maxlength="100" required autocomplete="name" /></div>
+            <button class="btn btn-primary" type="submit">@L["AccountSaveProfile"]</button>
+        </form>
+    </section>
+    <section class="content-card">
+        <div class="section-head"><div><h2>@L["AccountPreferences"]</h2><p>@L["AccountPreferencesHint"]</p></div></div>
+        <form method="post" asp-action="Preferences">
+            <div class="form-group"><label for="account-culture">@L["AccountLanguage"]</label><select id="account-culture" name="Culture" class="form-select">
+                <option value="id-ID" selected="@((Model.User.PreferredCulture ?? System.Globalization.CultureInfo.CurrentUICulture.Name) == "id-ID")">Bahasa Indonesia</option>
+                <option value="en-US" selected="@((Model.User.PreferredCulture ?? System.Globalization.CultureInfo.CurrentUICulture.Name) == "en-US")">English</option>
+            </select></div>
+            <label class="account-preference-row"><span><strong>@L["AccountTeamsNotifications"]</strong><small>@L["AccountTeamsNotificationsHint"]</small></span><input type="checkbox" name="TeamsNotificationsEnabled" value="true" checked="@Model.User.TeamsNotificationsEnabled" /></label>
+            <label class="account-preference-row"><span><strong>@L["AccountBrowserNotifications"]</strong><small>@L["AccountBrowserNotificationsHint"]</small></span><input type="checkbox" name="BrowserNotificationsEnabled" value="true" checked="@Model.User.BrowserNotificationsEnabled" /></label>
+            <p class="account-section-note text-muted">@L["AccountInAppAlwaysOn"]</p>
+            <button class="btn btn-primary" type="submit">@L["AccountSavePreferences"]</button>
+        </form>
+    </section>
     <section class="content-card">
         <div class="section-head"><h2>@L["LocalPassword"]</h2></div>
         @if (Model.HasPassword)
@@ -14,7 +41,30 @@
             <p>@L["LocalPasswordHelp"]</p>
             <a class="btn btn-light" asp-controller="Account" asp-action="ChangePassword">@L["ChangePassword"]</a>
         }
-        else { <p>@L["MicrosoftLocalPasswordRequired"]</p> }
+        else
+        {
+            <p>@L["AccountCreatePasswordHint"]</p>
+            @if (canVerifyMicrosoft)
+            {
+                <form asp-action="VerifyMicrosoft" method="post"><input type="hidden" name="purpose" value="@AccountSelfService.PasswordPurpose" /><button class="btn btn-light" type="submit"><partial name="_MicrosoftLogo" /> @L["AccountVerifyCreatePassword"]</button></form>
+            }
+            else { <p class="text-muted">@L["AccountVerificationUnavailable"]</p> }
+        }
+    </section>
+    <section class="content-card account-sessions-card">
+        <div class="section-head"><div><h2>@L["AccountSessions"]</h2><p>@L["AccountSessionsHint"]</p></div></div>
+        @if (Model.HasPassword)
+        {
+            <form asp-action="RevokeSessions" method="post">
+                <div class="form-group"><label for="revoke-password">@L["CurrentPassword"]</label><input id="revoke-password" name="password" type="password" class="form-control" required autocomplete="current-password" /></div>
+                <button class="btn btn-outline-danger" type="submit">@L["AccountSignOutEverywhere"]</button>
+            </form>
+        }
+        else if (canVerifyMicrosoft)
+        {
+            <form asp-action="VerifyMicrosoft" method="post"><input type="hidden" name="purpose" value="@AccountSelfService.SessionsPurpose" /><button class="btn btn-outline-danger" type="submit"><partial name="_MicrosoftLogo" /> @L["AccountVerifySignOut"]</button></form>
+        }
+        else { <p class="text-muted">@L["AccountVerificationUnavailable"]</p> }
     </section>
     @if (!MicrosoftAccountService.IsRecoveryAdmin(Model.User))
     {

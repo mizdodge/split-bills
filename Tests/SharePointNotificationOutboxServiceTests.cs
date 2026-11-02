@@ -32,6 +32,25 @@ public sealed class SharePointNotificationOutboxServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task PersonalTeamsOptOutSuppressesAllRecipientEvents()
+    {
+        foreach (var user in await db.Users.ToListAsync()) user.TeamsNotificationsEnabled = false;
+        await db.SaveChangesAsync();
+        var participant = new TransactionParticipant { Id = 44, Name = "Member", Amount = 1000,
+            AccountLink = new ParticipantAccountLink { UserId = "member" } };
+        var transaction = new BillTransaction { Id = 12, TransactionNumber = "OPT-OUT", MerchantName = "Cafe",
+            UploadedByUserId = "owner", Participants = [participant] };
+        participant.Transaction = transaction;
+        var service = new SharePointNotificationOutboxService(db);
+        await service.EnqueueBillAssignmentsAsync(transaction, "owner");
+        await service.EnqueuePaymentApprovalRequestedAsync(participant, new PaymentApproval { Id = 1 }, "member");
+        await service.EnqueuePaymentRejectedAsync(participant, new PaymentApproval { Id = 1, Note = "Retry" }, "owner");
+        await service.EnqueueFoodPickupSelectedAsync(transaction, new FoodPickupAssignment { SelectedUserId = "member", SelectedParticipantId = 44 },
+            new FoodPickupDrawHistory { Id = 99 }, "owner");
+        await db.SaveChangesAsync(); Assert.Empty(await db.SharePointNotificationOutbox.ToListAsync());
+    }
+
+    [Fact]
     public async Task BillAssignmentCreatesOnePendingRowForLinkedAccount()
     {
         var originalCulture = CultureInfo.CurrentUICulture;

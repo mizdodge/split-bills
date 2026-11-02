@@ -33,3 +33,7 @@ Public setup and operational guides:
 - [IIS setup and deployment](guides/SERVER_SETUP.md)
 
 Internal implementation plans stay outside release packages.
+
+## Account settings
+
+[Personal account settings](guides/ACCOUNT_SETTINGS.md) covers profile, per-account language and outbound notification preferences, session revocation, passwordless Microsoft verification, recovery and additive deployment behavior.

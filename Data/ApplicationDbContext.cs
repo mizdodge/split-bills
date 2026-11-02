@@ -11,6 +11,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<MicrosoftIntegrationConfiguration> MicrosoftIntegrationConfigurations => Set<MicrosoftIntegrationConfiguration>();
     public DbSet<MicrosoftLoginConfiguration> MicrosoftLoginConfigurations => Set<MicrosoftLoginConfiguration>();
     public DbSet<MicrosoftAccountLinkIntent> MicrosoftAccountLinkIntents => Set<MicrosoftAccountLinkIntent>();
+    public DbSet<AccountSecurityRequest> AccountSecurityRequests => Set<AccountSecurityRequest>();
     public DbSet<SharePointConfiguration> SharePointConfigurations => Set<SharePointConfiguration>();
     public DbSet<SharePointNotificationOutbox> SharePointNotificationOutbox => Set<SharePointNotificationOutbox>();
     public DbSet<FoodPickupConfiguration> FoodPickupConfigurations => Set<FoodPickupConfiguration>();
@@ -43,6 +44,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<AccountSecurityRequest>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<BillTransaction>()
             .HasIndex(x => x.TransactionNumber)

@@ -59,6 +59,7 @@ builder.Services.AddAuthentication()
     .AddOpenIdConnect("MicrosoftLink", MicrosoftOidcConfiguration.Configure);
 builder.Services.AddSingleton<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>, MicrosoftOidcNamedOptions>();
 builder.Services.AddScoped<IMicrosoftAccountService, MicrosoftAccountService>();
+builder.Services.AddScoped<IAccountSelfService, AccountSelfService>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnValidatePrincipal = MicrosoftSessionValidator.ValidateAsync;
@@ -210,16 +211,19 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
-app.UseRequestLocalization(new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("id-ID"),
-    SupportedCultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") },
-    SupportedUICultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") }
-});
 app.UseRouting();
 app.UseSession();
 app.UseRateLimiter();
 app.UseAuthentication();
+var accountLocalization = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("id-ID"),
+    SupportedCultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") },
+    SupportedUICultures = new[] { new CultureInfo("id-ID"), new CultureInfo("en-US") }
+};
+accountLocalization.RequestCultureProviders.Insert(0, new AccountCultureProvider());
+app.UseRequestLocalization(accountLocalization);
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

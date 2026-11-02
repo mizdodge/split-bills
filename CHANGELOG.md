@@ -1,3 +1,10 @@
+## 1.3.0 — 2026-11-02
+
+- Added personal profile settings, read-only identity/role information, account-wide ID/EN language and Teams/browser delivery preferences while retaining in-app history.
+- Added sign-out-everywhere with immediate cookie stamp validation and device-subscription revocation. Current local password or fresh bound Microsoft proof is required.
+- Added local-password creation for passwordless linked accounts after fresh Microsoft reauthentication, with single-use, owner/browser/purpose/config-bound requests and audit events. Existing Microsoft linking and local recovery remain.
+- Added additive schema upgrades, localized responsive settings, account/Entra setup documentation and security regression tests.
+
 ## 1.2.1 — 2026-11-02
 
 - Aligned navigation format with SplitBill Pro: grouped desktop links, consistent outline SVG icons, pinned profile/settings/logout and independent sidebar scrolling.
